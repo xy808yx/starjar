@@ -618,6 +618,40 @@
 
   .milestone-card.unlocked .milestone-label { color: #7E5A1E; }
 
+  /* ─── Milestone redemption states ─── */
+  .milestone-card.ready { cursor: pointer; animation: milestonePulse 1.8s ease-in-out infinite; }
+  @keyframes milestonePulse {
+    0%, 100% { transform: translateY(-1px) scale(1); }
+    50% { transform: translateY(-3px) scale(1.035); }
+  }
+  .milestone-card.ready:active { transform: scale(0.97); }
+  .milestone-card.pending { filter: saturate(0.85); }
+
+  .milestone-card.claimed {
+    background: linear-gradient(160deg, #F3EEE4, #E7DECB);
+    box-shadow: var(--card-shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    opacity: 0.6;
+  }
+  .milestone-card.claimed .milestone-icon { filter: grayscale(0.3) opacity(0.75); }
+
+  .milestone-cta {
+    font-family: 'Baloo 2', cursive;
+    font-size: 11px;
+    font-weight: 700;
+    margin-top: 5px;
+    position: relative;
+    color: #B26A00;
+  }
+  .milestone-card.pending .milestone-cta { color: #9A6512; }
+  .milestone-cta.claimed-cta { color: var(--check-green); }
+  .milestone-progress {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-faint);
+    margin-top: 5px;
+    position: relative;
+  }
+
   /* ─── Parent Zone ─── */
   .parent-zone-toggle {
     position: fixed;
@@ -960,6 +994,62 @@
 
   .celebration-close:active { transform: scale(0.96); }
 
+  .celebration-action {
+    font-family: 'Baloo 2', cursive;
+    font-size: 20px;
+    font-weight: 700;
+    background: linear-gradient(180deg, #FFE08A, #FFC83C 60%, #F2A23A);
+    color: #6B4A12;
+    border: none;
+    border-radius: 60px;
+    padding: 16px 50px;
+    cursor: pointer;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 22px rgba(244, 180, 60, 0.45), inset 0 1.5px 0 rgba(255, 255, 255, 0.6);
+    transition: transform 0.18s var(--ease-bounce);
+  }
+  .celebration-action:active { transform: scale(0.96); }
+
+  /* ─── Parent: prizes to hand out ─── */
+  .pz-prizes {
+    background: linear-gradient(160deg, #FFF6DC, #FFE9B8);
+    border: 1.5px solid rgba(214, 150, 40, 0.45);
+    border-radius: var(--radius-sm);
+    padding: 13px 14px 9px;
+    margin-bottom: 18px;
+  }
+  .pz-prizes-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 16px;
+    font-weight: 700;
+    color: #8A5A12;
+    margin-bottom: 8px;
+  }
+  .pz-prize-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 9px 0;
+    border-top: 1px solid rgba(214, 150, 40, 0.22);
+  }
+  .pz-prize-row:first-of-type { border-top: none; }
+  .pz-prize-info { font-size: 14px; font-weight: 600; color: var(--text); }
+  .pz-prize-actions { display: flex; gap: 7px; flex-shrink: 0; }
+  .pz-prize-give, .pz-prize-later {
+    font-family: 'Baloo 2', cursive;
+    font-size: 13px;
+    font-weight: 700;
+    border: none;
+    border-radius: 40px;
+    padding: 8px 14px;
+    cursor: pointer;
+    transition: transform 0.15s var(--ease-bounce);
+  }
+  .pz-prize-give { background: var(--check-green); color: white; }
+  .pz-prize-later { background: rgba(120, 90, 50, 0.1); color: var(--text-soft); }
+  .pz-prize-give:active, .pz-prize-later:active { transform: scale(0.95); }
+
   /* celebration confetti */
   .confetti-piece {
     position: absolute;
@@ -1168,6 +1258,7 @@
   <div class="celebration-icon" id="celebIcon"></div>
   <h2 id="celebTitle"></h2>
   <p id="celebText"></p>
+  <button class="celebration-action" id="celebActionBtn" onclick="claimMilestone()" style="display:none"></button>
   <button class="celebration-close" onclick="closeCelebration()">Awesome! ⭐</button>
 </div>
 
@@ -1219,12 +1310,19 @@ function freshDayState() {
   return { tasks, approved: false };
 }
 
+function freshMilestones() {
+  const m = {};
+  MILESTONES.forEach(ms => m[ms.key] = { redeemed: false, pending: false });
+  return m;
+}
+
 function initState(name) {
   return {
     name,
     streak: 0,
     totalStars: 0,
-    milestonesUnlocked: {},
+    cycleBase: 0,
+    milestones: freshMilestones(),
     days: { [getToday()]: freshDayState() }
   };
 }
@@ -1232,7 +1330,10 @@ function initState(name) {
 function ensureToday(state) {
   const today = getToday();
   if (!state.days[today]) state.days[today] = freshDayState();
-  if (!state.milestonesUnlocked) state.milestonesUnlocked = {};
+  if (!state.milestones) state.milestones = freshMilestones();
+  if (typeof state.cycleBase !== 'number') state.cycleBase = 0;
+  MILESTONES.forEach(ms => { if (!state.milestones[ms.key]) state.milestones[ms.key] = { redeemed: false, pending: false }; });
+  delete state.milestonesUnlocked;
   return state;
 }
 
@@ -1267,8 +1368,21 @@ function computeBestStreak(state) {
 function syncDerived(state) {
   state.streak = computeStreak(state);
   state.totalStars = computeTotalStars(state);
-  MILESTONES.forEach(ms => { if (state.streak >= ms.days) state.milestonesUnlocked[ms.key] = true; });
+  if (!state.milestones) { state.milestones = freshMilestones(); state.cycleBase = 0; }
+  // A broken streak collapses below the current cycle's start — restart the ladder.
+  if (state.streak < (state.cycleBase || 0)) {
+    state.cycleBase = 0;
+    MILESTONES.forEach(ms => { state.milestones[ms.key].redeemed = false; state.milestones[ms.key].pending = false; });
+  }
   return state;
+}
+
+// 'locked' | 'ready' | 'pending' | 'claimed' — availability is relative to the cycle, not the raw streak.
+function milestoneStatus(state, ms) {
+  const m = (state.milestones && state.milestones[ms.key]) || { redeemed: false, pending: false };
+  if (m.pending) return 'pending';
+  if (m.redeemed) return 'claimed';
+  return (state.streak - (state.cycleBase || 0)) >= ms.days ? 'ready' : 'locked';
 }
 
 // ═══════ ONBOARDING ═══════
@@ -1533,13 +1647,24 @@ function renderJarStars(count) {
 // ═══════ MILESTONES ═══════
 function renderMilestones(state) {
   const grid = document.getElementById('milestonesGrid');
+  const pos = state.streak - (state.cycleBase || 0);
   grid.innerHTML = MILESTONES.map(ms => {
-    const unlocked = state.milestonesUnlocked[ms.key] || state.streak >= ms.days;
+    const status = milestoneStatus(state, ms);
+    const cls = status === 'ready' ? 'unlocked ready'
+      : status === 'pending' ? 'unlocked pending'
+      : status === 'claimed' ? 'claimed' : '';
+    let footer;
+    if (status === 'ready') footer = `<div class="milestone-cta">🎁 Tap to claim!</div>`;
+    else if (status === 'pending') footer = `<div class="milestone-cta">⏳ Ask a grown-up</div>`;
+    else if (status === 'claimed') footer = `<div class="milestone-cta claimed-cta">Claimed ✓</div>`;
+    else { const left = Math.max(0, ms.days - pos); footer = `<div class="milestone-progress">${left} more ${left === 1 ? 'day' : 'days'}</div>`; }
+    const tap = status === 'ready' ? `onclick="openClaim('${ms.key}')"` : '';
     return `
-      <div class="milestone-card ${unlocked ? 'unlocked' : ''}">
+      <div class="milestone-card ${cls}" ${tap}>
         <div class="milestone-icon">${ms.icon}</div>
         <div class="milestone-days">${ms.days} days</div>
         <div class="milestone-label">${ms.label}</div>
+        ${footer}
       </div>
     `;
   }).join('');
@@ -1582,6 +1707,19 @@ function renderParentPanel() {
   const today = getToday();
   const monthName = pzMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   const best = computeBestStreak(state);
+  const pending = MILESTONES.filter(ms => state.milestones[ms.key] && state.milestones[ms.key].pending);
+  const prizesSection = pending.length ? `
+    <div class="pz-prizes">
+      <div class="pz-prizes-title">🎁 Prizes to hand out</div>
+      ${pending.map(ms => `
+        <div class="pz-prize-row">
+          <span class="pz-prize-info">${ms.icon} ${ms.label}</span>
+          <span class="pz-prize-actions">
+            <button class="pz-prize-give" onclick="pzConfirmPrize('${ms.key}')">Gave it ✓</button>
+            <button class="pz-prize-later" onclick="pzCancelPrize('${ms.key}')">Not yet</button>
+          </span>
+        </div>`).join('')}
+    </div>` : '';
   const monthApproved = Object.keys(state.days).filter(k => {
     const d = parseKey(k);
     return state.days[k].approved && d.getMonth() === pzMonth.getMonth() && d.getFullYear() === pzMonth.getFullYear();
@@ -1597,6 +1735,7 @@ function renderParentPanel() {
       <div class="pz-stat"><div class="pz-stat-num">⭐ ${state.totalStars}</div><div class="pz-stat-lbl">Total stars</div></div>
       <div class="pz-stat"><div class="pz-stat-num">🏆 ${best}</div><div class="pz-stat-lbl">Best streak</div></div>
     </div>
+    ${prizesSection}
 
     <div class="pz-cal-head">
       <button class="pz-nav" onclick="pzNav(-1)">‹</button>
@@ -1686,19 +1825,38 @@ function pzToggleTask(key, taskId) {
 function pzToggleApproved(key) {
   const state = ensureToday(loadState());
   if (!state.days[key]) state.days[key] = freshDayState();
-  const before = Object.assign({}, state.milestonesUnlocked);
   state.days[key].approved = !state.days[key].approved;
   syncDerived(state);
   saveState(state);
   render(state);
-  let newMilestone = null;
-  MILESTONES.forEach(ms => { if (state.milestonesUnlocked[ms.key] && !before[ms.key]) newMilestone = ms; });
-  if (newMilestone) {
-    closeParentZone();
-    setTimeout(() => showCelebration(newMilestone, state), 350);
-  } else {
-    renderParentPanel();
+  renderParentPanel();
+}
+
+function pzConfirmPrize(key) {
+  const state = ensureToday(loadState());
+  const m = state.milestones[key];
+  if (!m) return;
+  m.pending = false;
+  m.redeemed = true;
+  // Cashing out the top prize completes the cycle and restarts the ladder.
+  const capstone = MILESTONES[MILESTONES.length - 1];
+  if (key === capstone.key) {
+    state.cycleBase = (state.cycleBase || 0) + capstone.days;
+    MILESTONES.forEach(ms => { state.milestones[ms.key].redeemed = false; state.milestones[ms.key].pending = false; });
   }
+  syncDerived(state);
+  saveState(state);
+  render(state);
+  renderParentPanel();
+}
+
+function pzCancelPrize(key) {
+  const state = ensureToday(loadState());
+  if (state.milestones[key]) state.milestones[key].pending = false;
+  syncDerived(state);
+  saveState(state);
+  render(state);
+  renderParentPanel();
 }
 
 function closeParentZone() {
@@ -1712,12 +1870,34 @@ document.getElementById('parentOverlay').addEventListener('click', (e) => {
 // Day approval now lives in the Parent Dashboard (see pzToggleApproved).
 
 // ═══════ CELEBRATION ═══════
-function showCelebration(milestone, state) {
-  document.getElementById('celebIcon').textContent = milestone.icon;
-  document.getElementById('celebTitle').textContent = `${milestone.days}-Day Streak!`;
-  document.getElementById('celebText').textContent = `You earned: ${milestone.label}`;
+let claimKey = null;
+function openClaim(key) {
+  const ms = MILESTONES.find(m => m.key === key);
+  if (!ms) return;
+  claimKey = key;
+  document.getElementById('celebIcon').textContent = ms.icon;
+  document.getElementById('celebTitle').textContent = `${ms.days}-Day Prize!`;
+  document.getElementById('celebText').textContent = `You earned: ${ms.label}`;
+  const action = document.getElementById('celebActionBtn');
+  action.textContent = 'Claim it! 🎁';
+  action.style.display = '';
+  document.querySelector('.celebration-close').textContent = 'Maybe later';
   document.getElementById('celebration').classList.add('show');
   spawnConfetti();
+}
+
+function claimMilestone() {
+  if (!claimKey) return;
+  const state = ensureToday(loadState());
+  if (state.milestones[claimKey]) state.milestones[claimKey].pending = true;
+  syncDerived(state);
+  saveState(state);
+  render(state);
+  claimKey = null;
+  document.getElementById('celebTitle').textContent = 'Yay!';
+  document.getElementById('celebText').textContent = 'Go tell a grown-up to give you your prize! 🎉';
+  document.getElementById('celebActionBtn').style.display = 'none';
+  document.querySelector('.celebration-close').textContent = 'Okay! ⭐';
 }
 
 function spawnConfetti() {
@@ -1745,6 +1925,9 @@ function closeCelebration() {
   const c = document.getElementById('celebration');
   c.classList.remove('show');
   c.querySelectorAll('.confetti-piece').forEach(p => p.remove());
+  document.getElementById('celebActionBtn').style.display = 'none';
+  document.querySelector('.celebration-close').textContent = 'Awesome! ⭐';
+  claimKey = null;
 }
 
 // ═══════ RESET ═══════
