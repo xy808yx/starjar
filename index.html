@@ -414,11 +414,54 @@
   }
 
   .routine-target {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-faint);
-    margin-top: 1px;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    width: fit-content;
+    margin-top: 6px;
+    padding: 4px 14px 5px;
+    border-radius: 30px;
+    font-family: 'Baloo 2', cursive;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 2px 6px rgba(150, 116, 74, 0.12);
   }
+  .routine-target .rt-pre { font-size: 13px; font-weight: 600; opacity: 0.8; }
+  .routine-target .rt-time { font-size: 20px; font-weight: 800; letter-spacing: 0.2px; }
+  #morningBlock .routine-target { background: linear-gradient(160deg, #FFF1CF, #FFDF9A); color: #97600F; }
+  #bedtimeBlock .routine-target { background: linear-gradient(160deg, #F1EBFA, #DCD0F1); color: #5C4986; }
+
+  /* time-of-day foregrounding */
+  .routine-header { cursor: pointer; }
+  .routine-chevron {
+    margin-left: 8px;
+    font-size: 13px;
+    color: var(--text-faint);
+    transition: transform 0.28s var(--ease-out);
+    flex-shrink: 0;
+  }
+  .routine-block.deemph { opacity: 0.6; }
+  .routine-block.deemph .task-list { display: none; }
+  .routine-block.deemph .routine-chevron { transform: rotate(-90deg); }
+
+  /* completion toast */
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: calc(94px + env(safe-area-inset-bottom));
+    transform: translateX(-50%) translateY(16px);
+    background: linear-gradient(180deg, #FFFFFF, #FFF6E2);
+    color: var(--text);
+    font-family: 'Baloo 2', cursive;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 12px 22px;
+    border-radius: 40px;
+    box-shadow: 0 12px 30px rgba(150, 116, 74, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 250;
+    transition: opacity 0.3s ease, transform 0.3s var(--ease-bounce);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
   .routine-progress {
     margin-left: auto;
@@ -1229,26 +1272,28 @@
 
   <!-- Morning -->
   <div class="routine-block" id="morningBlock">
-    <div class="routine-header">
+    <div class="routine-header" onclick="toggleRoutine('morning')">
       <div class="routine-icon morning">☀️</div>
       <div class="routine-titlegroup">
         <div class="routine-title">Morning</div>
-        <div class="routine-target">🕗 by 8:00 AM</div>
+        <div class="routine-target"><span class="rt-pre">by</span><span class="rt-time">8:00 AM</span></div>
       </div>
       <div class="routine-progress" id="morningProgress">0/5</div>
+      <span class="routine-chevron">▾</span>
     </div>
     <ul class="task-list" id="morningTasks"></ul>
   </div>
 
   <!-- Bedtime -->
   <div class="routine-block" id="bedtimeBlock">
-    <div class="routine-header">
+    <div class="routine-header" onclick="toggleRoutine('bedtime')">
       <div class="routine-icon bedtime">🌙</div>
       <div class="routine-titlegroup">
         <div class="routine-title">Bedtime</div>
-        <div class="routine-target">🕗 by 8:00 PM</div>
+        <div class="routine-target"><span class="rt-pre">by</span><span class="rt-time">8:00 PM</span></div>
       </div>
       <div class="routine-progress" id="bedtimeProgress">0/5</div>
+      <span class="routine-chevron">▾</span>
     </div>
     <ul class="task-list" id="bedtimeTasks"></ul>
   </div>
@@ -1267,6 +1312,9 @@
 <div class="parent-overlay" id="parentOverlay">
   <div class="parent-panel" id="parentPanel"></div>
 </div>
+
+<!-- Completion toast -->
+<div class="toast" id="toast"></div>
 
 <!-- Celebration -->
 <div class="celebration" id="celebration">
@@ -1347,6 +1395,7 @@ function ensureToday(state) {
   if (!state.days[today]) state.days[today] = freshDayState();
   if (!state.milestones) state.milestones = freshMilestones();
   if (typeof state.cycleBase !== 'number') state.cycleBase = 0;
+  if (typeof state.muted !== 'boolean') state.muted = false;
   delete state.milestonesUnlocked;
   return state;
 }
@@ -1420,6 +1469,10 @@ function launchApp() {
   showApp(state);
 }
 
+// Module state read by render() on load — declared before INIT to avoid a temporal-dead-zone error.
+let appMuted = false;
+let routineToggled = { morning: null, bedtime: null }; // null = auto (by time); else explicit open/closed
+
 // ═══════ INIT ═══════
 const existingState = loadState();
 if (existingState) {
@@ -1443,6 +1496,7 @@ function render(state) {
   const today = getToday();
   const dayState = state.days[today];
   const isApproved = dayState.approved;
+  appMuted = !!state.muted;
 
   // Greeting
   const hour = new Date().getHours();
@@ -1468,6 +1522,9 @@ function render(state) {
 
   // Milestones
   renderMilestones(state);
+
+  // Foreground the routine relevant to the time of day
+  applyForegrounding();
 }
 
 function renderTaskList(containerId, tasks, dayState, state, progressId, disabled) {
@@ -1492,20 +1549,32 @@ function toggleTask(taskId, el) {
   const state = ensureToday(loadState());
   const today = getToday();
   if (state.days[today].approved) return;
+  const ds = state.days[today];
 
-  const newVal = !state.days[today].tasks[taskId];
-  state.days[today].tasks[taskId] = newVal;
+  // routine-completion snapshot before the change
+  const beforeM = MORNING_TASKS.every(t => ds.tasks[t.id]);
+  const beforeB = BEDTIME_TASKS.every(t => ds.tasks[t.id]);
+
+  const newVal = !ds.tasks[taskId];
+  ds.tasks[taskId] = newVal;
   saveState(state);
 
   // Animate star flying to jar
-  if (newVal && el) {
-    animateStarToJar(el);
-  }
+  if (newVal && el) animateStarToJar(el);
 
   render(state);
 
-  // satisfying "thunk" on the box that was just tapped
-  if (newVal) flashCheckbox(taskId);
+  if (newVal) {
+    flashCheckbox(taskId);   // satisfying "thunk"
+    chimeCheck();
+    buzz(18);
+    // celebrate completions (only when checking on)
+    const afterM = MORNING_TASKS.every(t => ds.tasks[t.id]);
+    const afterB = BEDTIME_TASKS.every(t => ds.tasks[t.id]);
+    if (afterM && afterB && !(beforeM && beforeB)) celebrateDay(state.name);
+    else if (afterM && !beforeM) cueRoutine('morning');
+    else if (afterB && !beforeB) cueRoutine('bedtime');
+  }
 }
 
 function flashCheckbox(taskId) {
@@ -1513,6 +1582,84 @@ function flashCheckbox(taskId) {
   if (!box) return;
   box.classList.add('justchecked');
   setTimeout(() => box.classList.remove('justchecked'), 600);
+}
+
+// ═══════ FEEDBACK & FOREGROUNDING ═══════
+// (appMuted + routineToggled are declared just above INIT, since render() reads them on load)
+
+// Sound — synthesized via WebAudio, no audio files (keeps the single-file app).
+let _actx = null;
+function _audio() {
+  if (_actx === null) { try { _actx = new (window.AudioContext || window.webkitAudioContext)(); } catch { _actx = false; } }
+  return _actx || null;
+}
+function playTone(freqs, dur, gainPeak) {
+  if (appMuted) return;
+  const ctx = _audio();
+  if (!ctx) return;
+  if (ctx.state === 'suspended') { try { ctx.resume(); } catch {} }
+  const t0 = ctx.currentTime;
+  freqs.forEach((f, i) => {
+    const osc = ctx.createOscillator(), g = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.value = f;
+    const s = t0 + i * 0.075;
+    g.gain.setValueAtTime(0.0001, s);
+    g.gain.exponentialRampToValueAtTime(gainPeak, s + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, s + dur);
+    osc.connect(g).connect(ctx.destination);
+    osc.start(s); osc.stop(s + dur + 0.03);
+  });
+}
+function chimeCheck()   { playTone([660, 880], 0.16, 0.12); }
+function chimeRoutine() { playTone([660, 880, 1047], 0.20, 0.12); }
+function chimeDay()     { playTone([523, 659, 784, 1047], 0.30, 0.14); }
+// Haptics (Android/Chrome; iOS Safari has no web vibration — degrades silently).
+function buzz(p) { if (navigator.vibrate) { try { navigator.vibrate(p); } catch {} } }
+
+// Completion toast (small, non-takeover cue)
+let _toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  if (!t) return;
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// Big "whole day done" celebration — distinct from milestone confetti (gold/star palette).
+function celebrateDay(name) {
+  document.getElementById('celebIcon').textContent = '🌟';
+  document.getElementById('celebTitle').textContent = 'Day Complete!';
+  document.getElementById('celebText').textContent = `Every star earned today${name ? ', ' + name : ''}! 🎉`;
+  document.getElementById('celebActionBtn').style.display = 'none';
+  document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
+  document.getElementById('celebration').classList.add('show');
+  spawnConfetti(['#FFD700', '#FFC83C', '#FFE488', '#FFF3CE', '#FFFFFF', '#F2A23A']);
+  chimeDay();
+  buzz([30, 40, 30, 40, 70]);
+}
+function cueRoutine(which) {
+  showToast(which === 'morning' ? 'Morning all done! ☀️' : 'Bedtime all done! 🌙');
+  chimeRoutine();
+  buzz([20, 30, 20]);
+}
+
+// Time-of-day foregrounding: show the relevant routine, collapse/dim the other.
+function currentRoutine() { return new Date().getHours() < 14 ? 'morning' : 'bedtime'; }
+function isRoutineOpen(r) {
+  return routineToggled[r] !== null ? routineToggled[r] : (currentRoutine() === r);
+}
+function applyForegrounding() {
+  ['morning', 'bedtime'].forEach(r => {
+    const block = document.getElementById(r + 'Block');
+    if (block) block.classList.toggle('deemph', !isRoutineOpen(r));
+  });
+}
+function toggleRoutine(r) {
+  routineToggled[r] = !isRoutineOpen(r);
+  applyForegrounding();
 }
 
 // ═══════ STAR ANIMATION ═══════
@@ -1913,10 +2060,10 @@ function claimMilestone() {
   document.querySelector('.celebration-close').textContent = 'Okay! ⭐';
 }
 
-function spawnConfetti() {
+function spawnConfetti(colors) {
   const wrap = document.getElementById('celebration');
   wrap.querySelectorAll('.confetti-piece').forEach(p => p.remove());
-  const colors = ['#FFC83C', '#F2A23A', '#E8972E', '#8BBE72', '#C9B6EC', '#FFE488', '#FFFDF8'];
+  colors = colors || ['#FFC83C', '#F2A23A', '#E8972E', '#8BBE72', '#C9B6EC', '#FFE488', '#FFFDF8'];
   const frag = document.createDocumentFragment();
   for (let i = 0; i < 26; i++) {
     const p = document.createElement('div');
