@@ -404,11 +404,20 @@
   .routine-icon.morning { background: linear-gradient(145deg, #FFF0CE, var(--morning-deep)); }
   .routine-icon.bedtime { background: linear-gradient(145deg, #F1EBFA, var(--bedtime-deep)); }
 
+  .routine-titlegroup { display: flex; flex-direction: column; }
+
   .routine-title {
     font-family: 'Baloo 2', cursive;
     font-size: 22px;
     font-weight: 700;
     color: var(--text);
+  }
+
+  .routine-target {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-faint);
+    margin-top: 1px;
   }
 
   .routine-progress {
@@ -1222,7 +1231,10 @@
   <div class="routine-block" id="morningBlock">
     <div class="routine-header">
       <div class="routine-icon morning">☀️</div>
-      <div class="routine-title">Morning</div>
+      <div class="routine-titlegroup">
+        <div class="routine-title">Morning</div>
+        <div class="routine-target">🕗 by 8:00 AM</div>
+      </div>
       <div class="routine-progress" id="morningProgress">0/5</div>
     </div>
     <ul class="task-list" id="morningTasks"></ul>
@@ -1232,7 +1244,10 @@
   <div class="routine-block" id="bedtimeBlock">
     <div class="routine-header">
       <div class="routine-icon bedtime">🌙</div>
-      <div class="routine-title">Bedtime</div>
+      <div class="routine-titlegroup">
+        <div class="routine-title">Bedtime</div>
+        <div class="routine-target">🕗 by 8:00 PM</div>
+      </div>
       <div class="routine-progress" id="bedtimeProgress">0/5</div>
     </div>
     <ul class="task-list" id="bedtimeTasks"></ul>
