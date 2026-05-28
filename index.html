@@ -1332,7 +1332,6 @@ function ensureToday(state) {
   if (!state.days[today]) state.days[today] = freshDayState();
   if (!state.milestones) state.milestones = freshMilestones();
   if (typeof state.cycleBase !== 'number') state.cycleBase = 0;
-  MILESTONES.forEach(ms => { if (!state.milestones[ms.key]) state.milestones[ms.key] = { redeemed: false, pending: false }; });
   delete state.milestonesUnlocked;
   return state;
 }
@@ -1368,9 +1367,8 @@ function computeBestStreak(state) {
 function syncDerived(state) {
   state.streak = computeStreak(state);
   state.totalStars = computeTotalStars(state);
-  if (!state.milestones) { state.milestones = freshMilestones(); state.cycleBase = 0; }
   // A broken streak collapses below the current cycle's start — restart the ladder.
-  if (state.streak < (state.cycleBase || 0)) {
+  if (state.streak < state.cycleBase) {
     state.cycleBase = 0;
     MILESTONES.forEach(ms => { state.milestones[ms.key].redeemed = false; state.milestones[ms.key].pending = false; });
   }
@@ -1379,10 +1377,10 @@ function syncDerived(state) {
 
 // 'locked' | 'ready' | 'pending' | 'claimed' — availability is relative to the cycle, not the raw streak.
 function milestoneStatus(state, ms) {
-  const m = (state.milestones && state.milestones[ms.key]) || { redeemed: false, pending: false };
+  const m = state.milestones[ms.key];
   if (m.pending) return 'pending';
   if (m.redeemed) return 'claimed';
-  return (state.streak - (state.cycleBase || 0)) >= ms.days ? 'ready' : 'locked';
+  return (state.streak - state.cycleBase) >= ms.days ? 'ready' : 'locked';
 }
 
 // ═══════ ONBOARDING ═══════
@@ -1647,7 +1645,7 @@ function renderJarStars(count) {
 // ═══════ MILESTONES ═══════
 function renderMilestones(state) {
   const grid = document.getElementById('milestonesGrid');
-  const pos = state.streak - (state.cycleBase || 0);
+  const pos = state.streak - state.cycleBase;
   grid.innerHTML = MILESTONES.map(ms => {
     const status = milestoneStatus(state, ms);
     const cls = status === 'ready' ? 'unlocked ready'
@@ -1841,7 +1839,7 @@ function pzConfirmPrize(key) {
   // Cashing out the top prize completes the cycle and restarts the ladder.
   const capstone = MILESTONES[MILESTONES.length - 1];
   if (key === capstone.key) {
-    state.cycleBase = (state.cycleBase || 0) + capstone.days;
+    state.cycleBase += capstone.days;
     MILESTONES.forEach(ms => { state.milestones[ms.key].redeemed = false; state.milestones[ms.key].pending = false; });
   }
   syncDerived(state);
