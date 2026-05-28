@@ -1,0 +1,1565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Star Jar">
+<meta name="theme-color" content="#F6EEE0">
+<title>Star Jar</title>
+<link rel="manifest" href="./manifest.json">
+<link rel="apple-touch-icon" href="./icon-180.png">
+<link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* warm paper surfaces */
+    --bg: #F6EEE0;
+    --bg-deep: #EFE3CF;
+    --card: #FFFDF8;
+    --card-2: #FBF4E7;
+    --card-shadow: 0 8px 26px rgba(150, 116, 74, 0.12), 0 2px 6px rgba(150, 116, 74, 0.06);
+    --card-shadow-soft: 0 3px 12px rgba(150, 116, 74, 0.08);
+    --hairline: rgba(150, 116, 74, 0.12);
+
+    /* ink */
+    --text: #463528;
+    --text-soft: #8A745C;
+    --text-faint: #BBA488;
+
+    /* amber accent */
+    --accent: #E8972E;
+    --accent-deep: #CF8019;
+    --accent-glow: #F7C76B;
+    --accent-soft: #FCEBCB;
+
+    /* leaf-green check */
+    --check-green: #7CAE63;
+    --check-green-deep: #6A9B53;
+    --check-green-soft: #EAF1E1;
+
+    /* star gold */
+    --star-gold: #FFC83C;
+    --star-gold-deep: #F2A93C;
+    --star-glow: rgba(255, 196, 70, 0.55);
+
+    /* morning sun */
+    --morning: #FBE3B6;
+    --morning-deep: #F4CD82;
+    --morning-accent: #E8972E;
+
+    /* bedtime — muted lavender */
+    --bedtime: #E4DCF1;
+    --bedtime-deep: #CFC3E9;
+    --bedtime-accent: #7C6BA6;
+
+    /* streak flame */
+    --streak-flame: #F2762E;
+    --streak-flame-glow: rgba(242, 118, 46, 0.35);
+
+    --radius: 22px;
+    --radius-sm: 16px;
+    --radius-lg: 28px;
+
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    color: var(--text);
+    min-height: 100dvh;
+    overflow-x: hidden;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(135% 90% at 50% -15%, #FFF7E9 0%, rgba(255, 247, 233, 0) 52%),
+      radial-gradient(120% 80% at 50% 118%, #ECDDC4 0%, rgba(236, 221, 196, 0) 55%);
+    background-attachment: fixed;
+  }
+
+  /* subtle paper grain */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    opacity: 0.6;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.86' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.09'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+
+  /* ─── Onboarding ─── */
+  .onboarding {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100dvh;
+    padding: 40px 24px calc(40px + env(safe-area-inset-bottom));
+    text-align: center;
+    animation: fadeIn 0.8s var(--ease-out);
+  }
+
+  .onboarding-jar {
+    width: 134px;
+    height: 178px;
+    margin-bottom: 28px;
+    filter: drop-shadow(0 16px 20px rgba(150, 116, 74, 0.20));
+    animation: floatGently 3.4s ease-in-out infinite;
+  }
+
+  @keyframes floatGently {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-9px); }
+  }
+
+  .onboarding h1 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 46px;
+    font-weight: 800;
+    color: var(--accent);
+    margin-bottom: 10px;
+    letter-spacing: -0.5px;
+    text-shadow: 0 2px 0 rgba(255, 255, 255, 0.65);
+  }
+
+  .onboarding p {
+    font-size: 18px;
+    color: var(--text-soft);
+    margin-bottom: 34px;
+    line-height: 1.55;
+    font-weight: 600;
+  }
+
+  .name-input {
+    font-family: 'Nunito', sans-serif;
+    font-size: 27px;
+    font-weight: 800;
+    text-align: center;
+    border: 2.5px solid transparent;
+    border-radius: var(--radius);
+    padding: 17px 24px;
+    width: 290px;
+    max-width: 90%;
+    color: var(--text);
+    background: var(--card);
+    box-shadow: var(--card-shadow), inset 0 0 0 2px var(--accent-soft);
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s, transform 0.3s;
+  }
+
+  .name-input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 5px rgba(232, 151, 46, 0.16), var(--card-shadow);
+    transform: translateY(-1px);
+  }
+
+  .name-input::placeholder { color: var(--text-faint); font-weight: 700; }
+
+  .start-btn {
+    margin-top: 26px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 21px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: white;
+    background: linear-gradient(180deg, var(--accent-glow) 0%, var(--accent) 55%, var(--accent-deep) 100%);
+    border: none;
+    border-radius: 60px;
+    padding: 16px 52px;
+    cursor: pointer;
+    transition: transform 0.18s var(--ease-bounce), box-shadow 0.25s, opacity 0.25s;
+    box-shadow: 0 8px 22px rgba(232, 151, 46, 0.38), inset 0 1.5px 0 rgba(255, 255, 255, 0.5);
+  }
+
+  .start-btn:active { transform: scale(0.95); }
+  .start-btn:disabled { opacity: 0.4; box-shadow: none; }
+
+  /* ─── Main App ─── */
+  .app {
+    display: none;
+    flex-direction: column;
+    min-height: 100dvh;
+    padding: 20px 20px 120px;
+    max-width: 500px;
+    margin: 0 auto;
+    animation: fadeIn 0.6s ease;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── Header ─── */
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding: 4px 6px 0;
+  }
+
+  .greeting {
+    font-family: 'Baloo 2', cursive;
+    font-size: 27px;
+    font-weight: 800;
+    color: var(--text);
+    letter-spacing: -0.3px;
+    line-height: 1.12;
+  }
+
+  .streak-badge {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: linear-gradient(135deg, #FFF1DD, #FFE2BE);
+    border-radius: 40px;
+    padding: 8px 16px 8px 13px;
+    font-family: 'Baloo 2', cursive;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--streak-flame);
+    box-shadow: 0 4px 14px var(--streak-flame-glow), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+    flex-shrink: 0;
+  }
+
+  .streak-badge .flame {
+    font-size: 21px;
+    transform-origin: center 80%;
+    animation: flicker 2.6s ease-in-out infinite;
+    filter: drop-shadow(0 0 5px rgba(242, 118, 46, 0.5));
+  }
+
+  @keyframes flicker {
+    0%, 100% { transform: scale(1) rotate(-1.5deg); opacity: 0.94; }
+    25% { transform: scale(1.09, 0.95) rotate(1.5deg); opacity: 1; }
+    50% { transform: scale(0.96, 1.06) rotate(-1deg); opacity: 0.88; }
+    75% { transform: scale(1.04, 0.99) rotate(1.2deg); opacity: 1; }
+  }
+
+  /* ─── Jar Section ─── */
+  .jar-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 6px 0 26px;
+    position: relative;
+  }
+
+  .jar-section::after {
+    content: '';
+    position: absolute;
+    top: 28px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 244px;
+    height: 244px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 200, 90, 0.22) 0%, rgba(255, 200, 90, 0) 68%);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .jar-container {
+    position: relative;
+    width: 174px;
+    height: 218px;
+    z-index: 1;
+  }
+
+  .jar-svg { width: 100%; height: 100%; display: block; overflow: visible; }
+
+  .jar-container.jar-pop { animation: jarPop 0.6s var(--ease-bounce); }
+
+  @keyframes jarPop {
+    0% { transform: scale(1); }
+    35% { transform: scale(1.045); }
+    100% { transform: scale(1); }
+  }
+
+  #starFill use { transform-box: fill-box; transform-origin: center; will-change: transform, opacity; }
+  .star-glow { transform-box: fill-box; transform-origin: center; }
+
+  @keyframes starPulse {
+    0%, 100% { transform: scale(1); opacity: 0.9; }
+    50% { transform: scale(1.09); opacity: 1; }
+  }
+  @keyframes starGlowPulse {
+    0%, 100% { opacity: 0.4; transform: scale(0.9); }
+    50% { opacity: 0.85; transform: scale(1.14); }
+  }
+
+  .jar-count {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-soft);
+    z-index: 1;
+  }
+
+  .jar-count span {
+    color: var(--accent);
+    font-family: 'Baloo 2', cursive;
+    font-size: 19px;
+  }
+
+  /* ─── Star fly animation ─── */
+  .flying-star {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 30px;
+    height: 30px;
+    pointer-events: none;
+    z-index: 1000;
+    will-change: transform, offset-distance;
+    filter: drop-shadow(0 3px 6px rgba(242, 170, 58, 0.5));
+  }
+  .flying-star svg { width: 100%; height: 100%; display: block; }
+
+  .fly-sparkle {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 999;
+    background: radial-gradient(circle, rgba(255, 236, 156, 0.95) 0%, rgba(255, 205, 80, 0) 70%);
+    will-change: transform, opacity;
+  }
+
+  /* ─── Routine Blocks ─── */
+  .routine-block {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 18px 18px 10px;
+    margin-bottom: 18px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    position: relative;
+    overflow: hidden;
+  }
+
+  #morningBlock { box-shadow: var(--card-shadow), inset 0 3px 0 rgba(244, 205, 130, 0.6); }
+  #bedtimeBlock { box-shadow: var(--card-shadow), inset 0 3px 0 rgba(207, 195, 233, 0.75); }
+
+  .routine-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+    padding-bottom: 8px;
+  }
+
+  .routine-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6), 0 2px 6px rgba(150, 116, 74, 0.12);
+  }
+
+  .routine-icon.morning { background: linear-gradient(145deg, #FFF0CE, var(--morning-deep)); }
+  .routine-icon.bedtime { background: linear-gradient(145deg, #F1EBFA, var(--bedtime-deep)); }
+
+  .routine-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .routine-progress {
+    margin-left: auto;
+    font-family: 'Baloo 2', cursive;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-soft);
+    background: var(--bg);
+    padding: 4px 12px;
+    border-radius: 30px;
+    box-shadow: inset 0 0 0 1px var(--hairline);
+  }
+
+  .task-list { list-style: none; }
+
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 6px;
+    border-bottom: 1px solid var(--hairline);
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    border-radius: 12px;
+  }
+
+  .task-item:last-child { border-bottom: none; }
+  .task-item:active { background: rgba(232, 151, 46, 0.07); transform: scale(0.995); }
+
+  .task-checkbox {
+    position: relative;
+    width: 32px;
+    height: 32px;
+    border-radius: 11px;
+    border: 2.5px solid var(--text-faint);
+    background: var(--card-2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.25s var(--ease-out), border-color 0.25s var(--ease-out);
+    flex-shrink: 0;
+  }
+
+  .task-checkbox.checked {
+    background: linear-gradient(180deg, #8BBE72 0%, var(--check-green-deep) 100%);
+    border-color: var(--check-green-deep);
+    box-shadow: 0 3px 9px rgba(106, 155, 83, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
+  .task-checkbox .check-icon {
+    opacity: 0;
+    transform: scale(0.4);
+    transition: opacity 0.18s ease, transform 0.3s var(--ease-bounce);
+    color: white;
+    font-size: 18px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .task-checkbox.checked .check-icon {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  /* the "thunk" — only on the box that was just tapped */
+  .task-checkbox.justchecked { animation: thunk 0.42s var(--ease-bounce); }
+  @keyframes thunk {
+    0% { transform: scale(0.82); }
+    45% { transform: scale(1.18); }
+    72% { transform: scale(0.95); }
+    100% { transform: scale(1); }
+  }
+  .task-checkbox.justchecked::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 13px;
+    border: 2.5px solid var(--check-green);
+    animation: ripple 0.55s ease-out forwards;
+    pointer-events: none;
+  }
+  @keyframes ripple {
+    0% { transform: scale(1); opacity: 0.7; }
+    100% { transform: scale(1.85); opacity: 0; }
+  }
+
+  @keyframes popIn {
+    0% { transform: scale(0.7); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1); }
+  }
+
+  .task-label {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+    transition: color 0.3s;
+  }
+
+  .task-item.done .task-label {
+    color: var(--text-faint);
+    text-decoration: line-through;
+    text-decoration-color: var(--check-green);
+    text-decoration-thickness: 2px;
+  }
+
+  /* ─── Milestones ─── */
+  .milestones-section {
+    margin-bottom: 24px;
+  }
+
+  .milestones-title {
+    font-family: 'Baloo 2', cursive;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 14px;
+    padding: 0 6px;
+    color: var(--text);
+  }
+
+  .milestones-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+
+  .milestone-card {
+    background: linear-gradient(160deg, #FFFDF8, #F2E9DA);
+    border-radius: var(--radius-sm);
+    padding: 18px 10px 14px;
+    text-align: center;
+    box-shadow: var(--card-shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.8), inset 0 -2px 5px rgba(150, 116, 74, 0.07);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s var(--ease-out);
+  }
+
+  .milestone-card.unlocked {
+    background: linear-gradient(160deg, #FFF3CE 0%, #FFE39E 55%, #F6C45A 100%);
+    box-shadow: 0 7px 22px rgba(244, 180, 60, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    transform: translateY(-1px);
+  }
+
+  /* metallic sheen sweep on unlocked badges */
+  .milestone-card.unlocked::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -60%;
+    width: 55%; height: 100%;
+    background: linear-gradient(105deg, transparent, rgba(255, 255, 255, 0.7), transparent);
+    transform: skewX(-18deg);
+    animation: sheen 6s ease-in-out 0.6s infinite;
+    pointer-events: none;
+  }
+  @keyframes sheen {
+    0%, 100% { left: -60%; }
+    16%, 84% { left: 135%; }
+  }
+
+  .milestone-card.unlocked::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid rgba(214, 150, 40, 0.6);
+    pointer-events: none;
+  }
+
+  .milestone-icon {
+    font-size: 31px;
+    margin-bottom: 6px;
+    filter: grayscale(1) opacity(0.32);
+    transition: filter 0.5s;
+    position: relative;
+  }
+
+  .milestone-card.unlocked .milestone-icon {
+    filter: drop-shadow(0 2px 3px rgba(180, 120, 30, 0.3));
+    animation: milestoneReveal 0.6s var(--ease-bounce);
+  }
+
+  @keyframes milestoneReveal {
+    0% { transform: scale(0); }
+    60% { transform: scale(1.25); }
+    100% { transform: scale(1); }
+  }
+
+  .milestone-days {
+    font-family: 'Baloo 2', cursive;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-faint);
+    margin-bottom: 3px;
+    position: relative;
+  }
+
+  .milestone-card.unlocked .milestone-days { color: #9A6512; }
+
+  .milestone-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-soft);
+    line-height: 1.3;
+    position: relative;
+  }
+
+  .milestone-card.unlocked .milestone-label { color: #7E5A1E; }
+
+  /* ─── Parent Zone ─── */
+  .parent-zone-toggle {
+    position: fixed;
+    bottom: calc(22px + env(safe-area-inset-bottom));
+    right: 22px;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--card);
+    border: 1px solid rgba(150, 116, 74, 0.16);
+    box-shadow: 0 6px 18px rgba(150, 116, 74, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 21px;
+    cursor: pointer;
+    z-index: 100;
+    transition: transform 0.2s var(--ease-out), box-shadow 0.2s;
+  }
+
+  .parent-zone-toggle:active { transform: scale(0.88); box-shadow: 0 3px 10px rgba(150, 116, 74, 0.2); }
+
+  .parent-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(74, 55, 40, 0.42);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 200;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .parent-panel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg);
+    background-image: radial-gradient(120% 60% at 50% 0%, #FFF7E9, rgba(255, 247, 233, 0) 60%);
+    border-radius: 28px 28px 0 0;
+    padding: 26px 22px calc(34px + env(safe-area-inset-bottom));
+    max-height: 86vh;
+    overflow-y: auto;
+    box-shadow: 0 -10px 40px rgba(74, 55, 40, 0.18);
+    animation: slideUp 0.42s var(--ease-out);
+  }
+
+  .parent-panel::before {
+    content: '';
+    display: block;
+    width: 42px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--text-faint);
+    opacity: 0.5;
+    margin: -8px auto 16px;
+  }
+
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .parent-panel h2 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 25px;
+    margin-bottom: 4px;
+    color: var(--text);
+  }
+
+  .parent-panel .date-label {
+    font-size: 14px;
+    color: var(--text-soft);
+    margin-bottom: 18px;
+    font-weight: 600;
+  }
+
+  .parent-summary {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin-bottom: 14px;
+    box-shadow: var(--card-shadow-soft);
+  }
+
+  .parent-summary h3 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+  }
+
+  .parent-task-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-soft);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .parent-task-row:last-child { border-bottom: none; }
+
+  .parent-task-status {
+    font-size: 18px;
+  }
+
+  .approve-btn {
+    width: 100%;
+    font-family: 'Baloo 2', cursive;
+    font-size: 18px;
+    font-weight: 700;
+    color: white;
+    background: linear-gradient(180deg, #8BBE72, var(--check-green-deep));
+    border: none;
+    border-radius: 60px;
+    padding: 16px;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: transform 0.18s var(--ease-bounce), box-shadow 0.25s, opacity 0.25s;
+    box-shadow: 0 8px 20px rgba(106, 155, 83, 0.4), inset 0 1.5px 0 rgba(255, 255, 255, 0.4);
+  }
+
+  .approve-btn:active { transform: scale(0.97); }
+  .approve-btn:disabled { opacity: 0.5; box-shadow: none; background: var(--text-faint); }
+
+  .approved-badge {
+    text-align: center;
+    padding: 16px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--check-green-deep);
+  }
+
+  .close-parent {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(150, 116, 74, 0.12);
+    border: none;
+    font-size: 16px;
+    color: var(--text-soft);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .close-parent:active { background: rgba(150, 116, 74, 0.22); }
+
+  .reset-link {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 13px;
+    color: var(--text-faint);
+    cursor: pointer;
+    text-decoration: underline;
+  }
+
+  /* ─── Day approved state ─── */
+  .app.day-approved .task-item { pointer-events: none; opacity: 0.65; }
+  .app.day-approved .task-checkbox { opacity: 0.7; }
+
+  /* ─── Celebration overlay ─── */
+  .celebration {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(circle at 50% 38%, #FFF8EC 0%, rgba(255, 248, 240, 0.97) 70%);
+    z-index: 300;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px;
+    animation: fadeIn 0.5s ease;
+    overflow: hidden;
+  }
+
+  .celebration.show { display: flex; }
+
+  .celebration-icon {
+    font-size: 84px;
+    margin-bottom: 18px;
+    filter: drop-shadow(0 8px 16px rgba(244, 180, 60, 0.4));
+    animation: popIn 0.6s var(--ease-bounce);
+  }
+
+  .celebration h2 {
+    font-family: 'Baloo 2', cursive;
+    font-size: 33px;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .celebration p {
+    font-size: 18px;
+    color: var(--text-soft);
+    line-height: 1.5;
+    margin-bottom: 26px;
+    font-weight: 600;
+  }
+
+  .celebration-close {
+    font-family: 'Baloo 2', cursive;
+    font-size: 18px;
+    font-weight: 700;
+    background: linear-gradient(180deg, var(--accent-glow), var(--accent) 60%, var(--accent-deep));
+    color: white;
+    border: none;
+    border-radius: 60px;
+    padding: 15px 44px;
+    cursor: pointer;
+    box-shadow: 0 8px 22px rgba(232, 151, 46, 0.4), inset 0 1.5px 0 rgba(255, 255, 255, 0.5);
+    transition: transform 0.18s var(--ease-bounce);
+  }
+
+  .celebration-close:active { transform: scale(0.96); }
+
+  /* celebration confetti */
+  .confetti-piece {
+    position: absolute;
+    top: -24px;
+    width: 9px;
+    height: 9px;
+    opacity: 0;
+    will-change: transform, opacity;
+    pointer-events: none;
+  }
+  .celebration.show .confetti-piece { animation: confettiFall 2.6s ease-in forwards; }
+  @keyframes confettiFall {
+    0% { transform: translateY(-10px) rotate(0deg); opacity: 0; }
+    12% { opacity: 1; }
+    100% { transform: translateY(105vh) rotate(540deg); opacity: 0.9; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════ ONBOARDING ═══════ -->
+<div class="onboarding" id="onboarding">
+  <svg class="onboarding-jar" viewBox="0 0 120 170">
+    <defs>
+      <linearGradient id="obBody" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="rgba(255,255,255,0.18)"/>
+        <stop offset="100%" stop-color="rgba(186,206,228,0.34)"/>
+      </linearGradient>
+      <linearGradient id="obLip" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#E9EFF6"/>
+        <stop offset="50%" stop-color="#C2D0DE"/>
+        <stop offset="100%" stop-color="#D6E0EA"/>
+      </linearGradient>
+      <linearGradient id="obStarGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#FFE488"/>
+        <stop offset="55%" stop-color="#FFC83C"/>
+        <stop offset="100%" stop-color="#F2A23A"/>
+      </linearGradient>
+      <radialGradient id="obGlow" cx="0.5" cy="0.5" r="0.5">
+        <stop offset="0%" stop-color="rgba(255,212,96,0.8)"/>
+        <stop offset="100%" stop-color="rgba(255,212,96,0)"/>
+      </radialGradient>
+      <clipPath id="obClip"><path d="M26 36 Q26 34 28 34 L92 34 Q94 34 94 36 L94 138 Q94 152 82 152 L38 152 Q26 152 26 138 Z"/></clipPath>
+      <symbol id="obStar" viewBox="0 0 24 24">
+        <path d="M12 2 L14.9 8.6 L22 9.2 L16.6 14 L18.3 21 L12 17.3 L5.7 21 L7.4 14 L2 9.2 L9.1 8.6 Z" fill="url(#obStarGrad)" stroke="rgba(214,140,40,0.5)" stroke-width="0.5" stroke-linejoin="round"/>
+        <path d="M12 4.4 L13.5 8 L10.3 9.6 Z" fill="rgba(255,255,255,0.5)"/>
+      </symbol>
+    </defs>
+    <ellipse cx="60" cy="161" rx="32" ry="5" fill="rgba(150,116,74,0.22)"/>
+    <path d="M26 36 Q26 34 28 34 L92 34 Q94 34 94 36 L94 138 Q94 152 82 152 L38 152 Q26 152 26 138 Z" fill="url(#obBody)" stroke="rgba(150,180,205,0.55)" stroke-width="1.5"/>
+    <g clip-path="url(#obClip)">
+      <rect x="26" y="98" width="68" height="54" fill="rgba(247,170,58,0.18)"/>
+      <circle cx="50" cy="122" r="13" fill="url(#obGlow)"/>
+      <circle cx="74" cy="128" r="12" fill="url(#obGlow)"/>
+      <circle cx="62" cy="106" r="13" fill="url(#obGlow)"/>
+      <use href="#obStar" x="40" y="112" width="20" height="20" style="animation:starPulse 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:center"/>
+      <use href="#obStar" x="64" y="118" width="20" height="20" style="animation:starPulse 3s ease-in-out 0.4s infinite;transform-box:fill-box;transform-origin:center"/>
+      <use href="#obStar" x="52" y="96" width="20" height="20" style="animation:starPulse 2.8s ease-in-out 0.8s infinite;transform-box:fill-box;transform-origin:center"/>
+      <path d="M40 42 Q36 42 36 48 L36 120" stroke="rgba(255,255,255,0.5)" stroke-width="4" stroke-linecap="round" fill="none"/>
+    </g>
+    <rect x="22" y="15" width="76" height="13" rx="5" fill="url(#obLip)" stroke="rgba(120,150,180,0.42)" stroke-width="1"/>
+    <rect x="22" y="17.5" width="76" height="2.4" rx="1.2" fill="rgba(255,255,255,0.5)"/>
+  </svg>
+  <h1>Star Jar</h1>
+  <p>Build your habits, fill your jar!<br>What's your name?</p>
+  <input type="text" class="name-input" id="nameInput" placeholder="Your name" maxlength="12" autocomplete="off" autocapitalize="words">
+  <button class="start-btn" id="startBtn" disabled>Let's Go! ✨</button>
+</div>
+
+<!-- ═══════ MAIN APP ═══════ -->
+<div class="app" id="app">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="greeting" id="greeting"></div>
+    <div class="streak-badge" id="streakBadge">
+      <span class="flame">🔥</span>
+      <span id="streakCount">0</span>
+    </div>
+  </div>
+
+  <!-- Jar -->
+  <div class="jar-section">
+    <div class="jar-container">
+      <svg class="jar-svg" viewBox="0 0 160 206" id="jarSvg">
+        <defs>
+          <linearGradient id="jarBody" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgba(255,255,255,0.16)"/>
+            <stop offset="44%" stop-color="rgba(214,228,240,0.16)"/>
+            <stop offset="100%" stop-color="rgba(186,206,228,0.32)"/>
+          </linearGradient>
+          <linearGradient id="jarCurve" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="rgba(110,142,175,0.32)"/>
+            <stop offset="15%" stop-color="rgba(110,142,175,0)"/>
+            <stop offset="50%" stop-color="rgba(255,255,255,0)"/>
+            <stop offset="85%" stop-color="rgba(110,142,175,0)"/>
+            <stop offset="100%" stop-color="rgba(110,142,175,0.36)"/>
+          </linearGradient>
+          <linearGradient id="jarLip" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#E9EFF6"/>
+            <stop offset="50%" stop-color="#C2D0DE"/>
+            <stop offset="100%" stop-color="#D6E0EA"/>
+          </linearGradient>
+          <linearGradient id="warmFill" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgba(255,206,90,0)"/>
+            <stop offset="55%" stop-color="rgba(255,196,70,0.14)"/>
+            <stop offset="100%" stop-color="rgba(247,170,58,0.40)"/>
+          </linearGradient>
+          <linearGradient id="starGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFE488"/>
+            <stop offset="55%" stop-color="#FFC83C"/>
+            <stop offset="100%" stop-color="#F2A23A"/>
+          </linearGradient>
+          <radialGradient id="starGlow" cx="0.5" cy="0.5" r="0.5">
+            <stop offset="0%" stop-color="rgba(255,212,96,0.85)"/>
+            <stop offset="100%" stop-color="rgba(255,212,96,0)"/>
+          </radialGradient>
+          <clipPath id="jarClip">
+            <path d="M30 38 Q30 36 32 36 L128 36 Q130 36 130 38 L130 172 Q130 190 112 190 L48 190 Q30 190 30 172 Z"/>
+          </clipPath>
+          <filter id="jarBlur" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="3"/>
+          </filter>
+          <symbol id="jarStar" viewBox="0 0 24 24">
+            <path d="M12 2 L14.9 8.6 L22 9.2 L16.6 14 L18.3 21 L12 17.3 L5.7 21 L7.4 14 L2 9.2 L9.1 8.6 Z" fill="url(#starGrad)" stroke="rgba(214,140,40,0.5)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M12 4.4 L13.5 8 L10.3 9.6 Z" fill="rgba(255,255,255,0.5)"/>
+          </symbol>
+        </defs>
+
+        <!-- soft ground shadow -->
+        <ellipse cx="80" cy="197" rx="45" ry="6.5" fill="rgba(150,116,74,0.30)" filter="url(#jarBlur)"/>
+
+        <!-- glass body -->
+        <path d="M30 38 Q30 36 32 36 L128 36 Q130 36 130 38 L130 172 Q130 190 112 190 L48 190 Q30 190 30 172 Z" fill="url(#jarBody)" stroke="rgba(150,180,205,0.55)" stroke-width="1.6"/>
+
+        <!-- rising warm light -->
+        <g clip-path="url(#jarClip)">
+          <rect id="warmFillRect" x="28" y="190" width="104" height="0" fill="url(#warmFill)"/>
+        </g>
+
+        <!-- stars (rendered by JS) -->
+        <g clip-path="url(#jarClip)" id="starFill"></g>
+
+        <!-- cylinder curvature over the glass body -->
+        <path d="M30 38 Q30 36 32 36 L128 36 Q130 36 130 38 L130 172 Q130 190 112 190 L48 190 Q30 190 30 172 Z" fill="url(#jarCurve)" clip-path="url(#jarClip)" pointer-events="none"/>
+
+        <!-- glass reflections -->
+        <g clip-path="url(#jarClip)" pointer-events="none">
+          <path d="M45 46 Q41 46 41 53 L41 150" stroke="rgba(255,255,255,0.55)" stroke-width="5" stroke-linecap="round" fill="none"/>
+          <path d="M53 47 L53 116" stroke="rgba(255,255,255,0.22)" stroke-width="2" stroke-linecap="round" fill="none"/>
+          <path d="M119 64 L119 166" stroke="rgba(255,255,255,0.15)" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        </g>
+
+        <!-- frosted neck + lid ring -->
+        <rect x="33" y="33" width="94" height="7" rx="3" fill="rgba(255,255,255,0.16)"/>
+        <rect x="23" y="16" width="114" height="15" rx="6" fill="url(#jarLip)" stroke="rgba(120,150,180,0.45)" stroke-width="1"/>
+        <rect x="23" y="19" width="114" height="2.6" rx="1.3" fill="rgba(255,255,255,0.5)"/>
+        <rect x="30" y="26.5" width="100" height="2" rx="1" fill="rgba(110,142,175,0.22)"/>
+      </svg>
+    </div>
+    <div class="jar-count">
+      <span id="todayStars">0</span> / 10 stars today
+    </div>
+  </div>
+
+  <!-- Morning -->
+  <div class="routine-block" id="morningBlock">
+    <div class="routine-header">
+      <div class="routine-icon morning">☀️</div>
+      <div class="routine-title">Morning</div>
+      <div class="routine-progress" id="morningProgress">0/5</div>
+    </div>
+    <ul class="task-list" id="morningTasks"></ul>
+  </div>
+
+  <!-- Bedtime -->
+  <div class="routine-block" id="bedtimeBlock">
+    <div class="routine-header">
+      <div class="routine-icon bedtime">🌙</div>
+      <div class="routine-title">Bedtime</div>
+      <div class="routine-progress" id="bedtimeProgress">0/5</div>
+    </div>
+    <ul class="task-list" id="bedtimeTasks"></ul>
+  </div>
+
+  <!-- Milestones -->
+  <div class="milestones-section">
+    <div class="milestones-title">🏆 Milestones</div>
+    <div class="milestones-grid" id="milestonesGrid"></div>
+  </div>
+</div>
+
+<!-- Parent Zone Toggle -->
+<div class="parent-zone-toggle" id="parentToggle" style="display:none;">🔒</div>
+
+<!-- Parent Overlay -->
+<div class="parent-overlay" id="parentOverlay">
+  <div class="parent-panel" id="parentPanel"></div>
+</div>
+
+<!-- Celebration -->
+<div class="celebration" id="celebration">
+  <div class="celebration-icon" id="celebIcon"></div>
+  <h2 id="celebTitle"></h2>
+  <p id="celebText"></p>
+  <button class="celebration-close" onclick="closeCelebration()">Awesome! ⭐</button>
+</div>
+
+<script>
+// ═══════ CONFIG ═══════
+const MORNING_TASKS = [
+  { id: 'm1', label: 'Make my bed', emoji: '🛏️' },
+  { id: 'm2', label: 'Get dressed', emoji: '👕' },
+  { id: 'm3', label: 'Brush teeth', emoji: '🪥' },
+  { id: 'm4', label: 'Eat breakfast', emoji: '🥣' },
+  { id: 'm5', label: 'Put dishes in sink', emoji: '🍽️' }
+];
+
+const BEDTIME_TASKS = [
+  { id: 'b1', label: 'Tidy up toys & room', emoji: '🧸' },
+  { id: 'b2', label: 'Take bath or shower', emoji: '🛁' },
+  { id: 'b3', label: 'Put on pajamas', emoji: '🌙' },
+  { id: 'b4', label: 'Brush teeth', emoji: '🪥' },
+  { id: 'b5', label: 'Lay out tomorrow\'s clothes', emoji: '👖' }
+];
+
+const MILESTONES = [
+  { days: 7, icon: '🎬', label: 'Pick a show to watch', key: 'ms7' },
+  { days: 14, icon: '🍦', label: 'Choose an ice cream flavor', key: 'ms14' },
+  { days: 30, icon: '💰', label: '$20 cash or toy', key: 'ms30' }
+];
+
+// ═══════ STATE ═══════
+function getToday() {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function loadState() {
+  try {
+    return JSON.parse(localStorage.getItem('starjar_state')) || null;
+  } catch { return null; }
+}
+
+function saveState(state) {
+  localStorage.setItem('starjar_state', JSON.stringify(state));
+}
+
+function freshDayState() {
+  const tasks = {};
+  MORNING_TASKS.forEach(t => tasks[t.id] = false);
+  BEDTIME_TASKS.forEach(t => tasks[t.id] = false);
+  return { tasks, approved: false };
+}
+
+function initState(name) {
+  return {
+    name,
+    streak: 0,
+    totalStars: 0,
+    milestonesUnlocked: {},
+    days: { [getToday()]: freshDayState() }
+  };
+}
+
+function ensureToday(state) {
+  const today = getToday();
+  if (!state.days[today]) {
+    state.days[today] = freshDayState();
+    // Check if yesterday was approved for streak continuity
+    // (streak updates happen on approval, so we just need a fresh day)
+  }
+  return state;
+}
+
+// ═══════ ONBOARDING ═══════
+const nameInput = document.getElementById('nameInput');
+const startBtn = document.getElementById('startBtn');
+
+nameInput.addEventListener('input', () => {
+  startBtn.disabled = nameInput.value.trim().length === 0;
+});
+
+nameInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && nameInput.value.trim()) launchApp();
+});
+
+startBtn.addEventListener('click', launchApp);
+
+function launchApp() {
+  const name = nameInput.value.trim();
+  if (!name) return;
+  const state = initState(name);
+  saveState(state);
+  showApp(state);
+}
+
+// ═══════ INIT ═══════
+const existingState = loadState();
+if (existingState) {
+  document.getElementById('onboarding').style.display = 'none';
+  showApp(ensureToday(existingState));
+}
+
+// ═══════ MAIN RENDER ═══════
+function showApp(state) {
+  document.getElementById('onboarding').style.display = 'none';
+  const app = document.getElementById('app');
+  app.style.display = 'flex';
+  document.getElementById('parentToggle').style.display = 'flex';
+  render(state);
+}
+
+function render(state) {
+  const today = getToday();
+  const dayState = state.days[today];
+  const isApproved = dayState.approved;
+
+  // Greeting
+  const hour = new Date().getHours();
+  let greetWord = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greeting').textContent = `${greetWord}, ${state.name}!`;
+
+  // Streak
+  document.getElementById('streakCount').textContent = state.streak;
+
+  // Approved state
+  const app = document.getElementById('app');
+  app.classList.toggle('day-approved', isApproved);
+
+  // Tasks
+  renderTaskList('morningTasks', MORNING_TASKS, dayState, state, 'morningProgress', isApproved);
+  renderTaskList('bedtimeTasks', BEDTIME_TASKS, dayState, state, 'bedtimeProgress', isApproved);
+
+  // Stars
+  const starCount = Object.values(dayState.tasks).filter(Boolean).length;
+  document.getElementById('todayStars').textContent = starCount;
+  renderJarStars(starCount);
+
+  // Milestones
+  renderMilestones(state);
+}
+
+function renderTaskList(containerId, tasks, dayState, state, progressId, disabled) {
+  const container = document.getElementById(containerId);
+  const done = tasks.filter(t => dayState.tasks[t.id]).length;
+  document.getElementById(progressId).textContent = `${done}/${tasks.length}`;
+
+  container.innerHTML = tasks.map(task => {
+    const checked = dayState.tasks[task.id];
+    return `
+      <li class="task-item ${checked ? 'done' : ''}" data-task="${task.id}" onclick="${disabled ? '' : `toggleTask('${task.id}', this)`}">
+        <div class="task-checkbox ${checked ? 'checked' : ''}">
+          <span class="check-icon">✓</span>
+        </div>
+        <span class="task-label">${task.emoji} ${task.label}</span>
+      </li>
+    `;
+  }).join('');
+}
+
+function toggleTask(taskId, el) {
+  const state = ensureToday(loadState());
+  const today = getToday();
+  if (state.days[today].approved) return;
+
+  const newVal = !state.days[today].tasks[taskId];
+  state.days[today].tasks[taskId] = newVal;
+  saveState(state);
+
+  // Animate star flying to jar
+  if (newVal && el) {
+    animateStarToJar(el);
+  }
+
+  render(state);
+
+  // satisfying "thunk" on the box that was just tapped
+  if (newVal) flashCheckbox(taskId);
+}
+
+function flashCheckbox(taskId) {
+  const box = document.querySelector(`[data-task="${taskId}"] .task-checkbox`);
+  if (!box) return;
+  box.classList.add('justchecked');
+  setTimeout(() => box.classList.remove('justchecked'), 600);
+}
+
+// ═══════ STAR ANIMATION ═══════
+const STAR_SVG = '<svg viewBox="0 0 24 24"><path d="M12 2 L14.9 8.6 L22 9.2 L16.6 14 L18.3 21 L12 17.3 L5.7 21 L7.4 14 L2 9.2 L9.1 8.6 Z" fill="#FFC83C" stroke="#E0902A" stroke-width="0.6" stroke-linejoin="round"/></svg>';
+
+function popJar() {
+  const jarC = document.querySelector('.jar-container');
+  if (!jarC) return;
+  jarC.classList.remove('jar-pop');
+  void jarC.offsetWidth;          // restart the animation
+  jarC.classList.add('jar-pop');
+}
+
+function animateStarToJar(taskEl) {
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    popJar();
+    return;
+  }
+
+  const cb = taskEl.querySelector('.task-checkbox') || taskEl;
+  const rect = cb.getBoundingClientRect();
+  const jarRect = document.getElementById('jarSvg').getBoundingClientRect();
+
+  const sx = rect.left + rect.width / 2;
+  const sy = rect.top + rect.height / 2;
+  const ex = jarRect.left + jarRect.width / 2;
+  const ey = jarRect.top + jarRect.height * 0.52;
+
+  // arc up and over into the jar
+  const cx = (sx + ex) / 2;
+  const cy = Math.min(sy, ey) - Math.max(72, Math.abs(ex - sx) * 0.32);
+  const pathStr = `path('M ${sx} ${sy} Q ${cx} ${cy} ${ex} ${ey}')`;
+
+  const DUR = 760;
+  const supportsPath = window.CSS && CSS.supports && CSS.supports('offset-path', "path('M0 0 L1 1')");
+
+  const star = document.createElement('div');
+  star.className = 'flying-star';
+  star.innerHTML = STAR_SVG;
+
+  if (supportsPath) {
+    star.style.offsetPath = pathStr;
+    star.style.offsetRotate = '0deg';
+    document.body.appendChild(star);
+    star.animate([
+      { offsetDistance: '0%',   transform: 'translate(-50%,-50%) scale(0.5) rotate(-30deg)', opacity: 0 },
+      { offsetDistance: '12%',  transform: 'translate(-50%,-50%) scale(1.2) rotate(-16deg)', opacity: 1, offset: 0.15 },
+      { offsetDistance: '82%',  transform: 'translate(-50%,-50%) scale(1.0) rotate(10deg)',  opacity: 1, offset: 0.8 },
+      { offsetDistance: '100%', transform: 'translate(-50%,-50%) scale(0.42) rotate(22deg)', opacity: 0 }
+    ], { duration: DUR, easing: 'cubic-bezier(0.45, 0, 0.25, 1)', fill: 'forwards' });
+
+    // sparkle trail tracing the same arc, just behind the star
+    for (let i = 0; i < 6; i++) {
+      const sp = document.createElement('div');
+      sp.className = 'fly-sparkle';
+      sp.style.offsetPath = pathStr;
+      document.body.appendChild(sp);
+      const delay = 70 + i * 38;
+      sp.animate([
+        { offsetDistance: '0%',  transform: 'translate(-50%,-50%) scale(1)', opacity: 0.9 },
+        { offsetDistance: '84%', transform: `translate(-50%,-50%) scale(${0.3 + Math.random() * 0.3})`, opacity: 0 }
+      ], { duration: DUR - delay, delay, easing: 'cubic-bezier(0.45,0,0.25,1)', fill: 'forwards' });
+      setTimeout(() => sp.remove(), DUR + 60);
+    }
+  } else {
+    // fallback: faux-arc with a mid keyframe
+    star.style.left = sx + 'px';
+    star.style.top = sy + 'px';
+    document.body.appendChild(star);
+    const dx = ex - sx, dy = ey - sy;
+    star.animate([
+      { transform: 'translate(-50%,-50%) scale(1.1)', opacity: 0 },
+      { transform: `translate(calc(-50% + ${dx * 0.5}px), calc(-50% + ${dy * 0.5 - 72}px)) scale(1.15)`, opacity: 1, offset: 0.5 },
+      { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.42)`, opacity: 0 }
+    ], { duration: DUR, easing: 'cubic-bezier(0.45,0,0.25,1)', fill: 'forwards' });
+  }
+
+  setTimeout(popJar, DUR - 130);
+  setTimeout(() => star.remove(), DUR + 60);
+}
+
+// ═══════ JAR RENDERING ═══════
+function renderJarStars(count) {
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  const fill = document.getElementById('starFill');
+  const warm = document.getElementById('warmFillRect');
+  fill.innerHTML = '';
+
+  // rising warm-light pool: bottom (y=190) up to y=40
+  const maxHeight = 150;
+  const fillHeight = Math.max(0, (count / 10) * maxHeight);
+  if (warm) {
+    warm.setAttribute('y', String(190 - fillHeight));
+    warm.setAttribute('height', String(fillHeight));
+  }
+
+  if (count === 0) return;
+
+  const positions = [
+    { x: 58, y: 176 }, { x: 100, y: 178 }, { x: 79, y: 168 },
+    { x: 48, y: 158 }, { x: 110, y: 160 }, { x: 67, y: 150 },
+    { x: 92, y: 146 }, { x: 52, y: 138 }, { x: 108, y: 136 },
+    { x: 80, y: 126 }
+  ];
+
+  for (let i = 0; i < count && i < positions.length; i++) {
+    const pos = positions[i];
+    const size = 21;
+
+    const glow = document.createElementNS(SVGNS, 'circle');
+    glow.setAttribute('class', 'star-glow');
+    glow.setAttribute('cx', String(pos.x));
+    glow.setAttribute('cy', String(pos.y));
+    glow.setAttribute('r', '13');
+    glow.setAttribute('fill', 'url(#starGlow)');
+    glow.style.animation = `starGlowPulse ${2.6 + (i % 4) * 0.45}s ease-in-out ${i * 0.22}s infinite`;
+    fill.appendChild(glow);
+
+    const star = document.createElementNS(SVGNS, 'use');
+    star.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#jarStar');
+    star.setAttribute('href', '#jarStar');
+    star.setAttribute('x', String(pos.x - size / 2));
+    star.setAttribute('y', String(pos.y - size / 2));
+    star.setAttribute('width', String(size));
+    star.setAttribute('height', String(size));
+    star.style.animation = `starPulse ${2.4 + (i % 3) * 0.5}s ease-in-out ${i * 0.18}s infinite`;
+    fill.appendChild(star);
+  }
+}
+
+// ═══════ MILESTONES ═══════
+function renderMilestones(state) {
+  const grid = document.getElementById('milestonesGrid');
+  grid.innerHTML = MILESTONES.map(ms => {
+    const unlocked = state.milestonesUnlocked[ms.key] || state.streak >= ms.days;
+    return `
+      <div class="milestone-card ${unlocked ? 'unlocked' : ''}">
+        <div class="milestone-icon">${ms.icon}</div>
+        <div class="milestone-days">${ms.days} days</div>
+        <div class="milestone-label">${ms.label}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ═══════ PARENT ZONE ═══════
+let parentHoldTimer = null;
+const parentToggle = document.getElementById('parentToggle');
+
+parentToggle.addEventListener('touchstart', (e) => {
+  e.preventDefault();
+  parentHoldTimer = setTimeout(openParentZone, 800);
+});
+parentToggle.addEventListener('touchend', () => clearTimeout(parentHoldTimer));
+parentToggle.addEventListener('touchcancel', () => clearTimeout(parentHoldTimer));
+
+// Also support mouse for testing
+parentToggle.addEventListener('mousedown', () => {
+  parentHoldTimer = setTimeout(openParentZone, 800);
+});
+parentToggle.addEventListener('mouseup', () => clearTimeout(parentHoldTimer));
+parentToggle.addEventListener('mouseleave', () => clearTimeout(parentHoldTimer));
+
+function openParentZone() {
+  const state = ensureToday(loadState());
+  const today = getToday();
+  const dayState = state.days[today];
+  const overlay = document.getElementById('parentOverlay');
+  const panel = document.getElementById('parentPanel');
+
+  const allTasks = [...MORNING_TASKS, ...BEDTIME_TASKS];
+  const completedCount = allTasks.filter(t => dayState.tasks[t.id]).length;
+  const allDone = completedCount === allTasks.length;
+
+  const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+
+  panel.innerHTML = `
+    <button class="close-parent" onclick="closeParentZone()">✕</button>
+    <h2>Parent Review</h2>
+    <div class="date-label">${dateStr} — ${state.name}'s day</div>
+
+    <div class="parent-summary">
+      <h3>☀️ Morning (${MORNING_TASKS.filter(t=>dayState.tasks[t.id]).length}/${MORNING_TASKS.length})</h3>
+      ${MORNING_TASKS.map(t => `
+        <div class="parent-task-row">
+          <span>${t.label}</span>
+          <span class="parent-task-status">${dayState.tasks[t.id] ? '✅' : '⬜'}</span>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="parent-summary">
+      <h3>🌙 Bedtime (${BEDTIME_TASKS.filter(t=>dayState.tasks[t.id]).length}/${BEDTIME_TASKS.length})</h3>
+      ${BEDTIME_TASKS.map(t => `
+        <div class="parent-task-row">
+          <span>${t.label}</span>
+          <span class="parent-task-status">${dayState.tasks[t.id] ? '✅' : '⬜'}</span>
+        </div>
+      `).join('')}
+    </div>
+
+    ${dayState.approved
+      ? `<div class="approved-badge">✅ Day approved! Streak: ${state.streak} days</div>`
+      : `<button class="approve-btn" ${!allDone ? 'disabled title="All tasks must be done"' : ''} onclick="approveDay()">
+          ${allDone ? '✅ Approve Day' : `⬜ ${completedCount}/10 tasks done`}
+         </button>`
+    }
+
+    <div class="parent-summary" style="margin-top:16px">
+      <h3>📊 Stats</h3>
+      <div class="parent-task-row"><span>Current streak</span><span>${state.streak} days</span></div>
+      <div class="parent-task-row"><span>Total stars earned</span><span>${state.totalStars} ⭐</span></div>
+    </div>
+
+    <div class="reset-link" onclick="confirmReset()">Reset all data</div>
+  `;
+
+  overlay.style.display = 'block';
+}
+
+function closeParentZone() {
+  document.getElementById('parentOverlay').style.display = 'none';
+}
+
+document.getElementById('parentOverlay').addEventListener('click', (e) => {
+  if (e.target === document.getElementById('parentOverlay')) closeParentZone();
+});
+
+function approveDay() {
+  const state = ensureToday(loadState());
+  const today = getToday();
+  const dayState = state.days[today];
+
+  const allDone = [...MORNING_TASKS, ...BEDTIME_TASKS].every(t => dayState.tasks[t.id]);
+  if (!allDone) return;
+
+  dayState.approved = true;
+  state.totalStars += 10;
+
+  // Update streak
+  state.streak += 1;
+
+  // Check milestones
+  let newMilestone = null;
+  MILESTONES.forEach(ms => {
+    if (state.streak >= ms.days && !state.milestonesUnlocked[ms.key]) {
+      state.milestonesUnlocked[ms.key] = true;
+      newMilestone = ms;
+    }
+  });
+
+  saveState(state);
+  closeParentZone();
+  render(state);
+
+  // Celebrate
+  if (newMilestone) {
+    setTimeout(() => showCelebration(newMilestone, state), 400);
+  }
+}
+
+// ═══════ CELEBRATION ═══════
+function showCelebration(milestone, state) {
+  document.getElementById('celebIcon').textContent = milestone.icon;
+  document.getElementById('celebTitle').textContent = `${milestone.days}-Day Streak!`;
+  document.getElementById('celebText').textContent = `You earned: ${milestone.label}`;
+  document.getElementById('celebration').classList.add('show');
+  spawnConfetti();
+}
+
+function spawnConfetti() {
+  const wrap = document.getElementById('celebration');
+  wrap.querySelectorAll('.confetti-piece').forEach(p => p.remove());
+  const colors = ['#FFC83C', '#F2A23A', '#E8972E', '#8BBE72', '#C9B6EC', '#FFE488', '#FFFDF8'];
+  const frag = document.createDocumentFragment();
+  for (let i = 0; i < 26; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    const s = 7 + Math.floor(Math.random() * 7);
+    p.style.left = Math.random() * 100 + '%';
+    p.style.width = s + 'px';
+    p.style.height = s + 'px';
+    p.style.background = colors[i % colors.length];
+    p.style.borderRadius = Math.random() < 0.5 ? '50%' : '2px';
+    p.style.animationDelay = (Math.random() * 0.6) + 's';
+    p.style.animationDuration = (2.2 + Math.random() * 1.4) + 's';
+    frag.appendChild(p);
+  }
+  wrap.appendChild(frag);
+}
+
+function closeCelebration() {
+  const c = document.getElementById('celebration');
+  c.classList.remove('show');
+  c.querySelectorAll('.confetti-piece').forEach(p => p.remove());
+}
+
+// ═══════ RESET ═══════
+function confirmReset() {
+  if (confirm('This will erase all data for this profile. Are you sure?')) {
+    localStorage.removeItem('starjar_state');
+    location.reload();
+  }
+}
+
+// ═══════ STREAK CONTINUITY CHECK ═══════
+// On load, check if the last approved day was yesterday. If not, reset streak.
+(function checkStreakContinuity() {
+  const state = loadState();
+  if (!state) return;
+
+  const today = getToday();
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
+
+  // If there's a streak but yesterday wasn't approved (and today isn't already approved)
+  if (state.streak > 0) {
+    const yDay = state.days[yesterdayStr];
+    const tDay = state.days[today];
+    const yesterdayApproved = yDay && yDay.approved;
+    const todayApproved = tDay && tDay.approved;
+
+    if (!yesterdayApproved && !todayApproved) {
+      // Check if the last approved day was today — if so, streak is fine
+      // Otherwise, streak broken
+      state.streak = 0;
+      saveState(state);
+    }
+  }
+})();
+
+// ═══════ PWA: register service worker ═══════
+// Guarded so it no-ops on file:// (only registers over http/https).
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
