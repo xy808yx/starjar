@@ -221,6 +221,8 @@
     padding: 4px 6px 0;
   }
 
+  .greet-wrap { min-width: 0; }
+
   .greeting {
     font-family: 'Baloo 2', cursive;
     font-size: 27px;
@@ -228,6 +230,13 @@
     color: var(--text);
     letter-spacing: -0.3px;
     line-height: 1.12;
+  }
+
+  .today-date {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text-soft);
+    margin-top: 3px;
   }
 
   .streak-badge {
@@ -299,16 +308,21 @@
     100% { transform: scale(1); }
   }
 
-  #starFill use { transform-box: fill-box; transform-origin: center; will-change: transform, opacity; }
-  .star-glow { transform-box: fill-box; transform-origin: center; }
+  .jar-star { will-change: transform; }
+  .s-star, .s-glow { transform-box: fill-box; transform-origin: center; }
+  .s-star { will-change: transform, opacity; }
 
+  @keyframes starFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-3.5px); }
+  }
   @keyframes starPulse {
-    0%, 100% { transform: scale(1); opacity: 0.9; }
-    50% { transform: scale(1.09); opacity: 1; }
+    0%, 100% { transform: scale(1); opacity: 0.92; }
+    50% { transform: scale(1.08); opacity: 1; }
   }
   @keyframes starGlowPulse {
-    0%, 100% { opacity: 0.4; transform: scale(0.9); }
-    50% { opacity: 0.85; transform: scale(1.14); }
+    0%, 100% { opacity: 0.4; transform: scale(0.88); }
+    50% { opacity: 0.8; transform: scale(1.12); }
   }
 
   .jar-count {
@@ -642,11 +656,13 @@
     bottom: 0;
     left: 0;
     right: 0;
+    max-width: 540px;
+    margin: 0 auto;
     background: var(--bg);
     background-image: radial-gradient(120% 60% at 50% 0%, #FFF7E9, rgba(255, 247, 233, 0) 60%);
     border-radius: 28px 28px 0 0;
     padding: 26px 22px calc(34px + env(safe-area-inset-bottom));
-    max-height: 86vh;
+    max-height: 88vh;
     overflow-y: auto;
     box-shadow: 0 -10px 40px rgba(74, 55, 40, 0.18);
     animation: slideUp 0.42s var(--ease-out);
@@ -774,6 +790,115 @@
     cursor: pointer;
     text-decoration: underline;
   }
+
+  /* ─── Parent Dashboard ─── */
+  .pz-stats { display: flex; gap: 10px; margin-bottom: 18px; }
+  .pz-stat {
+    flex: 1;
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    padding: 12px 6px;
+    text-align: center;
+    box-shadow: var(--card-shadow-soft);
+  }
+  .pz-stat-num { font-family: 'Baloo 2', cursive; font-size: 20px; font-weight: 800; color: var(--text); }
+  .pz-stat-lbl { font-size: 11px; font-weight: 700; color: var(--text-soft); margin-top: 2px; }
+
+  .pz-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .pz-month { font-family: 'Baloo 2', cursive; font-size: 18px; font-weight: 700; color: var(--text); }
+  .pz-nav {
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    border: none;
+    background: var(--card);
+    box-shadow: var(--card-shadow-soft);
+    color: var(--accent);
+    font-size: 22px; font-weight: 800; line-height: 1;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .pz-nav:active { transform: scale(0.9); }
+
+  .pz-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
+  .pz-weekdays { margin-bottom: 6px; }
+  .pz-weekday { text-align: center; font-size: 11px; font-weight: 800; color: var(--text-faint); }
+
+  .pz-day {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 11px;
+    background: var(--card);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    box-shadow: inset 0 0 0 1px var(--hairline);
+    transition: transform 0.12s;
+  }
+  .pz-day:active { transform: scale(0.92); }
+  .pz-day.empty, .pz-day.future { background: none; box-shadow: none; cursor: default; }
+  .pz-daynum { font-size: 13px; font-weight: 700; color: var(--text-soft); }
+  .pz-day.future .pz-daynum { color: var(--text-faint); opacity: 0.45; }
+  .pz-day.none .pz-daynum { color: var(--text-faint); }
+  .pz-day.partial { box-shadow: inset 0 0 0 2px var(--accent-glow); }
+  .pz-day.partial .pz-daynum { color: var(--accent-deep); }
+  .pz-day.approved { background: linear-gradient(160deg, #FFE39E, #F6C45A); box-shadow: inset 0 0 0 1px rgba(214, 150, 40, 0.5); }
+  .pz-day.approved .pz-daynum { color: #7E5A1E; }
+  .pz-star { position: absolute; top: 1px; right: 4px; font-size: 9px; color: #B9791E; }
+  .pz-day.today { box-shadow: inset 0 0 0 2px var(--accent); }
+  .pz-day.selected { box-shadow: inset 0 0 0 2px var(--accent), 0 0 0 3px rgba(232, 151, 46, 0.22); }
+
+  .pz-legend { display: flex; justify-content: center; gap: 16px; margin: 13px 0 2px; font-size: 11px; font-weight: 700; color: var(--text-soft); }
+  .pz-legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+  .pz-legend .dot.approved { background: #F6C45A; }
+  .pz-legend .dot.partial { background: var(--accent-glow); }
+  .pz-hint { color: var(--text-faint); font-weight: 600; }
+
+  .pz-day-detail {
+    background: var(--card);
+    border-radius: var(--radius-sm);
+    padding: 16px 18px;
+    margin-top: 14px;
+    box-shadow: var(--card-shadow-soft);
+    animation: fadeIn 0.25s ease;
+  }
+  .pz-detail-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
+  .pz-detail-date { font-family: 'Baloo 2', cursive; font-size: 16px; font-weight: 700; color: var(--text); }
+  .pz-detail-count { font-size: 13px; font-weight: 700; color: var(--text-soft); }
+  .pz-detail-grouplbl { font-size: 12px; font-weight: 800; color: var(--text-soft); margin: 8px 0 2px; }
+  .pz-task { display: flex; align-items: center; gap: 10px; padding: 7px 4px; cursor: pointer; border-radius: 8px; }
+  .pz-task:active { background: rgba(232, 151, 46, 0.07); }
+  .pz-task-box {
+    width: 22px; height: 22px;
+    border-radius: 7px;
+    border: 2px solid var(--text-faint);
+    background: var(--card-2);
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 13px; font-weight: 900;
+    flex-shrink: 0;
+  }
+  .pz-task.done .pz-task-box { background: var(--check-green); border-color: var(--check-green-deep); }
+  .pz-task-lbl { font-size: 14px; font-weight: 600; color: var(--text); }
+  .pz-task.done .pz-task-lbl { color: var(--text-faint); text-decoration: line-through; }
+
+  .pz-approve-toggle {
+    width: 100%;
+    margin-top: 12px;
+    padding: 13px;
+    border: none;
+    border-radius: 40px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer;
+    background: var(--card-2);
+    color: var(--text-soft);
+    box-shadow: inset 0 0 0 1.5px var(--hairline);
+    transition: transform 0.15s;
+  }
+  .pz-approve-toggle.on {
+    background: linear-gradient(180deg, #FFE39E, #F6C45A);
+    color: #7E5A1E;
+    box-shadow: 0 4px 14px rgba(244, 180, 60, 0.35);
+  }
+  .pz-approve-toggle:active { transform: scale(0.98); }
 
   /* ─── Day approved state ─── */
   .app.day-approved .task-item { pointer-events: none; opacity: 0.65; }
@@ -909,7 +1034,10 @@
 
   <!-- Header -->
   <div class="header">
-    <div class="greeting" id="greeting"></div>
+    <div class="greet-wrap">
+      <div class="greeting" id="greeting"></div>
+      <div class="today-date" id="todayDate"></div>
+    </div>
     <div class="streak-badge" id="streakBadge">
       <span class="flame">🔥</span>
       <span id="streakCount">0</span>
@@ -1050,7 +1178,7 @@ const MORNING_TASKS = [
   { id: 'm2', label: 'Get dressed', emoji: '👕' },
   { id: 'm3', label: 'Brush teeth', emoji: '🪥' },
   { id: 'm4', label: 'Eat breakfast', emoji: '🥣' },
-  { id: 'm5', label: 'Put dishes in sink', emoji: '🍽️' }
+  { id: 'm5', label: 'Clean up dining table', emoji: '🍽️' }
 ];
 
 const BEDTIME_TASKS = [
@@ -1068,10 +1196,11 @@ const MILESTONES = [
 ];
 
 // ═══════ STATE ═══════
-function getToday() {
-  const d = new Date();
+function dateKey(d) {
   return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
 }
+function getToday() { return dateKey(new Date()); }      // uses the device's local date
+function parseKey(k) { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); }
 
 function loadState() {
   try {
@@ -1102,11 +1231,43 @@ function initState(name) {
 
 function ensureToday(state) {
   const today = getToday();
-  if (!state.days[today]) {
-    state.days[today] = freshDayState();
-    // Check if yesterday was approved for streak continuity
-    // (streak updates happen on approval, so we just need a fresh day)
+  if (!state.days[today]) state.days[today] = freshDayState();
+  if (!state.milestonesUnlocked) state.milestonesUnlocked = {};
+  return state;
+}
+
+// ── Derived values (computed from the day history so parent edits recompute) ──
+function computeStreak(state) {
+  // consecutive approved days ending today (or yesterday, if today isn't approved yet)
+  let d = new Date();
+  if (!(state.days[getToday()] && state.days[getToday()].approved)) d.setDate(d.getDate() - 1);
+  let s = 0;
+  while (state.days[dateKey(d)] && state.days[dateKey(d)].approved) { s++; d.setDate(d.getDate() - 1); }
+  return s;
+}
+
+function computeTotalStars(state) {
+  let n = 0;
+  for (const k in state.days) if (state.days[k].approved) n++;
+  return n * 10;
+}
+
+function computeBestStreak(state) {
+  const keys = Object.keys(state.days).filter(k => state.days[k].approved).sort();
+  let best = 0, cur = 0, prev = null;
+  for (const k of keys) {
+    if (prev) { const pd = parseKey(prev); pd.setDate(pd.getDate() + 1); cur = (dateKey(pd) === k) ? cur + 1 : 1; }
+    else cur = 1;
+    if (cur > best) best = cur;
+    prev = k;
   }
+  return best;
+}
+
+function syncDerived(state) {
+  state.streak = computeStreak(state);
+  state.totalStars = computeTotalStars(state);
+  MILESTONES.forEach(ms => { if (state.streak >= ms.days) state.milestonesUnlocked[ms.key] = true; });
   return state;
 }
 
@@ -1136,7 +1297,10 @@ function launchApp() {
 const existingState = loadState();
 if (existingState) {
   document.getElementById('onboarding').style.display = 'none';
-  showApp(ensureToday(existingState));
+  ensureToday(existingState);
+  syncDerived(existingState);
+  saveState(existingState);
+  showApp(existingState);
 }
 
 // ═══════ MAIN RENDER ═══════
@@ -1157,6 +1321,7 @@ function render(state) {
   const hour = new Date().getHours();
   let greetWord = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
   document.getElementById('greeting').textContent = `${greetWord}, ${state.name}!`;
+  document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
   // Streak
   document.getElementById('streakCount').textContent = state.streak;
@@ -1319,35 +1484,49 @@ function renderJarStars(count) {
 
   if (count === 0) return;
 
+  // loose constellation spread across the jar interior; fill order builds a
+  // balanced shape at every count. All centers stay well inside the clip
+  // (size 20 -> half 10) so nothing pokes out the bottom or sides.
   const positions = [
-    { x: 58, y: 176 }, { x: 100, y: 178 }, { x: 79, y: 168 },
-    { x: 48, y: 158 }, { x: 110, y: 160 }, { x: 67, y: 150 },
-    { x: 92, y: 146 }, { x: 52, y: 138 }, { x: 108, y: 136 },
-    { x: 80, y: 126 }
+    { x: 80, y: 148 }, { x: 58, y: 162 }, { x: 104, y: 160 }, { x: 80, y: 124 },
+    { x: 52, y: 132 }, { x: 108, y: 130 }, { x: 66, y: 104 }, { x: 94, y: 106 },
+    { x: 80, y: 173 }, { x: 80, y: 86 }
   ];
+  const size = 20;
 
   for (let i = 0; i < count && i < positions.length; i++) {
     const pos = positions[i];
-    const size = 21;
+
+    // static group sets the position; inner group does the floating bob
+    const pivot = document.createElementNS(SVGNS, 'g');
+    pivot.setAttribute('transform', `translate(${pos.x} ${pos.y})`);
+
+    const floatG = document.createElementNS(SVGNS, 'g');
+    floatG.setAttribute('class', 'jar-star');
+    floatG.style.animation = `starFloat ${(3 + (i % 4) * 0.55).toFixed(2)}s ease-in-out ${(i * 0.31).toFixed(2)}s infinite`;
 
     const glow = document.createElementNS(SVGNS, 'circle');
-    glow.setAttribute('class', 'star-glow');
-    glow.setAttribute('cx', String(pos.x));
-    glow.setAttribute('cy', String(pos.y));
-    glow.setAttribute('r', '13');
+    glow.setAttribute('class', 's-glow');
+    glow.setAttribute('cx', '0');
+    glow.setAttribute('cy', '0');
+    glow.setAttribute('r', '11');
     glow.setAttribute('fill', 'url(#starGlow)');
-    glow.style.animation = `starGlowPulse ${2.6 + (i % 4) * 0.45}s ease-in-out ${i * 0.22}s infinite`;
-    fill.appendChild(glow);
+    glow.style.animation = `starGlowPulse ${(2.6 + (i % 3) * 0.5).toFixed(2)}s ease-in-out ${(i * 0.22).toFixed(2)}s infinite`;
+    floatG.appendChild(glow);
 
     const star = document.createElementNS(SVGNS, 'use');
     star.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#jarStar');
     star.setAttribute('href', '#jarStar');
-    star.setAttribute('x', String(pos.x - size / 2));
-    star.setAttribute('y', String(pos.y - size / 2));
+    star.setAttribute('class', 's-star');
+    star.setAttribute('x', String(-size / 2));
+    star.setAttribute('y', String(-size / 2));
     star.setAttribute('width', String(size));
     star.setAttribute('height', String(size));
-    star.style.animation = `starPulse ${2.4 + (i % 3) * 0.5}s ease-in-out ${i * 0.18}s infinite`;
-    fill.appendChild(star);
+    star.style.animation = `starPulse ${(2.4 + (i % 3) * 0.5).toFixed(2)}s ease-in-out ${(i * 0.18).toFixed(2)}s infinite`;
+    floatG.appendChild(star);
+
+    pivot.appendChild(floatG);
+    fill.appendChild(pivot);
   }
 }
 
@@ -1384,61 +1563,142 @@ parentToggle.addEventListener('mousedown', () => {
 parentToggle.addEventListener('mouseup', () => clearTimeout(parentHoldTimer));
 parentToggle.addEventListener('mouseleave', () => clearTimeout(parentHoldTimer));
 
+let pzMonth = null;     // first-of-month Date shown in the calendar
+let pzSelected = null;  // currently selected day key, or null
+
 function openParentZone() {
+  const t = new Date();
+  pzMonth = new Date(t.getFullYear(), t.getMonth(), 1);
+  pzSelected = getToday();
+  document.getElementById('parentOverlay').style.display = 'block';
+  renderParentPanel();
+}
+
+function renderParentPanel() {
   const state = ensureToday(loadState());
+  syncDerived(state);
+  saveState(state);
+
   const today = getToday();
-  const dayState = state.days[today];
-  const overlay = document.getElementById('parentOverlay');
-  const panel = document.getElementById('parentPanel');
+  const monthName = pzMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+  const best = computeBestStreak(state);
+  const monthApproved = Object.keys(state.days).filter(k => {
+    const d = parseKey(k);
+    return state.days[k].approved && d.getMonth() === pzMonth.getMonth() && d.getFullYear() === pzMonth.getFullYear();
+  }).length;
 
-  const allTasks = [...MORNING_TASKS, ...BEDTIME_TASKS];
-  const completedCount = allTasks.filter(t => dayState.tasks[t.id]).length;
-  const allDone = completedCount === allTasks.length;
-
-  const dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-
-  panel.innerHTML = `
+  document.getElementById('parentPanel').innerHTML = `
     <button class="close-parent" onclick="closeParentZone()">✕</button>
-    <h2>Parent Review</h2>
-    <div class="date-label">${dateStr} — ${state.name}'s day</div>
+    <h2>Parent Dashboard</h2>
+    <div class="date-label">${state.name}'s progress · ${monthApproved} streak ${monthApproved === 1 ? 'day' : 'days'} this month</div>
 
-    <div class="parent-summary">
-      <h3>☀️ Morning (${MORNING_TASKS.filter(t=>dayState.tasks[t.id]).length}/${MORNING_TASKS.length})</h3>
-      ${MORNING_TASKS.map(t => `
-        <div class="parent-task-row">
-          <span>${t.label}</span>
-          <span class="parent-task-status">${dayState.tasks[t.id] ? '✅' : '⬜'}</span>
-        </div>
-      `).join('')}
+    <div class="pz-stats">
+      <div class="pz-stat"><div class="pz-stat-num">🔥 ${state.streak}</div><div class="pz-stat-lbl">Current streak</div></div>
+      <div class="pz-stat"><div class="pz-stat-num">⭐ ${state.totalStars}</div><div class="pz-stat-lbl">Total stars</div></div>
+      <div class="pz-stat"><div class="pz-stat-num">🏆 ${best}</div><div class="pz-stat-lbl">Best streak</div></div>
     </div>
 
-    <div class="parent-summary">
-      <h3>🌙 Bedtime (${BEDTIME_TASKS.filter(t=>dayState.tasks[t.id]).length}/${BEDTIME_TASKS.length})</h3>
-      ${BEDTIME_TASKS.map(t => `
-        <div class="parent-task-row">
-          <span>${t.label}</span>
-          <span class="parent-task-status">${dayState.tasks[t.id] ? '✅' : '⬜'}</span>
-        </div>
-      `).join('')}
+    <div class="pz-cal-head">
+      <button class="pz-nav" onclick="pzNav(-1)">‹</button>
+      <div class="pz-month">${monthName}</div>
+      <button class="pz-nav" onclick="pzNav(1)">›</button>
+    </div>
+    <div class="pz-cal-grid pz-weekdays">${['S', 'M', 'T', 'W', 'T', 'F', 'S'].map(d => `<div class="pz-weekday">${d}</div>`).join('')}</div>
+    <div class="pz-cal-grid">${buildCalendarCells(state, today)}</div>
+
+    <div class="pz-legend">
+      <span><i class="dot approved"></i>Streak day</span>
+      <span><i class="dot partial"></i>Partial</span>
+      <span class="pz-hint">tap a day to edit</span>
     </div>
 
-    ${dayState.approved
-      ? `<div class="approved-badge">✅ Day approved! Streak: ${state.streak} days</div>`
-      : `<button class="approve-btn" ${!allDone ? 'disabled title="All tasks must be done"' : ''} onclick="approveDay()">
-          ${allDone ? '✅ Approve Day' : `⬜ ${completedCount}/10 tasks done`}
-         </button>`
-    }
-
-    <div class="parent-summary" style="margin-top:16px">
-      <h3>📊 Stats</h3>
-      <div class="parent-task-row"><span>Current streak</span><span>${state.streak} days</span></div>
-      <div class="parent-task-row"><span>Total stars earned</span><span>${state.totalStars} ⭐</span></div>
-    </div>
+    ${pzSelected ? buildDayDetail(state, pzSelected, today) : ''}
 
     <div class="reset-link" onclick="confirmReset()">Reset all data</div>
   `;
+}
 
-  overlay.style.display = 'block';
+function buildCalendarCells(state, today) {
+  const year = pzMonth.getFullYear(), month = pzMonth.getMonth();
+  const firstDow = new Date(year, month, 1).getDay();
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  let cells = '';
+  for (let i = 0; i < firstDow; i++) cells += `<div class="pz-day empty"></div>`;
+  for (let day = 1; day <= daysInMonth; day++) {
+    const k = dateKey(new Date(year, month, day));
+    const d = state.days[k];
+    const isFuture = k > today;
+    let status = 'none';
+    if (d) status = d.approved ? 'approved' : (Object.values(d.tasks).some(Boolean) ? 'partial' : 'none');
+    const cls = ['pz-day', isFuture ? 'future' : status, k === today ? 'today' : '', k === pzSelected ? 'selected' : ''].filter(Boolean).join(' ');
+    const click = isFuture ? '' : `onclick="pzSelect('${k}')"`;
+    const mark = (!isFuture && status === 'approved') ? `<span class="pz-star">★</span>` : '';
+    cells += `<div class="${cls}" ${click}><span class="pz-daynum">${day}</span>${mark}</div>`;
+  }
+  return cells;
+}
+
+function buildDayDetail(state, key, today) {
+  const d = state.days[key] || null;
+  const tasks = (d && d.tasks) || {};
+  const label = parseKey(key).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const approved = !!(d && d.approved);
+  const done = [...MORNING_TASKS, ...BEDTIME_TASKS].filter(t => tasks[t.id]).length;
+  const rows = (list) => list.map(t => `
+    <div class="pz-task ${tasks[t.id] ? 'done' : ''}" onclick="pzToggleTask('${key}','${t.id}')">
+      <span class="pz-task-box">${tasks[t.id] ? '✓' : ''}</span>
+      <span class="pz-task-lbl">${t.emoji} ${t.label}</span>
+    </div>`).join('');
+  return `
+    <div class="pz-day-detail">
+      <div class="pz-detail-head">
+        <div class="pz-detail-date">${label}${key === today ? ' · Today' : ''}</div>
+        <div class="pz-detail-count">${done}/10 done</div>
+      </div>
+      <div class="pz-detail-grouplbl">☀️ Morning</div>${rows(MORNING_TASKS)}
+      <div class="pz-detail-grouplbl">🌙 Bedtime</div>${rows(BEDTIME_TASKS)}
+      <button class="pz-approve-toggle ${approved ? 'on' : ''}" onclick="pzToggleApproved('${key}')">
+        ${approved ? '★ Streak day — tap to remove' : '☆ Mark as a streak day'}
+      </button>
+    </div>`;
+}
+
+function pzNav(delta) {
+  pzMonth = new Date(pzMonth.getFullYear(), pzMonth.getMonth() + delta, 1);
+  renderParentPanel();
+}
+
+function pzSelect(key) {
+  pzSelected = key;
+  renderParentPanel();
+}
+
+function pzToggleTask(key, taskId) {
+  const state = ensureToday(loadState());
+  if (!state.days[key]) state.days[key] = freshDayState();
+  state.days[key].tasks[taskId] = !state.days[key].tasks[taskId];
+  syncDerived(state);
+  saveState(state);
+  render(state);
+  renderParentPanel();
+}
+
+function pzToggleApproved(key) {
+  const state = ensureToday(loadState());
+  if (!state.days[key]) state.days[key] = freshDayState();
+  const before = Object.assign({}, state.milestonesUnlocked);
+  state.days[key].approved = !state.days[key].approved;
+  syncDerived(state);
+  saveState(state);
+  render(state);
+  let newMilestone = null;
+  MILESTONES.forEach(ms => { if (state.milestonesUnlocked[ms.key] && !before[ms.key]) newMilestone = ms; });
+  if (newMilestone) {
+    closeParentZone();
+    setTimeout(() => showCelebration(newMilestone, state), 350);
+  } else {
+    renderParentPanel();
+  }
 }
 
 function closeParentZone() {
@@ -1449,38 +1709,7 @@ document.getElementById('parentOverlay').addEventListener('click', (e) => {
   if (e.target === document.getElementById('parentOverlay')) closeParentZone();
 });
 
-function approveDay() {
-  const state = ensureToday(loadState());
-  const today = getToday();
-  const dayState = state.days[today];
-
-  const allDone = [...MORNING_TASKS, ...BEDTIME_TASKS].every(t => dayState.tasks[t.id]);
-  if (!allDone) return;
-
-  dayState.approved = true;
-  state.totalStars += 10;
-
-  // Update streak
-  state.streak += 1;
-
-  // Check milestones
-  let newMilestone = null;
-  MILESTONES.forEach(ms => {
-    if (state.streak >= ms.days && !state.milestonesUnlocked[ms.key]) {
-      state.milestonesUnlocked[ms.key] = true;
-      newMilestone = ms;
-    }
-  });
-
-  saveState(state);
-  closeParentZone();
-  render(state);
-
-  // Celebrate
-  if (newMilestone) {
-    setTimeout(() => showCelebration(newMilestone, state), 400);
-  }
-}
+// Day approval now lives in the Parent Dashboard (see pzToggleApproved).
 
 // ═══════ CELEBRATION ═══════
 function showCelebration(milestone, state) {
@@ -1526,32 +1755,7 @@ function confirmReset() {
   }
 }
 
-// ═══════ STREAK CONTINUITY CHECK ═══════
-// On load, check if the last approved day was yesterday. If not, reset streak.
-(function checkStreakContinuity() {
-  const state = loadState();
-  if (!state) return;
-
-  const today = getToday();
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
-
-  // If there's a streak but yesterday wasn't approved (and today isn't already approved)
-  if (state.streak > 0) {
-    const yDay = state.days[yesterdayStr];
-    const tDay = state.days[today];
-    const yesterdayApproved = yDay && yDay.approved;
-    const todayApproved = tDay && tDay.approved;
-
-    if (!yesterdayApproved && !todayApproved) {
-      // Check if the last approved day was today — if so, streak is fine
-      // Otherwise, streak broken
-      state.streak = 0;
-      saveState(state);
-    }
-  }
-})();
+// Streak + totals are derived from the day history (see syncDerived) and computed on load in INIT.
 
 // ═══════ PWA: register service worker ═══════
 // Guarded so it no-ops on file:// (only registers over http/https).
