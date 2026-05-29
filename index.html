@@ -1415,19 +1415,41 @@
 // ═══════ CONFIG (defaults — these seed state.settings, then editing happens in the parent Settings panel) ═══════
 const DEFAULT_MORNING_TASKS = [
   { id: 'm1', label: 'Make my bed', emoji: '🛏️' },
+  { id: 'm4', label: 'Eat breakfast', emoji: '🥣' },
+  { id: 'm5', label: 'Clean up dining table', emoji: '🍽️' },
+  { id: 'm3', label: 'Brush teeth & wash face', emoji: '🪥' },
+  { id: 'm2', label: 'Get dressed', emoji: '👕' }
+];
+
+const DEFAULT_BEDTIME_TASKS = [
+  { id: 'b1', label: 'Tidy up toys & room', emoji: '🧸' },
+  { id: 'b4', label: 'Brush teeth & floss', emoji: '🪥' },
+  { id: 'b2', label: 'Wash up', emoji: '🧼' },
+  { id: 'b3', label: 'Put on pajamas', emoji: '🌙' },
+  { id: 'b5', label: 'Lay out tomorrow\'s clothes', emoji: '👖' }
+];
+
+// Temporary: the original routines, used only to detect an un-customized install
+// during the v2 migration in ensureToday(). Safe to delete once every device has migrated.
+const TASKS_VERSION = 2;
+const OLD_DEFAULT_MORNING_TASKS = [
+  { id: 'm1', label: 'Make my bed', emoji: '🛏️' },
   { id: 'm2', label: 'Get dressed', emoji: '👕' },
   { id: 'm3', label: 'Brush teeth', emoji: '🪥' },
   { id: 'm4', label: 'Eat breakfast', emoji: '🥣' },
   { id: 'm5', label: 'Clean up dining table', emoji: '🍽️' }
 ];
-
-const DEFAULT_BEDTIME_TASKS = [
+const OLD_DEFAULT_BEDTIME_TASKS = [
   { id: 'b1', label: 'Tidy up toys & room', emoji: '🧸' },
   { id: 'b2', label: 'Take bath or shower', emoji: '🛁' },
   { id: 'b3', label: 'Put on pajamas', emoji: '🌙' },
   { id: 'b4', label: 'Brush teeth', emoji: '🪥' },
   { id: 'b5', label: 'Lay out tomorrow\'s clothes', emoji: '👖' }
 ];
+function sameTasks(a, b) {
+  return Array.isArray(a) && a.length === b.length &&
+    a.every((t, i) => t.id === b[i].id && t.label === b[i].label && t.emoji === b[i].emoji);
+}
 
 // Milestone thresholds (7/14/30) + keys are FIXED; only icon/label are editable in Settings.
 const DEFAULT_MILESTONES = [
@@ -1530,6 +1552,18 @@ function ensureToday(state) {
   if (typeof s.muted !== 'boolean') s.muted = (typeof state.muted === 'boolean' ? state.muted : false);
   delete state.muted;
 
+  // ── v2 routines: bump task lists on devices still running the untouched originals.
+  //    Custom-edited devices are left as-is; the version flag makes this run once. ──
+  let _tasksMigrated = false;
+  if (s.tasksVersion !== TASKS_VERSION) {
+    if (sameTasks(s.tasks.morning, OLD_DEFAULT_MORNING_TASKS) &&
+        sameTasks(s.tasks.bedtime, OLD_DEFAULT_BEDTIME_TASKS)) {
+      s.tasks = { morning: clone(DEFAULT_MORNING_TASKS), bedtime: clone(DEFAULT_BEDTIME_TASKS) };
+      _tasksMigrated = true;
+    }
+    s.tasksVersion = TASKS_VERSION;
+  }
+
   // ── Immutability: days recorded before settings existed get the original task set ──
   for (const k in state.days) {
     if (!state.days[k].taskDefs) {
@@ -1539,6 +1573,8 @@ function ensureToday(state) {
 
   const today = getToday();
   if (!state.days[today]) state.days[today] = freshDayState(s);
+  // If today already existed pre-migration, re-point it at the new tasks (keeps checks by id).
+  else if (_tasksMigrated) applySettingsToToday(state);
   // Every milestone in settings must have a runtime claim-state entry (keys are fixed,
   // but this guards renderMilestones against a missing key on any odd/old save).
   if (!state.milestones) state.milestones = freshMilestones(s);

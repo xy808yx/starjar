@@ -1,7 +1,7 @@
 /* Star Jar — service worker
    Precaches the app shell, serves the page network-first (so updates land),
    and runtime-caches Google Fonts so the app works fully offline. */
-const CACHE = 'starjar-v2';
+const CACHE = 'starjar-v3';
 const SHELL = [
   './',
   './index.html',
