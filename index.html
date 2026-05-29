@@ -784,70 +784,6 @@
     font-weight: 600;
   }
 
-  .parent-summary {
-    background: var(--card);
-    border-radius: var(--radius-sm);
-    padding: 16px 18px;
-    margin-bottom: 14px;
-    box-shadow: var(--card-shadow-soft);
-  }
-
-  .parent-summary h3 {
-    font-family: 'Baloo 2', cursive;
-    font-size: 16px;
-    font-weight: 700;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--text);
-  }
-
-  .parent-task-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 9px 0;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-soft);
-    border-bottom: 1px solid var(--hairline);
-  }
-
-  .parent-task-row:last-child { border-bottom: none; }
-
-  .parent-task-status {
-    font-size: 18px;
-  }
-
-  .approve-btn {
-    width: 100%;
-    font-family: 'Baloo 2', cursive;
-    font-size: 18px;
-    font-weight: 700;
-    color: white;
-    background: linear-gradient(180deg, #8BBE72, var(--check-green-deep));
-    border: none;
-    border-radius: 60px;
-    padding: 16px;
-    cursor: pointer;
-    margin-top: 6px;
-    transition: transform 0.18s var(--ease-bounce), box-shadow 0.25s, opacity 0.25s;
-    box-shadow: 0 8px 20px rgba(106, 155, 83, 0.4), inset 0 1.5px 0 rgba(255, 255, 255, 0.4);
-  }
-
-  .approve-btn:active { transform: scale(0.97); }
-  .approve-btn:disabled { opacity: 0.5; box-shadow: none; background: var(--text-faint); }
-
-  .approved-badge {
-    text-align: center;
-    padding: 16px;
-    font-family: 'Baloo 2', cursive;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--check-green-deep);
-  }
-
   .close-parent {
     position: absolute;
     top: 18px;
@@ -986,6 +922,71 @@
   }
   .pz-approve-toggle:active { transform: scale(0.98); }
 
+  /* ─── Parent: Dashboard / Settings tabs ─── */
+  .pz-tabs { display: flex; gap: 8px; margin: 2px 0 16px; }
+  .pz-tab {
+    flex: 1; padding: 11px; border: none; border-radius: 40px;
+    font-family: 'Baloo 2', cursive; font-size: 15px; font-weight: 700;
+    color: var(--text-soft); background: var(--card-2);
+    box-shadow: inset 0 0 0 1px var(--hairline); cursor: pointer;
+    transition: transform 0.15s, background 0.2s, color 0.2s, box-shadow 0.2s;
+  }
+  .pz-tab.active {
+    background: linear-gradient(180deg, var(--accent-glow), var(--accent));
+    color: #fff; box-shadow: 0 4px 14px rgba(232, 151, 46, 0.35);
+  }
+  .pz-tab:active { transform: scale(0.97); }
+
+  /* ─── Settings form ─── */
+  .set-section-title { font-family: 'Baloo 2', cursive; font-size: 16px; font-weight: 700; color: var(--text); margin: 20px 4px 9px; }
+  .set-group { background: var(--card); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 12px; box-shadow: var(--card-shadow-soft); }
+  .set-grouphead { font-family: 'Baloo 2', cursive; font-size: 15px; font-weight: 700; color: var(--text-soft); margin-bottom: 10px; }
+  .set-task-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .set-emoji, .set-label, .set-pin, .set-time input {
+    font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; color: var(--text);
+    background: var(--card-2); border: 1.5px solid var(--hairline); border-radius: 12px;
+    padding: 10px 12px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .set-emoji { width: 50px; flex-shrink: 0; text-align: center; padding: 10px 4px; }
+  .set-label { flex: 1; min-width: 0; }
+  .set-emoji:focus, .set-label:focus, .set-pin:focus, .set-time input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232, 151, 46, 0.14); }
+  .set-remove {
+    width: 36px; height: 36px; flex-shrink: 0; border: none; border-radius: 10px;
+    background: rgba(201, 74, 46, 0.1); color: #C0492E; font-size: 15px; font-weight: 800; cursor: pointer;
+    transition: transform 0.15s, background 0.2s;
+  }
+  .set-remove:active { transform: scale(0.88); background: rgba(201, 74, 46, 0.2); }
+  .set-add {
+    width: 100%; padding: 11px; border: 1.5px dashed var(--text-faint); border-radius: 12px;
+    background: none; color: var(--text-soft); font-family: 'Baloo 2', cursive; font-size: 14px; font-weight: 700;
+    cursor: pointer; transition: background 0.2s; margin-top: 2px;
+  }
+  .set-add:active { background: var(--accent-soft); }
+  .set-times { display: flex; flex-direction: column; gap: 10px; }
+  .set-time { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--card); border-radius: var(--radius-sm); padding: 12px 14px; box-shadow: var(--card-shadow-soft); font-weight: 700; color: var(--text); }
+  .set-time input { width: 145px; }
+  .set-ms { background: var(--card); border-radius: var(--radius-sm); padding: 12px 14px; box-shadow: var(--card-shadow-soft); }
+  .set-ms-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .set-ms-row:last-child { margin-bottom: 0; }
+  .set-ms-days { width: 62px; flex-shrink: 0; font-family: 'Baloo 2', cursive; font-weight: 700; font-size: 13px; color: var(--accent-deep); }
+  .set-pin { width: 130px; letter-spacing: 7px; text-align: center; font-size: 21px; }
+  .set-mute { display: flex; align-items: center; justify-content: space-between; background: var(--card); border-radius: var(--radius-sm); padding: 14px; margin-top: 18px; box-shadow: var(--card-shadow-soft); font-weight: 700; color: var(--text); }
+  .set-switch { width: 52px; height: 30px; flex-shrink: 0; border-radius: 30px; border: none; background: var(--text-faint); position: relative; cursor: pointer; transition: background 0.25s; }
+  .set-switch.on { background: var(--check-green); }
+  .set-knob { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: #fff; box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); transition: transform 0.25s var(--ease-out); }
+  .set-switch.on .set-knob { transform: translateX(22px); }
+  .set-msg { text-align: center; font-weight: 700; font-size: 14px; min-height: 18px; margin: 16px 0 4px; }
+  .set-msg.ok { color: var(--check-green-deep); }
+  .set-msg.err { color: var(--streak-flame); }
+  .set-save {
+    width: 100%; padding: 16px; border: none; border-radius: 60px; margin-top: 6px;
+    font-family: 'Baloo 2', cursive; font-size: 18px; font-weight: 700; color: #fff;
+    background: linear-gradient(180deg, var(--accent-glow), var(--accent) 60%, var(--accent-deep));
+    box-shadow: 0 8px 20px rgba(232, 151, 46, 0.4), inset 0 1.5px 0 rgba(255, 255, 255, 0.4); cursor: pointer;
+    transition: transform 0.18s var(--ease-bounce);
+  }
+  .set-save:active { transform: scale(0.98); }
+
   /* ─── Day approved state ─── */
   .app.day-approved .task-item { pointer-events: none; opacity: 0.65; }
   .app.day-approved .task-checkbox { opacity: 0.7; }
@@ -1061,6 +1062,70 @@
     transition: transform 0.18s var(--ease-bounce);
   }
   .celebration-action:active { transform: scale(0.96); }
+
+  /* ─── Get-my-star CTA (kid-initiated approval) ─── */
+  .get-star-btn {
+    display: block;
+    margin: -6px auto 26px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    color: #6B4A12;
+    background: linear-gradient(180deg, #FFE491, #FFC83C 58%, #F2A23A);
+    border: none;
+    border-radius: 60px;
+    padding: 16px 44px;
+    cursor: pointer;
+    box-shadow: 0 10px 26px rgba(244, 180, 60, 0.5), inset 0 1.5px 0 rgba(255, 255, 255, 0.6);
+    animation: getStarPulse 1.9s var(--ease-out) infinite;
+    transition: transform 0.18s var(--ease-bounce);
+  }
+  .get-star-btn:active { transform: scale(0.95); }
+  @keyframes getStarPulse {
+    0%, 100% { transform: translateY(0) scale(1); box-shadow: 0 10px 26px rgba(244, 180, 60, 0.5), inset 0 1.5px 0 rgba(255, 255, 255, 0.6); }
+    50% { transform: translateY(-3px) scale(1.03); box-shadow: 0 16px 34px rgba(244, 180, 60, 0.62), inset 0 1.5px 0 rgba(255, 255, 255, 0.6); }
+  }
+
+  /* ─── PIN pad (reuses the celebration overlay shell) ─── */
+  .pin-pad { display: flex; flex-direction: column; align-items: center; margin-bottom: 22px; }
+  .pin-pad.shake { animation: pinShake 0.5s; }
+  @keyframes pinShake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-9px); }
+    40% { transform: translateX(8px); }
+    60% { transform: translateX(-6px); }
+    80% { transform: translateX(4px); }
+  }
+  .pin-dots { display: flex; gap: 16px; margin-bottom: 22px; }
+  .pin-dot {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--card-2);
+    box-shadow: inset 0 0 0 2px var(--text-faint);
+    transition: background 0.18s var(--ease-out), box-shadow 0.18s, transform 0.18s var(--ease-bounce);
+  }
+  .pin-dot.filled {
+    background: linear-gradient(180deg, var(--accent-glow), var(--accent));
+    box-shadow: 0 3px 9px rgba(232, 151, 46, 0.4);
+    transform: scale(1.12);
+  }
+  .pin-keys { display: grid; grid-template-columns: repeat(3, 72px); gap: 12px; }
+  .pin-key {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    border: none;
+    background: var(--card);
+    font-family: 'Baloo 2', cursive;
+    font-size: 27px; font-weight: 700;
+    color: var(--text);
+    cursor: pointer;
+    box-shadow: var(--card-shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: transform 0.12s var(--ease-bounce), background 0.15s;
+  }
+  .pin-key:active { transform: scale(0.9); background: var(--accent-soft); }
+  .pin-key-util { font-size: 20px; color: var(--text-soft); background: var(--card-2); }
+  .pin-msg { margin-top: 14px; font-weight: 700; font-size: 15px; color: var(--streak-flame); min-height: 19px; }
 
   /* ─── Parent: prizes to hand out ─── */
   .pz-prizes {
@@ -1266,9 +1331,12 @@
       </svg>
     </div>
     <div class="jar-count">
-      <span id="todayStars">0</span> / 10 stars today
+      <span id="todayStars">0</span> / <span id="totalStarsToday">10</span> stars today
     </div>
   </div>
+
+  <!-- Kid-initiated approval: shown only when every task today is checked -->
+  <button class="get-star-btn" id="getStarBtn" style="display:none" onclick="openPin('approve')">Get my star! ⭐</button>
 
   <!-- Morning -->
   <div class="routine-block" id="morningBlock">
@@ -1276,7 +1344,7 @@
       <div class="routine-icon morning">☀️</div>
       <div class="routine-titlegroup">
         <div class="routine-title">Morning</div>
-        <div class="routine-target"><span class="rt-pre">by</span><span class="rt-time">8:00 AM</span></div>
+        <div class="routine-target"><span class="rt-pre">by</span><span class="rt-time" id="rtMorning">8:00 AM</span></div>
       </div>
       <div class="routine-progress" id="morningProgress">0/5</div>
       <span class="routine-chevron">▾</span>
@@ -1290,7 +1358,7 @@
       <div class="routine-icon bedtime">🌙</div>
       <div class="routine-titlegroup">
         <div class="routine-title">Bedtime</div>
-        <div class="routine-target"><span class="rt-pre">by</span><span class="rt-time">8:00 PM</span></div>
+        <div class="routine-target"><span class="rt-pre">by</span><span class="rt-time" id="rtBedtime">8:00 PM</span></div>
       </div>
       <div class="routine-progress" id="bedtimeProgress">0/5</div>
       <span class="routine-chevron">▾</span>
@@ -1321,13 +1389,31 @@
   <div class="celebration-icon" id="celebIcon"></div>
   <h2 id="celebTitle"></h2>
   <p id="celebText"></p>
+  <div class="pin-pad" id="pinPad" style="display:none">
+    <div class="pin-dots" id="pinDots"></div>
+    <div class="pin-keys">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key pin-key-util" onclick="pinClear()">C</button>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key pin-key-util" onclick="pinBack()">⌫</button>
+    </div>
+    <div class="pin-msg" id="pinMsg"></div>
+  </div>
   <button class="celebration-action" id="celebActionBtn" onclick="claimMilestone()" style="display:none"></button>
   <button class="celebration-close" onclick="closeCelebration()">Awesome! ⭐</button>
 </div>
 
 <script>
-// ═══════ CONFIG ═══════
-const MORNING_TASKS = [
+// ═══════ CONFIG (defaults — these seed state.settings, then editing happens in the parent Settings panel) ═══════
+const DEFAULT_MORNING_TASKS = [
   { id: 'm1', label: 'Make my bed', emoji: '🛏️' },
   { id: 'm2', label: 'Get dressed', emoji: '👕' },
   { id: 'm3', label: 'Brush teeth', emoji: '🪥' },
@@ -1335,7 +1421,7 @@ const MORNING_TASKS = [
   { id: 'm5', label: 'Clean up dining table', emoji: '🍽️' }
 ];
 
-const BEDTIME_TASKS = [
+const DEFAULT_BEDTIME_TASKS = [
   { id: 'b1', label: 'Tidy up toys & room', emoji: '🧸' },
   { id: 'b2', label: 'Take bath or shower', emoji: '🛁' },
   { id: 'b3', label: 'Put on pajamas', emoji: '🌙' },
@@ -1343,11 +1429,44 @@ const BEDTIME_TASKS = [
   { id: 'b5', label: 'Lay out tomorrow\'s clothes', emoji: '👖' }
 ];
 
-const MILESTONES = [
+// Milestone thresholds (7/14/30) + keys are FIXED; only icon/label are editable in Settings.
+const DEFAULT_MILESTONES = [
   { days: 7, icon: '🎬', label: 'Pick a show to watch', key: 'ms7' },
   { days: 14, icon: '🍦', label: 'Choose an ice cream flavor', key: 'ms14' },
   { days: 30, icon: '💰', label: '$20 cash or toy', key: 'ms30' }
 ];
+
+const DEFAULT_TIMES = { morning: '08:00', bedtime: '20:00' };
+
+// Gold/star palette for the "day complete" + "star earned" celebrations.
+const STAR_CONFETTI = ['#FFD700', '#FFC83C', '#FFE488', '#FFF3CE', '#FFFFFF', '#F2A23A'];
+
+const clone = (x) => JSON.parse(JSON.stringify(x));
+let _idSeq = 0;
+function genTaskId() { return 't' + Date.now().toString(36) + (_idSeq++).toString(36); }
+// Labels/emoji are parent-entered, so escape before dropping into innerHTML.
+function escapeHtml(s) {
+  return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+function defaultSettings() {
+  return {
+    tasks: { morning: clone(DEFAULT_MORNING_TASKS), bedtime: clone(DEFAULT_BEDTIME_TASKS) },
+    times: clone(DEFAULT_TIMES),
+    milestones: clone(DEFAULT_MILESTONES),
+    pin: '8888',
+    muted: false
+  };
+}
+
+// "8:00 AM" from a 24h "HH:MM" string.
+function formatTime(hhmm) {
+  const [h, m] = String(hhmm || '').split(':').map(Number);
+  if (isNaN(h)) return hhmm || '';
+  const ap = h < 12 ? 'AM' : 'PM';
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${String(isNaN(m) ? 0 : m).padStart(2, '0')} ${ap}`;
+}
 
 // ═══════ STATE ═══════
 function dateKey(d) {
@@ -1366,36 +1485,65 @@ function saveState(state) {
   localStorage.setItem('starjar_state', JSON.stringify(state));
 }
 
-function freshDayState() {
+// A day snapshots the task set in force when it was created, so history stays immutable
+// even after the parent edits the live task list in Settings.
+function freshDayState(settings) {
+  const defs = { morning: clone(settings.tasks.morning), bedtime: clone(settings.tasks.bedtime) };
   const tasks = {};
-  MORNING_TASKS.forEach(t => tasks[t.id] = false);
-  BEDTIME_TASKS.forEach(t => tasks[t.id] = false);
-  return { tasks, approved: false };
+  defs.morning.forEach(t => tasks[t.id] = false);
+  defs.bedtime.forEach(t => tasks[t.id] = false);
+  return { tasks, taskDefs: defs, approved: false };
 }
 
-function freshMilestones() {
+function freshMilestones(settings) {
   const m = {};
-  MILESTONES.forEach(ms => m[ms.key] = { redeemed: false, pending: false });
+  settings.milestones.forEach(ms => m[ms.key] = { redeemed: false, pending: false });
   return m;
 }
 
 function initState(name) {
+  const settings = defaultSettings();
   return {
     name,
     streak: 0,
     totalStars: 0,
     cycleBase: 0,
-    milestones: freshMilestones(),
-    days: { [getToday()]: freshDayState() }
+    settings,
+    milestones: freshMilestones(settings),
+    days: { [getToday()]: freshDayState(settings) }
   };
 }
 
 function ensureToday(state) {
+  // ── Settings (seed/migrate FIRST — freshDayState/freshMilestones below depend on it) ──
+  if (!state.settings) state.settings = {};
+  const s = state.settings;
+  if (typeof s.pin !== 'string') s.pin = '8888';
+  if (!s.tasks || !Array.isArray(s.tasks.morning) || !Array.isArray(s.tasks.bedtime)) {
+    s.tasks = { morning: clone(DEFAULT_MORNING_TASKS), bedtime: clone(DEFAULT_BEDTIME_TASKS) };
+  }
+  if (!s.times || typeof s.times.morning !== 'string' || typeof s.times.bedtime !== 'string') {
+    s.times = clone(DEFAULT_TIMES);
+  }
+  if (!Array.isArray(s.milestones)) s.milestones = clone(DEFAULT_MILESTONES);
+  // Mute moved from a top-level flag into settings.
+  if (typeof s.muted !== 'boolean') s.muted = (typeof state.muted === 'boolean' ? state.muted : false);
+  delete state.muted;
+
+  // ── Immutability: days recorded before settings existed get the original task set ──
+  for (const k in state.days) {
+    if (!state.days[k].taskDefs) {
+      state.days[k].taskDefs = { morning: clone(DEFAULT_MORNING_TASKS), bedtime: clone(DEFAULT_BEDTIME_TASKS) };
+    }
+  }
+
   const today = getToday();
-  if (!state.days[today]) state.days[today] = freshDayState();
-  if (!state.milestones) state.milestones = freshMilestones();
+  if (!state.days[today]) state.days[today] = freshDayState(s);
+  // Every milestone in settings must have a runtime claim-state entry (keys are fixed,
+  // but this guards renderMilestones against a missing key on any odd/old save).
+  if (!state.milestones) state.milestones = freshMilestones(s);
+  else s.milestones.forEach(ms => { if (!state.milestones[ms.key]) state.milestones[ms.key] = { redeemed: false, pending: false }; });
   if (typeof state.cycleBase !== 'number') state.cycleBase = 0;
-  if (typeof state.muted !== 'boolean') state.muted = false;
   delete state.milestonesUnlocked;
   return state;
 }
@@ -1411,9 +1559,16 @@ function computeStreak(state) {
 }
 
 function computeTotalStars(state) {
+  // Each approved day contributes its own task count (its frozen jar size).
   let n = 0;
-  for (const k in state.days) if (state.days[k].approved) n++;
-  return n * 10;
+  for (const k in state.days) {
+    const d = state.days[k];
+    if (d.approved) {
+      const defs = d.taskDefs;
+      n += defs ? (defs.morning.length + defs.bedtime.length) : 10;
+    }
+  }
+  return n;
 }
 
 function computeBestStreak(state) {
@@ -1434,7 +1589,9 @@ function syncDerived(state) {
   // A broken streak collapses below the current cycle's start — restart the ladder.
   if (state.streak < state.cycleBase) {
     state.cycleBase = 0;
-    MILESTONES.forEach(ms => { state.milestones[ms.key].redeemed = false; state.milestones[ms.key].pending = false; });
+    state.settings.milestones.forEach(ms => {
+      if (state.milestones[ms.key]) { state.milestones[ms.key].redeemed = false; state.milestones[ms.key].pending = false; }
+    });
   }
   return state;
 }
@@ -1496,7 +1653,8 @@ function render(state) {
   const today = getToday();
   const dayState = state.days[today];
   const isApproved = dayState.approved;
-  appMuted = !!state.muted;
+  appMuted = !!state.settings.muted;
+  const defs = dayState.taskDefs || state.settings.tasks;
 
   // Greeting
   const hour = new Date().getHours();
@@ -1511,14 +1669,29 @@ function render(state) {
   const app = document.getElementById('app');
   app.classList.toggle('day-approved', isApproved);
 
-  // Tasks
-  renderTaskList('morningTasks', MORNING_TASKS, dayState, state, 'morningProgress', isApproved);
-  renderTaskList('bedtimeTasks', BEDTIME_TASKS, dayState, state, 'bedtimeProgress', isApproved);
+  // Target times (editable in Settings)
+  document.getElementById('rtMorning').textContent = formatTime(state.settings.times.morning);
+  document.getElementById('rtBedtime').textContent = formatTime(state.settings.times.bedtime);
 
-  // Stars
-  const starCount = Object.values(dayState.tasks).filter(Boolean).length;
+  // A routine with no tasks is hidden entirely
+  setRoutineVisible('morning', defs.morning.length > 0);
+  setRoutineVisible('bedtime', defs.bedtime.length > 0);
+
+  // Tasks (today uses today's snapshot, which mirrors the live settings)
+  renderTaskList('morningTasks', defs.morning, dayState, 'morningProgress', isApproved);
+  renderTaskList('bedtimeTasks', defs.bedtime, dayState, 'bedtimeProgress', isApproved);
+
+  // Stars — counts adapt to the live task total
+  const allDefs = defs.morning.concat(defs.bedtime);
+  const totalTasks = allDefs.length;
+  const starCount = allDefs.filter(t => dayState.tasks[t.id]).length;
   document.getElementById('todayStars').textContent = starCount;
-  renderJarStars(starCount);
+  document.getElementById('totalStarsToday').textContent = totalTasks;
+  renderJarStars(starCount, totalTasks);
+
+  // Kid-initiated approval CTA — only when every task is done and the day isn't verified yet
+  document.getElementById('getStarBtn').style.display =
+    (totalTasks > 0 && starCount === totalTasks && !isApproved) ? '' : 'none';
 
   // Milestones
   renderMilestones(state);
@@ -1527,7 +1700,12 @@ function render(state) {
   applyForegrounding();
 }
 
-function renderTaskList(containerId, tasks, dayState, state, progressId, disabled) {
+function setRoutineVisible(r, visible) {
+  const block = document.getElementById(r + 'Block');
+  if (block) block.style.display = visible ? '' : 'none';
+}
+
+function renderTaskList(containerId, tasks, dayState, progressId, disabled) {
   const container = document.getElementById(containerId);
   const done = tasks.filter(t => dayState.tasks[t.id]).length;
   document.getElementById(progressId).textContent = `${done}/${tasks.length}`;
@@ -1539,7 +1717,7 @@ function renderTaskList(containerId, tasks, dayState, state, progressId, disable
         <div class="task-checkbox ${checked ? 'checked' : ''}">
           <span class="check-icon">✓</span>
         </div>
-        <span class="task-label">${task.emoji} ${task.label}</span>
+        <span class="task-label">${escapeHtml(task.emoji)} ${escapeHtml(task.label)}</span>
       </li>
     `;
   }).join('');
@@ -1550,10 +1728,11 @@ function toggleTask(taskId, el) {
   const today = getToday();
   if (state.days[today].approved) return;
   const ds = state.days[today];
+  const defs = ds.taskDefs;
 
   // routine-completion snapshot before the change
-  const beforeM = MORNING_TASKS.every(t => ds.tasks[t.id]);
-  const beforeB = BEDTIME_TASKS.every(t => ds.tasks[t.id]);
+  const beforeM = defs.morning.every(t => ds.tasks[t.id]);
+  const beforeB = defs.bedtime.every(t => ds.tasks[t.id]);
 
   const newVal = !ds.tasks[taskId];
   ds.tasks[taskId] = newVal;
@@ -1569,11 +1748,11 @@ function toggleTask(taskId, el) {
     chimeCheck();
     buzz(18);
     // celebrate completions (only when checking on)
-    const afterM = MORNING_TASKS.every(t => ds.tasks[t.id]);
-    const afterB = BEDTIME_TASKS.every(t => ds.tasks[t.id]);
+    const afterM = defs.morning.every(t => ds.tasks[t.id]);
+    const afterB = defs.bedtime.every(t => ds.tasks[t.id]);
     if (afterM && afterB && !(beforeM && beforeB)) celebrateDay(state.name);
-    else if (afterM && !beforeM) cueRoutine('morning');
-    else if (afterB && !beforeB) cueRoutine('bedtime');
+    else if (afterM && !beforeM && defs.morning.length) cueRoutine('morning');
+    else if (afterB && !beforeB && defs.bedtime.length) cueRoutine('bedtime');
   }
 }
 
@@ -1630,13 +1809,13 @@ function showToast(msg) {
 
 // Big "whole day done" celebration — distinct from milestone confetti (gold/star palette).
 function celebrateDay(name) {
+  resetCelebrationUI();
   document.getElementById('celebIcon').textContent = '🌟';
   document.getElementById('celebTitle').textContent = 'Day Complete!';
   document.getElementById('celebText').textContent = `Every star earned today${name ? ', ' + name : ''}! 🎉`;
-  document.getElementById('celebActionBtn').style.display = 'none';
   document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
   document.getElementById('celebration').classList.add('show');
-  spawnConfetti(['#FFD700', '#FFC83C', '#FFE488', '#FFF3CE', '#FFFFFF', '#F2A23A']);
+  spawnConfetti(STAR_CONFETTI);
   chimeDay();
   buzz([30, 40, 30, 40, 70]);
 }
@@ -1660,6 +1839,78 @@ function applyForegrounding() {
 function toggleRoutine(r) {
   routineToggled[r] = !isRoutineOpen(r);
   applyForegrounding();
+}
+
+// ═══════ PIN (gates kid approval + parent zone) ═══════
+let pinEntry = '';
+let pinMode = null;   // 'approve' | 'parent'
+
+function openPin(mode) {
+  resetCelebrationUI();
+  pinMode = mode;
+  pinEntry = '';
+  document.getElementById('celebIcon').textContent = '🔒';
+  document.getElementById('celebTitle').textContent = mode === 'approve' ? 'Get Your Star!' : 'Grown-Ups Only';
+  document.getElementById('celebText').textContent = mode === 'approve'
+    ? 'Ask a grown-up to enter the code' : 'Enter the grown-up code';
+  document.getElementById('pinPad').style.display = 'flex';
+  document.querySelector('.celebration-close').textContent = 'Cancel';
+  renderPinDots();
+  document.getElementById('celebration').classList.add('show');
+}
+
+function renderPinDots() {
+  document.getElementById('pinDots').innerHTML =
+    [0, 1, 2, 3].map(i => `<span class="pin-dot ${i < pinEntry.length ? 'filled' : ''}"></span>`).join('');
+}
+
+function pinKey(d) {
+  document.getElementById('pinMsg').textContent = '';
+  if (pinEntry.length >= 4) return;
+  pinEntry += d;
+  renderPinDots();
+  buzz(8);
+  if (pinEntry.length === 4) setTimeout(verifyPin, 200);
+}
+function pinBack() { pinEntry = pinEntry.slice(0, -1); renderPinDots(); }
+function pinClear() { pinEntry = ''; renderPinDots(); document.getElementById('pinMsg').textContent = ''; }
+
+function verifyPin() {
+  const state = ensureToday(loadState());
+  const correct = (state.settings && state.settings.pin) || '8888';
+  if (pinEntry !== correct) { pinFail(); return; }
+  const mode = pinMode;
+  pinMode = null;
+  pinEntry = '';
+  if (mode === 'approve') approveTodayAfterPin(state);
+  else { closeCelebration(); openParentZone(); }
+}
+
+function pinFail() {
+  const pad = document.getElementById('pinPad');
+  document.getElementById('pinMsg').textContent = 'Oops — try again';
+  pad.classList.remove('shake'); void pad.offsetWidth; pad.classList.add('shake');
+  buzz([40, 60, 40]);
+  pinEntry = '';
+  setTimeout(renderPinDots, 130);
+}
+
+// Correct PIN on the kid CTA → today is approved (counts toward streak via syncDerived).
+function approveTodayAfterPin(state) {
+  const today = getToday();
+  state.days[today].approved = true;
+  syncDerived(state);
+  saveState(state);
+  render(state);
+  // morph the same overlay into a "star earned!" celebration
+  resetCelebrationUI();
+  document.getElementById('celebIcon').textContent = '⭐';
+  document.getElementById('celebTitle').textContent = 'Star Earned!';
+  document.getElementById('celebText').textContent = `Amazing work today, ${state.name}! 🎉`;
+  document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
+  spawnConfetti(STAR_CONFETTI);
+  chimeDay();
+  buzz([30, 40, 30, 40, 70]);
 }
 
 // ═══════ STAR ANIMATION ═══════
@@ -1742,33 +1993,61 @@ function animateStarToJar(taskEl) {
 }
 
 // ═══════ JAR RENDERING ═══════
-function renderJarStars(count) {
+// Lay out `total` star slots bottom-up in a centered cluster, sized to fit the jar.
+// The first `count` are revealed, so slots never shift as the jar fills.
+function jarStarLayout(total) {
+  const CX = 80, X_HALF = 30;      // center x, max half-width for star centers
+  const Y_BOT = 172, Y_TOP = 96;   // center-y of the bottom and top rows
+  if (total <= 0) return { positions: [], size: 20 };
+  const cols = Math.max(2, Math.min(4, Math.ceil(Math.sqrt(total))));
+  const rows = Math.ceil(total / cols);
+  const colStep = (2 * X_HALF) / (cols - 1);
+  const rowGap = rows > 1 ? Math.min((Y_BOT - Y_TOP) / (rows - 1), 28) : 0;
+  let size = rows > 1 ? Math.min(21, rowGap * 0.82, colStep * 0.9) : 20;
+  size = Math.max(10, size);
+
+  // Build bottom-up, each row centered as a group, filled center-out so the
+  // first few stars (a partly-done day) sit balanced under the jar's middle.
+  const positions = [];
+  let placed = 0;
+  for (let row = 0; row < rows && placed < total; row++) {
+    const inRow = Math.min(cols, total - placed);
+    const y = Y_BOT - row * rowGap;
+    const startX = CX - ((inRow - 1) * colStep) / 2;
+    const xs = [];
+    for (let c = 0; c < inRow; c++) xs.push(startX + c * colStep);
+    const order = [...xs.keys()].sort((a, b) => Math.abs(a - (inRow - 1) / 2) - Math.abs(b - (inRow - 1) / 2));
+    order.forEach((c, k) => {
+      const jitter = (((placed + k) * 37) % 5) - 2;     // subtle deterministic wobble
+      positions.push({ x: xs[c] + jitter, y });
+    });
+    placed += inRow;
+  }
+  return { positions, size };
+}
+
+function renderJarStars(count, total) {
   const SVGNS = 'http://www.w3.org/2000/svg';
   const fill = document.getElementById('starFill');
   const warm = document.getElementById('warmFillRect');
   fill.innerHTML = '';
 
-  // rising warm-light pool: bottom (y=190) up to y=40
+  total = total || 0;
+
+  // rising warm-light pool: bottom (y=190) up to y=40, proportional to the day's total
   const maxHeight = 150;
-  const fillHeight = Math.max(0, (count / 10) * maxHeight);
+  const ratio = total > 0 ? Math.max(0, Math.min(1, count / total)) : 0;
+  const fillHeight = ratio * maxHeight;
   if (warm) {
     warm.setAttribute('y', String(190 - fillHeight));
     warm.setAttribute('height', String(fillHeight));
   }
 
-  if (count === 0) return;
+  if (count <= 0 || total <= 0) return;
 
-  // loose constellation spread across the jar interior; fill order builds a
-  // balanced shape at every count. All centers stay well inside the clip
-  // (size 20 -> half 10) so nothing pokes out the bottom or sides.
-  const positions = [
-    { x: 80, y: 148 }, { x: 58, y: 162 }, { x: 104, y: 160 }, { x: 80, y: 124 },
-    { x: 52, y: 132 }, { x: 108, y: 130 }, { x: 66, y: 104 }, { x: 94, y: 106 },
-    { x: 80, y: 173 }, { x: 80, y: 86 }
-  ];
-  const size = 20;
-
-  for (let i = 0; i < count && i < positions.length; i++) {
+  const { positions, size } = jarStarLayout(total);
+  const n = Math.min(count, positions.length);
+  for (let i = 0; i < n; i++) {
     const pos = positions[i];
 
     // static group sets the position; inner group does the floating bob
@@ -1783,7 +2062,7 @@ function renderJarStars(count) {
     glow.setAttribute('class', 's-glow');
     glow.setAttribute('cx', '0');
     glow.setAttribute('cy', '0');
-    glow.setAttribute('r', '11');
+    glow.setAttribute('r', String((size * 0.55).toFixed(2)));
     glow.setAttribute('fill', 'url(#starGlow)');
     glow.style.animation = `starGlowPulse ${(2.6 + (i % 3) * 0.5).toFixed(2)}s ease-in-out ${(i * 0.22).toFixed(2)}s infinite`;
     floatG.appendChild(glow);
@@ -1808,7 +2087,7 @@ function renderJarStars(count) {
 function renderMilestones(state) {
   const grid = document.getElementById('milestonesGrid');
   const pos = state.streak - state.cycleBase;
-  grid.innerHTML = MILESTONES.map(ms => {
+  grid.innerHTML = state.settings.milestones.map(ms => {
     const status = milestoneStatus(state, ms);
     const cls = status === 'ready' ? 'unlocked ready'
       : status === 'pending' ? 'unlocked pending'
@@ -1821,9 +2100,9 @@ function renderMilestones(state) {
     const tap = status === 'ready' ? `onclick="openClaim('${ms.key}')"` : '';
     return `
       <div class="milestone-card ${cls}" ${tap}>
-        <div class="milestone-icon">${ms.icon}</div>
+        <div class="milestone-icon">${escapeHtml(ms.icon)}</div>
         <div class="milestone-days">${ms.days} days</div>
-        <div class="milestone-label">${ms.label}</div>
+        <div class="milestone-label">${escapeHtml(ms.label)}</div>
         ${footer}
       </div>
     `;
@@ -1831,31 +2110,27 @@ function renderMilestones(state) {
 }
 
 // ═══════ PARENT ZONE ═══════
-let parentHoldTimer = null;
 const parentToggle = document.getElementById('parentToggle');
-
-parentToggle.addEventListener('touchstart', (e) => {
-  e.preventDefault();
-  parentHoldTimer = setTimeout(openParentZone, 800);
-});
-parentToggle.addEventListener('touchend', () => clearTimeout(parentHoldTimer));
-parentToggle.addEventListener('touchcancel', () => clearTimeout(parentHoldTimer));
-
-// Also support mouse for testing
-parentToggle.addEventListener('mousedown', () => {
-  parentHoldTimer = setTimeout(openParentZone, 800);
-});
-parentToggle.addEventListener('mouseup', () => clearTimeout(parentHoldTimer));
-parentToggle.addEventListener('mouseleave', () => clearTimeout(parentHoldTimer));
+// A single tap opens the PIN prompt; the correct PIN reveals the dashboard.
+parentToggle.addEventListener('click', () => openPin('parent'));
 
 let pzMonth = null;     // first-of-month Date shown in the calendar
 let pzSelected = null;  // currently selected day key, or null
+let pzView = 'dashboard';   // 'dashboard' | 'settings'
+let settingsDraft = null;   // working copy while the Settings form is open
 
 function openParentZone() {
   const t = new Date();
   pzMonth = new Date(t.getFullYear(), t.getMonth(), 1);
   pzSelected = getToday();
+  pzView = 'dashboard';
   document.getElementById('parentOverlay').style.display = 'block';
+  renderParentPanel();
+}
+
+function pzSwitch(view) {
+  pzView = view;
+  if (view === 'settings') settingsDraft = clone(ensureToday(loadState()).settings);
   renderParentPanel();
 }
 
@@ -1864,16 +2139,27 @@ function renderParentPanel() {
   syncDerived(state);
   saveState(state);
 
+  const tabs = `
+    <div class="pz-tabs">
+      <button class="pz-tab ${pzView === 'dashboard' ? 'active' : ''}" onclick="pzSwitch('dashboard')">📅 Dashboard</button>
+      <button class="pz-tab ${pzView === 'settings' ? 'active' : ''}" onclick="pzSwitch('settings')">⚙️ Settings</button>
+    </div>`;
+  const body = pzView === 'settings' ? renderSettingsForm() : renderDashboard(state);
+  document.getElementById('parentPanel').innerHTML =
+    `<button class="close-parent" onclick="closeParentZone()">✕</button>` + tabs + body;
+}
+
+function renderDashboard(state) {
   const today = getToday();
   const monthName = pzMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
   const best = computeBestStreak(state);
-  const pending = MILESTONES.filter(ms => state.milestones[ms.key] && state.milestones[ms.key].pending);
+  const pending = state.settings.milestones.filter(ms => state.milestones[ms.key] && state.milestones[ms.key].pending);
   const prizesSection = pending.length ? `
     <div class="pz-prizes">
       <div class="pz-prizes-title">🎁 Prizes to hand out</div>
       ${pending.map(ms => `
         <div class="pz-prize-row">
-          <span class="pz-prize-info">${ms.icon} ${ms.label}</span>
+          <span class="pz-prize-info">${escapeHtml(ms.icon)} ${escapeHtml(ms.label)}</span>
           <span class="pz-prize-actions">
             <button class="pz-prize-give" onclick="pzConfirmPrize('${ms.key}')">Gave it ✓</button>
             <button class="pz-prize-later" onclick="pzCancelPrize('${ms.key}')">Not yet</button>
@@ -1885,10 +2171,9 @@ function renderParentPanel() {
     return state.days[k].approved && d.getMonth() === pzMonth.getMonth() && d.getFullYear() === pzMonth.getFullYear();
   }).length;
 
-  document.getElementById('parentPanel').innerHTML = `
-    <button class="close-parent" onclick="closeParentZone()">✕</button>
+  return `
     <h2>Parent Dashboard</h2>
-    <div class="date-label">${state.name}'s progress · ${monthApproved} streak ${monthApproved === 1 ? 'day' : 'days'} this month</div>
+    <div class="date-label">${escapeHtml(state.name)}'s progress · ${monthApproved} streak ${monthApproved === 1 ? 'day' : 'days'} this month</div>
 
     <div class="pz-stats">
       <div class="pz-stat"><div class="pz-stat-num">🔥 ${state.streak}</div><div class="pz-stat-lbl">Current streak</div></div>
@@ -1917,6 +2202,118 @@ function renderParentPanel() {
   `;
 }
 
+// ═══════ SETTINGS FORM (PIN-gated, inside the parent zone) ═══════
+function renderSettingsForm() {
+  const d = settingsDraft;
+  const taskGroup = (routine, label, icon) => `
+    <div class="set-group">
+      <div class="set-grouphead">${icon} ${label}</div>
+      <div class="set-tasks">
+        ${d.tasks[routine].map((t, i) => `
+          <div class="set-task-row">
+            <input class="set-emoji" value="${escapeHtml(t.emoji)}" maxlength="4" oninput="setTaskField('${routine}',${i},'emoji',this.value)">
+            <input class="set-label" value="${escapeHtml(t.label)}" maxlength="28" placeholder="Task name" oninput="setTaskField('${routine}',${i},'label',this.value)">
+            <button class="set-remove" onclick="removeTask('${routine}',${i})" aria-label="Remove">✕</button>
+          </div>`).join('')}
+      </div>
+      <button class="set-add" onclick="addTask('${routine}')">＋ Add task</button>
+    </div>`;
+
+  const msRows = d.milestones.map((ms, i) => `
+    <div class="set-ms-row">
+      <span class="set-ms-days">${ms.days} days</span>
+      <input class="set-emoji" value="${escapeHtml(ms.icon)}" maxlength="4" oninput="setMsField(${i},'icon',this.value)">
+      <input class="set-label" value="${escapeHtml(ms.label)}" maxlength="30" placeholder="Reward" oninput="setMsField(${i},'label',this.value)">
+    </div>`).join('');
+
+  return `
+    <h2>Settings</h2>
+    <div class="date-label">Changes apply going forward — past days keep their tasks.</div>
+
+    <div class="set-section-title">Routines</div>
+    ${taskGroup('morning', 'Morning', '☀️')}
+    ${taskGroup('bedtime', 'Bedtime', '🌙')}
+
+    <div class="set-section-title">Target times</div>
+    <div class="set-times">
+      <label class="set-time"><span>☀️ Morning by</span><input type="time" value="${escapeHtml(d.times.morning)}" oninput="setTime('morning',this.value)"></label>
+      <label class="set-time"><span>🌙 Bedtime by</span><input type="time" value="${escapeHtml(d.times.bedtime)}" oninput="setTime('bedtime',this.value)"></label>
+    </div>
+
+    <div class="set-section-title">Milestone rewards</div>
+    <div class="date-label">Edit the prize — the 7 / 14 / 30-day goals stay fixed.</div>
+    <div class="set-ms">${msRows}</div>
+
+    <div class="set-section-title">Grown-up PIN</div>
+    <input class="set-pin" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="4" value="${escapeHtml(d.pin)}" oninput="setPin(this.value)">
+
+    <label class="set-mute">
+      <span>🔔 Sounds &amp; chimes</span>
+      <button class="set-switch ${d.muted ? '' : 'on'}" type="button" onclick="toggleMute(this)"><span class="set-knob"></span></button>
+    </label>
+
+    <div class="set-msg" id="setMsg"></div>
+    <button class="set-save" onclick="saveSettings()">Save settings</button>
+  `;
+}
+
+// Live edits mutate the draft only; structural changes (add/remove) re-render the form.
+function setTaskField(routine, i, field, val) { if (settingsDraft.tasks[routine][i]) settingsDraft.tasks[routine][i][field] = val; }
+function setMsField(i, field, val) { if (settingsDraft.milestones[i]) settingsDraft.milestones[i][field] = val; }
+function setTime(which, val) { settingsDraft.times[which] = val; }
+function setPin(val) { settingsDraft.pin = val.replace(/\D/g, '').slice(0, 4); }
+function addTask(routine) { settingsDraft.tasks[routine].push({ id: genTaskId(), label: '', emoji: '⭐' }); renderParentPanel(); }
+function removeTask(routine, i) { settingsDraft.tasks[routine].splice(i, 1); renderParentPanel(); }
+function toggleMute(btn) { settingsDraft.muted = !settingsDraft.muted; btn.classList.toggle('on', !settingsDraft.muted); }
+
+function setSettingsMsg(msg, ok) {
+  const el = document.getElementById('setMsg');
+  if (el) { el.textContent = msg; el.className = 'set-msg' + (ok ? ' ok' : ' err'); }
+}
+
+function saveSettings() {
+  const draft = settingsDraft;
+  // tidy tasks: trim labels, drop empty rows, default a missing emoji
+  ['morning', 'bedtime'].forEach(r => {
+    draft.tasks[r] = draft.tasks[r]
+      .map(t => ({ id: t.id || genTaskId(), label: (t.label || '').trim(), emoji: (t.emoji || '').trim() || '⭐' }))
+      .filter(t => t.label.length > 0);
+  });
+  if (draft.tasks.morning.length + draft.tasks.bedtime.length === 0) { setSettingsMsg('Add at least one task.'); return; }
+  const pin = (draft.pin || '').replace(/\D/g, '');
+  if (pin.length !== 4) { setSettingsMsg('PIN must be exactly 4 digits.'); return; }
+  draft.pin = pin;
+  draft.milestones = draft.milestones.map(ms => ({
+    days: ms.days, key: ms.key,
+    icon: (ms.icon || '').trim() || '⭐',
+    label: (ms.label || '').trim() || `${ms.days}-day prize`
+  }));
+  ['morning', 'bedtime'].forEach(w => { if (!/^\d{1,2}:\d{2}$/.test(draft.times[w] || '')) draft.times[w] = DEFAULT_TIMES[w]; });
+
+  const state = ensureToday(loadState());
+  state.settings = clone(draft);
+  applySettingsToToday(state);   // re-sync today to the new task set (past days untouched)
+  syncDerived(state);
+  saveState(state);
+  render(state);
+
+  settingsDraft = clone(state.settings);
+  renderParentPanel();           // rebuild form with the cleaned values
+  setSettingsMsg('Saved! ✓', true);
+}
+
+// Re-point TODAY at the live task set, preserving checks for tasks that survived the edit.
+function applySettingsToToday(state) {
+  const today = getToday();
+  const day = state.days[today];
+  if (!day) return;
+  const defs = clone(state.settings.tasks);
+  const newTasks = {};
+  defs.morning.concat(defs.bedtime).forEach(t => { newTasks[t.id] = !!day.tasks[t.id]; });
+  day.tasks = newTasks;
+  day.taskDefs = defs;
+}
+
 function buildCalendarCells(state, today) {
   const year = pzMonth.getFullYear(), month = pzMonth.getMonth();
   const firstDow = new Date(year, month, 1).getDay();
@@ -1940,22 +2337,24 @@ function buildCalendarCells(state, today) {
 function buildDayDetail(state, key, today) {
   const d = state.days[key] || null;
   const tasks = (d && d.tasks) || {};
+  const defs = (d && d.taskDefs) || state.settings.tasks;   // each day shows its own frozen task set
   const label = parseKey(key).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   const approved = !!(d && d.approved);
-  const done = [...MORNING_TASKS, ...BEDTIME_TASKS].filter(t => tasks[t.id]).length;
+  const allDefs = defs.morning.concat(defs.bedtime);
+  const done = allDefs.filter(t => tasks[t.id]).length;
   const rows = (list) => list.map(t => `
     <div class="pz-task ${tasks[t.id] ? 'done' : ''}" onclick="pzToggleTask('${key}','${t.id}')">
       <span class="pz-task-box">${tasks[t.id] ? '✓' : ''}</span>
-      <span class="pz-task-lbl">${t.emoji} ${t.label}</span>
+      <span class="pz-task-lbl">${escapeHtml(t.emoji)} ${escapeHtml(t.label)}</span>
     </div>`).join('');
   return `
     <div class="pz-day-detail">
       <div class="pz-detail-head">
         <div class="pz-detail-date">${label}${key === today ? ' · Today' : ''}</div>
-        <div class="pz-detail-count">${done}/10 done</div>
+        <div class="pz-detail-count">${done}/${allDefs.length} done</div>
       </div>
-      <div class="pz-detail-grouplbl">☀️ Morning</div>${rows(MORNING_TASKS)}
-      <div class="pz-detail-grouplbl">🌙 Bedtime</div>${rows(BEDTIME_TASKS)}
+      ${defs.morning.length ? `<div class="pz-detail-grouplbl">☀️ Morning</div>${rows(defs.morning)}` : ''}
+      ${defs.bedtime.length ? `<div class="pz-detail-grouplbl">🌙 Bedtime</div>${rows(defs.bedtime)}` : ''}
       <button class="pz-approve-toggle ${approved ? 'on' : ''}" onclick="pzToggleApproved('${key}')">
         ${approved ? '★ Streak day — tap to remove' : '☆ Mark as a streak day'}
       </button>
@@ -1974,7 +2373,7 @@ function pzSelect(key) {
 
 function pzToggleTask(key, taskId) {
   const state = ensureToday(loadState());
-  if (!state.days[key]) state.days[key] = freshDayState();
+  if (!state.days[key]) state.days[key] = freshDayState(state.settings);
   state.days[key].tasks[taskId] = !state.days[key].tasks[taskId];
   syncDerived(state);
   saveState(state);
@@ -1984,7 +2383,7 @@ function pzToggleTask(key, taskId) {
 
 function pzToggleApproved(key) {
   const state = ensureToday(loadState());
-  if (!state.days[key]) state.days[key] = freshDayState();
+  if (!state.days[key]) state.days[key] = freshDayState(state.settings);
   state.days[key].approved = !state.days[key].approved;
   syncDerived(state);
   saveState(state);
@@ -1999,10 +2398,11 @@ function pzConfirmPrize(key) {
   m.pending = false;
   m.redeemed = true;
   // Cashing out the top prize completes the cycle and restarts the ladder.
-  const capstone = MILESTONES[MILESTONES.length - 1];
+  const list = state.settings.milestones;
+  const capstone = list[list.length - 1];
   if (key === capstone.key) {
     state.cycleBase += capstone.days;
-    MILESTONES.forEach(ms => { state.milestones[ms.key].redeemed = false; state.milestones[ms.key].pending = false; });
+    list.forEach(ms => { if (state.milestones[ms.key]) { state.milestones[ms.key].redeemed = false; state.milestones[ms.key].pending = false; } });
   }
   syncDerived(state);
   saveState(state);
@@ -2027,13 +2427,16 @@ document.getElementById('parentOverlay').addEventListener('click', (e) => {
   if (e.target === document.getElementById('parentOverlay')) closeParentZone();
 });
 
-// Day approval now lives in the Parent Dashboard (see pzToggleApproved).
+// Today's approval is kid-initiated (the "Get my star!" PIN flow → approveTodayAfterPin).
+// The Parent Dashboard keeps retroactive approve/edit of any day (see pzToggleApproved).
 
 // ═══════ CELEBRATION ═══════
 let claimKey = null;
 function openClaim(key) {
-  const ms = MILESTONES.find(m => m.key === key);
+  const state = ensureToday(loadState());
+  const ms = state.settings.milestones.find(m => m.key === key);
   if (!ms) return;
+  resetCelebrationUI();
   claimKey = key;
   document.getElementById('celebIcon').textContent = ms.icon;
   document.getElementById('celebTitle').textContent = `${ms.days}-Day Prize!`;
@@ -2081,13 +2484,22 @@ function spawnConfetti(colors) {
   wrap.appendChild(frag);
 }
 
-function closeCelebration() {
-  const c = document.getElementById('celebration');
-  c.classList.remove('show');
-  c.querySelectorAll('.confetti-piece').forEach(p => p.remove());
+// Reset the shared overlay to a clean base so claim / day-complete / PIN / star-earned
+// modes never leak UI into one another.
+function resetCelebrationUI() {
+  document.getElementById('pinPad').style.display = 'none';
+  document.getElementById('pinMsg').textContent = '';
   document.getElementById('celebActionBtn').style.display = 'none';
   document.querySelector('.celebration-close').textContent = 'Awesome! ⭐';
+  document.getElementById('celebration').querySelectorAll('.confetti-piece').forEach(p => p.remove());
+}
+
+function closeCelebration() {
+  document.getElementById('celebration').classList.remove('show');
+  resetCelebrationUI();
   claimKey = null;
+  pinMode = null;
+  pinEntry = '';
 }
 
 // ═══════ RESET ═══════
