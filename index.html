@@ -328,16 +328,18 @@
   .jar-count {
     text-align: center;
     margin-top: 14px;
-    font-size: 15px;
+    font-size: 17px;
     font-weight: 700;
     color: var(--text-soft);
     z-index: 1;
   }
 
-  .jar-count span {
+  .jar-count .jar-num {
     color: var(--accent);
     font-family: 'Baloo 2', cursive;
-    font-size: 19px;
+    font-size: 30px;
+    font-weight: 800;
+    vertical-align: -3px;
   }
 
   /* ─── Star fly animation ─── */
@@ -825,6 +827,8 @@
   }
   .pz-stat-num { font-family: 'Baloo 2', cursive; font-size: 20px; font-weight: 800; color: var(--text); }
   .pz-stat-lbl { font-size: 11px; font-weight: 700; color: var(--text-soft); margin-top: 2px; }
+  .pz-stat-jar { flex: 1; }
+  .pz-stat-jar .pz-stat-num { font-size: 26px; }
 
   .pz-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
   .pz-month { font-family: 'Baloo 2', cursive; font-size: 18px; font-weight: 700; color: var(--text); }
@@ -922,6 +926,28 @@
   }
   .pz-approve-toggle:active { transform: scale(0.98); }
 
+  /* Two per-day check toggles (back-fill morning / bedtime) */
+  .pz-checks { display: flex; gap: 8px; margin-top: 12px; }
+  .pz-check-toggle {
+    flex: 1;
+    padding: 12px 8px;
+    border: none;
+    border-radius: 30px;
+    font-family: 'Baloo 2', cursive;
+    font-size: 13.5px; font-weight: 700;
+    cursor: pointer;
+    background: var(--card-2);
+    color: var(--text-soft);
+    box-shadow: inset 0 0 0 1.5px var(--hairline);
+    transition: transform 0.15s;
+  }
+  .pz-check-toggle.on {
+    background: linear-gradient(180deg, #FFE39E, #F6C45A);
+    color: #7E5A1E;
+    box-shadow: 0 4px 14px rgba(244, 180, 60, 0.35);
+  }
+  .pz-check-toggle:active { transform: scale(0.97); }
+
   /* ─── Parent: Dashboard / Settings tabs ─── */
   .pz-tabs { display: flex; gap: 8px; margin: 2px 0 16px; }
   .pz-tab {
@@ -990,6 +1016,9 @@
   /* ─── Day approved state ─── */
   .app.day-approved .task-item { pointer-events: none; opacity: 0.65; }
   .app.day-approved .task-checkbox { opacity: 0.7; }
+  /* A single routine locks (and dims) once a grown-up checks it */
+  .task-item.locked { pointer-events: none; opacity: 0.6; }
+  .task-item.locked .task-checkbox { opacity: 0.75; }
 
   /* ─── Celebration overlay ─── */
   .celebration {
@@ -1063,25 +1092,26 @@
   }
   .celebration-action:active { transform: scale(0.96); }
 
-  /* ─── Get-my-star CTA (kid-initiated approval) ─── */
-  .get-star-btn {
+  /* ─── Routine check CTAs (kid asks a grown-up to check) ─── */
+  .check-btn {
     display: block;
-    margin: -6px auto 26px;
+    margin: 2px auto 12px;
     font-family: 'Baloo 2', cursive;
-    font-size: 22px;
+    font-size: 17px;
     font-weight: 800;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.2px;
     color: #6B4A12;
     background: linear-gradient(180deg, #FFE491, #FFC83C 58%, #F2A23A);
     border: none;
     border-radius: 60px;
-    padding: 16px 44px;
+    padding: 14px 30px;
     cursor: pointer;
     box-shadow: 0 10px 26px rgba(244, 180, 60, 0.5), inset 0 1.5px 0 rgba(255, 255, 255, 0.6);
     animation: getStarPulse 1.9s var(--ease-out) infinite;
     transition: transform 0.18s var(--ease-bounce);
   }
-  .get-star-btn:active { transform: scale(0.95); }
+  .check-btn:last-of-type { margin-bottom: 22px; }
+  .check-btn:active { transform: scale(0.95); }
   @keyframes getStarPulse {
     0%, 100% { transform: translateY(0) scale(1); box-shadow: 0 10px 26px rgba(244, 180, 60, 0.5), inset 0 1.5px 0 rgba(255, 255, 255, 0.6); }
     50% { transform: translateY(-3px) scale(1.03); box-shadow: 0 16px 34px rgba(244, 180, 60, 0.62), inset 0 1.5px 0 rgba(255, 255, 255, 0.6); }
@@ -1245,10 +1275,6 @@
       <div class="greeting" id="greeting"></div>
       <div class="today-date" id="todayDate"></div>
     </div>
-    <div class="streak-badge" id="streakBadge">
-      <span class="flame">🔥</span>
-      <span id="streakCount">0</span>
-    </div>
   </div>
 
   <!-- Jar -->
@@ -1297,6 +1323,8 @@
             <path d="M12 2 L14.9 8.6 L22 9.2 L16.6 14 L18.3 21 L12 17.3 L5.7 21 L7.4 14 L2 9.2 L9.1 8.6 Z" fill="url(#starGrad)" stroke="rgba(214,140,40,0.5)" stroke-width="0.5" stroke-linejoin="round"/>
             <path d="M12 4.4 L13.5 8 L10.3 9.6 Z" fill="rgba(255,255,255,0.5)"/>
           </symbol>
+          <clipPath id="halfL" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="0.5" height="1"/></clipPath>
+          <clipPath id="halfR" clipPathUnits="objectBoundingBox"><rect x="0.5" y="0" width="0.5" height="1"/></clipPath>
         </defs>
 
         <!-- soft ground shadow -->
@@ -1331,12 +1359,13 @@
       </svg>
     </div>
     <div class="jar-count">
-      <span id="todayStars">0</span> / <span id="totalStarsToday">10</span> stars today
+      <span class="jar-num" id="jarStars">0</span> / 20 stars
     </div>
   </div>
 
-  <!-- Kid-initiated approval: shown only when every task today is checked -->
-  <button class="get-star-btn" id="getStarBtn" style="display:none" onclick="openPin('approve')">Get my star! ⭐</button>
+  <!-- Kid-initiated checks: each shown when its routine is fully done and not yet checked -->
+  <button class="check-btn" id="checkMorningBtn" style="display:none" onclick="openPin('morning')">Ask a grown-up to check ☀️</button>
+  <button class="check-btn" id="checkBedtimeBtn" style="display:none" onclick="openPin('bedtime')">Ask a grown-up to check 🌙</button>
 
   <!-- Morning -->
   <div class="routine-block" id="morningBlock">
@@ -1451,12 +1480,24 @@ function sameTasks(a, b) {
     a.every((t, i) => t.id === b[i].id && t.label === b[i].label && t.emoji === b[i].emoji);
 }
 
-// Milestone thresholds (7/14/30) + keys are FIXED; only icon/label are editable in Settings.
+// Prize thresholds are STAR counts (5/10/20). Keys are FIXED; only icon/label are editable in Settings.
 const DEFAULT_MILESTONES = [
+  { days: 5, icon: '🎬', label: 'Pick a show to watch', key: 'ms7' },
+  { days: 10, icon: '🍦', label: 'Choose an ice cream flavor', key: 'ms14' },
+  { days: 20, icon: '💰', label: '$20 cash or toy', key: 'ms30' }
+];
+
+// Pre-v3 prize ladder — used only to detect an un-customized install during the v3 migration.
+const MODEL_VERSION = 3;
+const OLD_DEFAULT_MILESTONES = [
   { days: 7, icon: '🎬', label: 'Pick a show to watch', key: 'ms7' },
   { days: 14, icon: '🍦', label: 'Choose an ice cream flavor', key: 'ms14' },
   { days: 30, icon: '💰', label: '$20 cash or toy', key: 'ms30' }
 ];
+function sameMilestones(a, b) {
+  return Array.isArray(a) && a.length === b.length &&
+    a.every((m, i) => m.days === b[i].days && m.key === b[i].key && m.icon === b[i].icon && m.label === b[i].label);
+}
 
 const DEFAULT_TIMES = { morning: '08:00', bedtime: '20:00' };
 
@@ -1514,7 +1555,7 @@ function freshDayState(settings) {
   const tasks = {};
   defs.morning.forEach(t => tasks[t.id] = false);
   defs.bedtime.forEach(t => tasks[t.id] = false);
-  return { tasks, taskDefs: defs, approved: false };
+  return { tasks, taskDefs: defs, checks: { morning: false, bedtime: false } };
 }
 
 function freshMilestones(settings) {
@@ -1522,6 +1563,9 @@ function freshMilestones(settings) {
   settings.milestones.forEach(ms => m[ms.key] = { redeemed: false, pending: false });
   return m;
 }
+
+// A day earns its star only when BOTH the morning and bedtime checks are done.
+function dayStarred(d) { return !!(d && d.checks && d.checks.morning && d.checks.bedtime); }
 
 function initState(name) {
   const settings = defaultSettings();
@@ -1564,6 +1608,17 @@ function ensureToday(state) {
     s.tasksVersion = TASKS_VERSION;
   }
 
+  // ── v3 model: split day approval into morning/bedtime checks; rebase the prize ladder to stars. ──
+  if (s.modelVersion !== MODEL_VERSION) {
+    for (const k in state.days) {
+      const dd = state.days[k];
+      if (!dd.checks) { const ap = dd.approved === true; dd.checks = { morning: ap, bedtime: ap }; }
+      delete dd.approved;
+    }
+    if (sameMilestones(s.milestones, OLD_DEFAULT_MILESTONES)) s.milestones = clone(DEFAULT_MILESTONES);
+    s.modelVersion = MODEL_VERSION;
+  }
+
   // ── Immutability: days recorded before settings existed get the original task set ──
   for (const k in state.days) {
     if (!state.days[k].taskDefs) {
@@ -1586,11 +1641,11 @@ function ensureToday(state) {
 
 // ── Derived values (computed from the day history so parent edits recompute) ──
 function computeStreak(state) {
-  // consecutive approved days ending today (or yesterday, if today isn't approved yet)
+  // consecutive starred days (both checks) ending today (or yesterday, if today isn't starred yet)
   let d = new Date();
-  if (!(state.days[getToday()] && state.days[getToday()].approved)) d.setDate(d.getDate() - 1);
+  if (!dayStarred(state.days[getToday()])) d.setDate(d.getDate() - 1);
   let s = 0;
-  while (state.days[dateKey(d)] && state.days[dateKey(d)].approved) { s++; d.setDate(d.getDate() - 1); }
+  while (dayStarred(state.days[dateKey(d)])) { s++; d.setDate(d.getDate() - 1); }
   return s;
 }
 
@@ -1599,7 +1654,7 @@ function computeTotalStars(state) {
   let n = 0;
   for (const k in state.days) {
     const d = state.days[k];
-    if (d.approved) {
+    if (dayStarred(d)) {
       const defs = d.taskDefs;
       n += defs ? (defs.morning.length + defs.bedtime.length) : 10;
     }
@@ -1608,7 +1663,7 @@ function computeTotalStars(state) {
 }
 
 function computeBestStreak(state) {
-  const keys = Object.keys(state.days).filter(k => state.days[k].approved).sort();
+  const keys = Object.keys(state.days).filter(k => dayStarred(state.days[k])).sort();
   let best = 0, cur = 0, prev = null;
   for (const k of keys) {
     if (prev) { const pd = parseKey(prev); pd.setDate(pd.getDate() + 1); cur = (dateKey(pd) === k) ? cur + 1 : 1; }
@@ -1624,6 +1679,7 @@ function syncDerived(state) {
   state.totalStars = computeTotalStars(state);
   // A broken streak collapses below the current cycle's start — restart the ladder.
   if (state.streak < state.cycleBase) {
+    if (state.cycleBase > 0) state.spilledPending = true;   // a run was lost — flag a gentle notice
     state.cycleBase = 0;
     state.settings.milestones.forEach(ms => {
       if (state.milestones[ms.key]) { state.milestones[ms.key].redeemed = false; state.milestones[ms.key].pending = false; }
@@ -1688,7 +1744,8 @@ function showApp(state) {
 function render(state) {
   const today = getToday();
   const dayState = state.days[today];
-  const isApproved = dayState.approved;
+  const checks = dayState.checks || { morning: false, bedtime: false };
+  const isStarred = checks.morning && checks.bedtime;
   appMuted = !!state.settings.muted;
   const defs = dayState.taskDefs || state.settings.tasks;
 
@@ -1698,12 +1755,9 @@ function render(state) {
   document.getElementById('greeting').textContent = `${greetWord}, ${state.name}!`;
   document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
 
-  // Streak
-  document.getElementById('streakCount').textContent = state.streak;
-
-  // Approved state
+  // Whole-day-done state (both checks): dim everything
   const app = document.getElementById('app');
-  app.classList.toggle('day-approved', isApproved);
+  app.classList.toggle('day-approved', isStarred);
 
   // Target times (editable in Settings)
   document.getElementById('rtMorning').textContent = formatTime(state.settings.times.morning);
@@ -1713,27 +1767,39 @@ function render(state) {
   setRoutineVisible('morning', defs.morning.length > 0);
   setRoutineVisible('bedtime', defs.bedtime.length > 0);
 
-  // Tasks (today uses today's snapshot, which mirrors the live settings)
-  renderTaskList('morningTasks', defs.morning, dayState, 'morningProgress', isApproved);
-  renderTaskList('bedtimeTasks', defs.bedtime, dayState, 'bedtimeProgress', isApproved);
+  // Tasks (today uses today's snapshot, which mirrors the live settings). A routine locks once checked.
+  renderTaskList('morningTasks', defs.morning, dayState, 'morningProgress', checks.morning);
+  renderTaskList('bedtimeTasks', defs.bedtime, dayState, 'bedtimeProgress', checks.bedtime);
 
-  // Stars — counts adapt to the live task total
-  const allDefs = defs.morning.concat(defs.bedtime);
-  const totalTasks = allDefs.length;
-  const starCount = allDefs.filter(t => dayState.tasks[t.id]).length;
-  document.getElementById('todayStars').textContent = starCount;
-  document.getElementById('totalStarsToday').textContent = totalTasks;
-  renderJarStars(starCount, totalTasks);
+  // Jar — banked run-stars (one per good day) toward the 20-star grand prize
+  const jarStars = Math.max(0, (state.streak || 0) - (state.cycleBase || 0));
+  const shown = Math.min(20, jarStars);
+  let forming = null;                              // today's in-progress half-star
+  if (!isStarred) {
+    if (checks.morning && !checks.bedtime) forming = 'morning';
+    else if (checks.bedtime && !checks.morning) forming = 'bedtime';
+  }
+  document.getElementById('jarStars').textContent = shown;
+  renderJarStars(shown, forming);
 
-  // Kid-initiated approval CTA — only when every task is done and the day isn't verified yet
-  document.getElementById('getStarBtn').style.display =
-    (totalTasks > 0 && starCount === totalTasks && !isApproved) ? '' : 'none';
+  // Per-routine check CTAs — shown when a routine is fully ticked but not yet checked by a grown-up
+  const mDone = defs.morning.length > 0 && defs.morning.every(t => dayState.tasks[t.id]);
+  const bDone = defs.bedtime.length > 0 && defs.bedtime.every(t => dayState.tasks[t.id]);
+  document.getElementById('checkMorningBtn').style.display = (mDone && !checks.morning) ? '' : 'none';
+  document.getElementById('checkBedtimeBtn').style.display = (bDone && !checks.bedtime) ? '' : 'none';
 
   // Milestones
   renderMilestones(state);
 
   // Foreground the routine relevant to the time of day
   applyForegrounding();
+
+  // Gentle one-time notice when a run was just lost (the jar spilled)
+  if (state.spilledPending && document.getElementById('parentOverlay').style.display !== 'block') {
+    state.spilledPending = false;
+    saveState(state);
+    showSpillNotice(state.name);
+  }
 }
 
 function setRoutineVisible(r, visible) {
@@ -1749,7 +1815,7 @@ function renderTaskList(containerId, tasks, dayState, progressId, disabled) {
   container.innerHTML = tasks.map(task => {
     const checked = dayState.tasks[task.id];
     return `
-      <li class="task-item ${checked ? 'done' : ''}" data-task="${task.id}" onclick="${disabled ? '' : `toggleTask('${task.id}', this)`}">
+      <li class="task-item ${checked ? 'done' : ''}${disabled ? ' locked' : ''}" data-task="${task.id}" onclick="${disabled ? '' : `toggleTask('${task.id}', this)`}">
         <div class="task-checkbox ${checked ? 'checked' : ''}">
           <span class="check-icon">✓</span>
         </div>
@@ -1762,33 +1828,23 @@ function renderTaskList(containerId, tasks, dayState, progressId, disabled) {
 function toggleTask(taskId, el) {
   const state = ensureToday(loadState());
   const today = getToday();
-  if (state.days[today].approved) return;
   const ds = state.days[today];
   const defs = ds.taskDefs;
+  const which = defs.morning.some(t => t.id === taskId) ? 'morning' : 'bedtime';
+  if (ds.checks && ds.checks[which]) return;   // a routine locks once a grown-up has checked it
 
-  // routine-completion snapshot before the change
-  const beforeM = defs.morning.every(t => ds.tasks[t.id]);
-  const beforeB = defs.bedtime.every(t => ds.tasks[t.id]);
-
+  const beforeDone = defs[which].every(t => ds.tasks[t.id]);
   const newVal = !ds.tasks[taskId];
   ds.tasks[taskId] = newVal;
   saveState(state);
-
-  // Animate star flying to jar
-  if (newVal && el) animateStarToJar(el);
-
   render(state);
 
   if (newVal) {
     flashCheckbox(taskId);   // satisfying "thunk"
     chimeCheck();
     buzz(18);
-    // celebrate completions (only when checking on)
-    const afterM = defs.morning.every(t => ds.tasks[t.id]);
-    const afterB = defs.bedtime.every(t => ds.tasks[t.id]);
-    if (afterM && afterB && !(beforeM && beforeB)) celebrateDay(state.name);
-    else if (afterM && !beforeM && defs.morning.length) cueRoutine('morning');
-    else if (afterB && !beforeB && defs.bedtime.length) cueRoutine('bedtime');
+    // when a routine becomes fully ticked, nudge to get it checked (its CTA appears)
+    if (defs[which].length && !beforeDone && defs[which].every(t => ds.tasks[t.id])) cueRoutine(which);
   }
 }
 
@@ -1879,16 +1935,17 @@ function toggleRoutine(r) {
 
 // ═══════ PIN (gates kid approval + parent zone) ═══════
 let pinEntry = '';
-let pinMode = null;   // 'approve' | 'parent'
+let pinMode = null;   // 'morning' | 'bedtime' | 'parent'
 
 function openPin(mode) {
   resetCelebrationUI();
   pinMode = mode;
   pinEntry = '';
   document.getElementById('celebIcon').textContent = '🔒';
-  document.getElementById('celebTitle').textContent = mode === 'approve' ? 'Get Your Star!' : 'Grown-Ups Only';
-  document.getElementById('celebText').textContent = mode === 'approve'
-    ? 'Ask a grown-up to enter the code' : 'Enter the grown-up code';
+  document.getElementById('celebTitle').textContent =
+    mode === 'morning' ? 'Morning Check ☀️' : mode === 'bedtime' ? 'Bedtime Check 🌙' : 'Grown-Ups Only';
+  document.getElementById('celebText').textContent =
+    mode === 'parent' ? 'Enter the grown-up code' : 'Ask a grown-up to enter the code';
   document.getElementById('pinPad').style.display = 'flex';
   document.querySelector('.celebration-close').textContent = 'Cancel';
   renderPinDots();
@@ -1918,7 +1975,7 @@ function verifyPin() {
   const mode = pinMode;
   pinMode = null;
   pinEntry = '';
-  if (mode === 'approve') approveTodayAfterPin(state);
+  if (mode === 'morning' || mode === 'bedtime') approveRoutineAfterPin(state, mode);
   else { closeCelebration(); openParentZone(); }
 }
 
@@ -1931,22 +1988,49 @@ function pinFail() {
   setTimeout(renderPinDots, 130);
 }
 
-// Correct PIN on the kid CTA → today is approved (counts toward streak via syncDerived).
-function approveTodayAfterPin(state) {
+// Correct PIN on a routine check → that half-star lights; both halves bank the day's whole star.
+function approveRoutineAfterPin(state, which) {
   const today = getToday();
-  state.days[today].approved = true;
+  const day = state.days[today];
+  if (!day.checks) day.checks = { morning: false, bedtime: false };
+  day.checks[which] = true;
+  const whole = day.checks.morning && day.checks.bedtime;
   syncDerived(state);
   saveState(state);
   render(state);
-  // morph the same overlay into a "star earned!" celebration
+  // morph the same overlay into a celebration
   resetCelebrationUI();
-  document.getElementById('celebIcon').textContent = '⭐';
-  document.getElementById('celebTitle').textContent = 'Star Earned!';
-  document.getElementById('celebText').textContent = `Amazing work today, ${state.name}! 🎉`;
-  document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
-  spawnConfetti(STAR_CONFETTI);
-  chimeDay();
-  buzz([30, 40, 30, 40, 70]);
+  if (whole) {
+    document.getElementById('celebIcon').textContent = '⭐';
+    document.getElementById('celebTitle').textContent = "Today's star! ⭐";
+    document.getElementById('celebText').textContent = `Great day, ${state.name} — one more star in the jar!`;
+    document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
+    spawnConfetti(STAR_CONFETTI);
+    chimeDay();
+    buzz([30, 40, 30, 40, 70]);
+    popJar();
+  } else {
+    const sun = which === 'morning';
+    document.getElementById('celebIcon').textContent = sun ? '☀️' : '🌙';
+    document.getElementById('celebTitle').textContent = sun ? 'Morning star!' : 'Bedtime star!';
+    document.getElementById('celebText').textContent = sun
+      ? `Half a star, ${state.name} — bedtime to go!`
+      : `Half a star, ${state.name} — morning to go!`;
+    document.querySelector('.celebration-close').textContent = 'Yay!';
+    spawnConfetti(STAR_CONFETTI);
+    chimeRoutine();
+    buzz([20, 30, 20]);
+  }
+}
+
+// Gentle, no-confetti notice shown once after a missed day spills the jar.
+function showSpillNotice(name) {
+  resetCelebrationUI();
+  document.getElementById('celebIcon').textContent = '🌱';
+  document.getElementById('celebTitle').textContent = "Yesterday's star got away";
+  document.getElementById('celebText').textContent = `Let's fill a fresh jar today${name ? ', ' + name : ''}!`;
+  document.querySelector('.celebration-close').textContent = "Let's go!";
+  document.getElementById('celebration').classList.add('show');
 }
 
 // ═══════ STAR ANIMATION ═══════
@@ -2062,27 +2146,26 @@ function jarStarLayout(total) {
   return { positions, size };
 }
 
-function renderJarStars(count, total) {
+function renderJarStars(shown, forming) {
   const SVGNS = 'http://www.w3.org/2000/svg';
   const fill = document.getElementById('starFill');
   const warm = document.getElementById('warmFillRect');
   fill.innerHTML = '';
 
-  total = total || 0;
+  const CAP = 20;
+  shown = Math.max(0, Math.min(CAP, shown | 0));
 
-  // rising warm-light pool: bottom (y=190) up to y=40, proportional to the day's total
+  // rising warm-light pool, proportional to how full the jar is (toward the 20-star grand prize)
   const maxHeight = 150;
-  const ratio = total > 0 ? Math.max(0, Math.min(1, count / total)) : 0;
+  const ratio = Math.max(0, Math.min(1, shown / CAP));
   const fillHeight = ratio * maxHeight;
   if (warm) {
     warm.setAttribute('y', String(190 - fillHeight));
     warm.setAttribute('height', String(fillHeight));
   }
 
-  if (count <= 0 || total <= 0) return;
-
-  const { positions, size } = jarStarLayout(total);
-  const n = Math.min(count, positions.length);
+  const { positions, size } = jarStarLayout(CAP);
+  const n = Math.min(shown, positions.length);
   for (let i = 0; i < n; i++) {
     const pos = positions[i];
 
@@ -2117,6 +2200,28 @@ function renderJarStars(count, total) {
     pivot.appendChild(floatG);
     fill.appendChild(pivot);
   }
+
+  // today's in-progress star: a faint outline in the next slot with the earned half lit
+  if (forming && n < positions.length) {
+    const pos = positions[n];
+    const half = forming === 'morning' ? 'url(#halfL)' : 'url(#halfR)';
+    [true, false].forEach((ghost) => {
+      const pivot = document.createElementNS(SVGNS, 'g');
+      pivot.setAttribute('transform', `translate(${pos.x} ${pos.y})`);
+      const star = document.createElementNS(SVGNS, 'use');
+      star.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#jarStar');
+      star.setAttribute('href', '#jarStar');
+      star.setAttribute('class', 's-star');
+      star.setAttribute('x', String(-size / 2));
+      star.setAttribute('y', String(-size / 2));
+      star.setAttribute('width', String(size));
+      star.setAttribute('height', String(size));
+      if (ghost) star.setAttribute('opacity', '0.26');
+      else star.setAttribute('clip-path', half);
+      pivot.appendChild(star);
+      fill.appendChild(pivot);
+    });
+  }
 }
 
 // ═══════ MILESTONES ═══════
@@ -2132,12 +2237,12 @@ function renderMilestones(state) {
     if (status === 'ready') footer = `<div class="milestone-cta">🎁 Tap to claim!</div>`;
     else if (status === 'pending') footer = `<div class="milestone-cta">⏳ Ask a grown-up</div>`;
     else if (status === 'claimed') footer = `<div class="milestone-cta claimed-cta">Claimed ✓</div>`;
-    else { const left = Math.max(0, ms.days - pos); footer = `<div class="milestone-progress">${left} more ${left === 1 ? 'day' : 'days'}</div>`; }
+    else { const left = Math.max(0, ms.days - pos); footer = `<div class="milestone-progress">${left} more ${left === 1 ? 'star' : 'stars'}</div>`; }
     const tap = status === 'ready' ? `onclick="openClaim('${ms.key}')"` : '';
     return `
       <div class="milestone-card ${cls}" ${tap}>
         <div class="milestone-icon">${escapeHtml(ms.icon)}</div>
-        <div class="milestone-days">${ms.days} days</div>
+        <div class="milestone-days">${ms.days} stars</div>
         <div class="milestone-label">${escapeHtml(ms.label)}</div>
         ${footer}
       </div>
@@ -2188,7 +2293,6 @@ function renderParentPanel() {
 function renderDashboard(state) {
   const today = getToday();
   const monthName = pzMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  const best = computeBestStreak(state);
   const pending = state.settings.milestones.filter(ms => state.milestones[ms.key] && state.milestones[ms.key].pending);
   const prizesSection = pending.length ? `
     <div class="pz-prizes">
@@ -2204,7 +2308,7 @@ function renderDashboard(state) {
     </div>` : '';
   const monthApproved = Object.keys(state.days).filter(k => {
     const d = parseKey(k);
-    return state.days[k].approved && d.getMonth() === pzMonth.getMonth() && d.getFullYear() === pzMonth.getFullYear();
+    return dayStarred(state.days[k]) && d.getMonth() === pzMonth.getMonth() && d.getFullYear() === pzMonth.getFullYear();
   }).length;
 
   return `
@@ -2212,9 +2316,7 @@ function renderDashboard(state) {
     <div class="date-label">${escapeHtml(state.name)}'s progress · ${monthApproved} streak ${monthApproved === 1 ? 'day' : 'days'} this month</div>
 
     <div class="pz-stats">
-      <div class="pz-stat"><div class="pz-stat-num">🔥 ${state.streak}</div><div class="pz-stat-lbl">Current streak</div></div>
-      <div class="pz-stat"><div class="pz-stat-num">⭐ ${state.totalStars}</div><div class="pz-stat-lbl">Total stars</div></div>
-      <div class="pz-stat"><div class="pz-stat-num">🏆 ${best}</div><div class="pz-stat-lbl">Best streak</div></div>
+      <div class="pz-stat pz-stat-jar"><div class="pz-stat-num">⭐ ${Math.max(0, state.streak - state.cycleBase)} / 20</div><div class="pz-stat-lbl">Stars in the jar</div></div>
     </div>
     ${prizesSection}
 
@@ -2227,7 +2329,7 @@ function renderDashboard(state) {
     <div class="pz-cal-grid">${buildCalendarCells(state, today)}</div>
 
     <div class="pz-legend">
-      <span><i class="dot approved"></i>Streak day</span>
+      <span><i class="dot approved"></i>Star day</span>
       <span><i class="dot partial"></i>Partial</span>
       <span class="pz-hint">tap a day to edit</span>
     </div>
@@ -2257,7 +2359,7 @@ function renderSettingsForm() {
 
   const msRows = d.milestones.map((ms, i) => `
     <div class="set-ms-row">
-      <span class="set-ms-days">${ms.days} days</span>
+      <span class="set-ms-days">${ms.days} stars</span>
       <input class="set-emoji" value="${escapeHtml(ms.icon)}" maxlength="4" oninput="setMsField(${i},'icon',this.value)">
       <input class="set-label" value="${escapeHtml(ms.label)}" maxlength="30" placeholder="Reward" oninput="setMsField(${i},'label',this.value)">
     </div>`).join('');
@@ -2277,7 +2379,7 @@ function renderSettingsForm() {
     </div>
 
     <div class="set-section-title">Milestone rewards</div>
-    <div class="date-label">Edit the prize — the 7 / 14 / 30-day goals stay fixed.</div>
+    <div class="date-label">Edit the prize — the 5 / 10 / 20-star goals stay fixed.</div>
     <div class="set-ms">${msRows}</div>
 
     <div class="set-section-title">Grown-up PIN</div>
@@ -2322,7 +2424,7 @@ function saveSettings() {
   draft.milestones = draft.milestones.map(ms => ({
     days: ms.days, key: ms.key,
     icon: (ms.icon || '').trim() || '⭐',
-    label: (ms.label || '').trim() || `${ms.days}-day prize`
+    label: (ms.label || '').trim() || `${ms.days}-star prize`
   }));
   ['morning', 'bedtime'].forEach(w => { if (!/^\d{1,2}:\d{2}$/.test(draft.times[w] || '')) draft.times[w] = DEFAULT_TIMES[w]; });
 
@@ -2361,7 +2463,7 @@ function buildCalendarCells(state, today) {
     const d = state.days[k];
     const isFuture = k > today;
     let status = 'none';
-    if (d) status = d.approved ? 'approved' : (Object.values(d.tasks).some(Boolean) ? 'partial' : 'none');
+    if (d) status = dayStarred(d) ? 'approved' : (((d.checks && (d.checks.morning || d.checks.bedtime)) || Object.values(d.tasks).some(Boolean)) ? 'partial' : 'none');
     const cls = ['pz-day', isFuture ? 'future' : status, k === today ? 'today' : '', k === pzSelected ? 'selected' : ''].filter(Boolean).join(' ');
     const click = isFuture ? '' : `onclick="pzSelect('${k}')"`;
     const mark = (!isFuture && status === 'approved') ? `<span class="pz-star">★</span>` : '';
@@ -2375,7 +2477,8 @@ function buildDayDetail(state, key, today) {
   const tasks = (d && d.tasks) || {};
   const defs = (d && d.taskDefs) || state.settings.tasks;   // each day shows its own frozen task set
   const label = parseKey(key).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
-  const approved = !!(d && d.approved);
+  const cm = !!(d && d.checks && d.checks.morning);
+  const cb = !!(d && d.checks && d.checks.bedtime);
   const allDefs = defs.morning.concat(defs.bedtime);
   const done = allDefs.filter(t => tasks[t.id]).length;
   const rows = (list) => list.map(t => `
@@ -2391,9 +2494,10 @@ function buildDayDetail(state, key, today) {
       </div>
       ${defs.morning.length ? `<div class="pz-detail-grouplbl">☀️ Morning</div>${rows(defs.morning)}` : ''}
       ${defs.bedtime.length ? `<div class="pz-detail-grouplbl">🌙 Bedtime</div>${rows(defs.bedtime)}` : ''}
-      <button class="pz-approve-toggle ${approved ? 'on' : ''}" onclick="pzToggleApproved('${key}')">
-        ${approved ? '★ Streak day — tap to remove' : '☆ Mark as a streak day'}
-      </button>
+      <div class="pz-checks">
+        <button class="pz-check-toggle ${cm ? 'on' : ''}" onclick="pzToggleCheck('${key}','morning')">${cm ? '☀️ Morning ✓' : '☀️ Mark morning'}</button>
+        <button class="pz-check-toggle ${cb ? 'on' : ''}" onclick="pzToggleCheck('${key}','bedtime')">${cb ? '🌙 Bedtime ✓' : '🌙 Mark bedtime'}</button>
+      </div>
     </div>`;
 }
 
@@ -2417,10 +2521,12 @@ function pzToggleTask(key, taskId) {
   renderParentPanel();
 }
 
-function pzToggleApproved(key) {
+function pzToggleCheck(key, which) {
   const state = ensureToday(loadState());
   if (!state.days[key]) state.days[key] = freshDayState(state.settings);
-  state.days[key].approved = !state.days[key].approved;
+  const day = state.days[key];
+  if (!day.checks) day.checks = { morning: false, bedtime: false };
+  day.checks[which] = !day.checks[which];
   syncDerived(state);
   saveState(state);
   render(state);
@@ -2463,8 +2569,8 @@ document.getElementById('parentOverlay').addEventListener('click', (e) => {
   if (e.target === document.getElementById('parentOverlay')) closeParentZone();
 });
 
-// Today's approval is kid-initiated (the "Get my star!" PIN flow → approveTodayAfterPin).
-// The Parent Dashboard keeps retroactive approve/edit of any day (see pzToggleApproved).
+// Each routine is checked by a grown-up via the PIN flow → approveRoutineAfterPin(which).
+// The Parent Dashboard keeps retroactive editing of any day's checks (see pzToggleCheck).
 
 // ═══════ CELEBRATION ═══════
 let claimKey = null;
@@ -2475,7 +2581,7 @@ function openClaim(key) {
   resetCelebrationUI();
   claimKey = key;
   document.getElementById('celebIcon').textContent = ms.icon;
-  document.getElementById('celebTitle').textContent = `${ms.days}-Day Prize!`;
+  document.getElementById('celebTitle').textContent = `${ms.days}-Star Prize!`;
   document.getElementById('celebText').textContent = `You earned: ${ms.label}`;
   const action = document.getElementById('celebActionBtn');
   action.textContent = 'Claim it! 🎁';
