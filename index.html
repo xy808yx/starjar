@@ -280,11 +280,11 @@
   .jar-section::after {
     content: '';
     position: absolute;
-    top: 28px;
+    top: 44px;
     left: 50%;
     transform: translateX(-50%);
-    width: 244px;
-    height: 244px;
+    width: min(380px, 92vw);
+    height: min(380px, 92vw);
     border-radius: 50%;
     background: radial-gradient(circle, rgba(255, 200, 90, 0.22) 0%, rgba(255, 200, 90, 0) 68%);
     z-index: 0;
@@ -293,8 +293,8 @@
 
   .jar-container {
     position: relative;
-    width: 174px;
-    height: 218px;
+    width: min(300px, 74vw);
+    aspect-ratio: 160 / 206;
     z-index: 1;
   }
 
@@ -2116,14 +2116,14 @@ function animateStarToJar(taskEl) {
 // Lay out `total` star slots bottom-up in a centered cluster, sized to fit the jar.
 // The first `count` are revealed, so slots never shift as the jar fills.
 function jarStarLayout(total) {
-  const CX = 80, X_HALF = 30;      // center x, max half-width for star centers
-  const Y_BOT = 172, Y_TOP = 96;   // center-y of the bottom and top rows
+  const CX = 80, X_HALF = 36;      // center x, max half-width for star centers
+  const Y_BOT = 176, Y_TOP = 72;   // center-y of bottom & top rows (taller spread → bigger stars)
   if (total <= 0) return { positions: [], size: 20 };
   const cols = Math.max(2, Math.min(4, Math.ceil(Math.sqrt(total))));
   const rows = Math.ceil(total / cols);
   const colStep = (2 * X_HALF) / (cols - 1);
-  const rowGap = rows > 1 ? Math.min((Y_BOT - Y_TOP) / (rows - 1), 28) : 0;
-  let size = rows > 1 ? Math.min(21, rowGap * 0.82, colStep * 0.9) : 20;
+  const rowGap = rows > 1 ? Math.min((Y_BOT - Y_TOP) / (rows - 1), 30) : 0;
+  let size = rows > 1 ? Math.min(26, rowGap * 0.82, colStep * 0.9) : 22;
   size = Math.max(10, size);
 
   // Build bottom-up, each row centered as a group, filled center-out so the
