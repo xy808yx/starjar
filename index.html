@@ -1091,6 +1091,8 @@
     transition: transform 0.18s var(--ease-bounce);
   }
   .celebration-action:active { transform: scale(0.96); }
+  /* Locked look while the dad-note read-gate counts down */
+  .celebration-action[disabled] { opacity: 0.5; cursor: default; box-shadow: none; transform: none; }
 
   /* ─── Routine check CTAs (kid asks a grown-up to check) ─── */
   .check-btn {
@@ -1364,8 +1366,8 @@
   </div>
 
   <!-- Kid-initiated checks: each shown when its routine is fully done and not yet checked -->
-  <button class="check-btn" id="checkMorningBtn" style="display:none" onclick="openPin('morning')">Ask a grown-up to check ☀️</button>
-  <button class="check-btn" id="checkBedtimeBtn" style="display:none" onclick="openPin('bedtime')">Ask a grown-up to check 🌙</button>
+  <button class="check-btn" id="checkMorningBtn" style="display:none" onclick="showDadNote('morning')">Ask a grown-up to check ☀️</button>
+  <button class="check-btn" id="checkBedtimeBtn" style="display:none" onclick="showDadNote('bedtime')">Ask a grown-up to check 🌙</button>
 
   <!-- Morning -->
   <div class="routine-block" id="morningBlock">
@@ -1436,7 +1438,8 @@
     </div>
     <div class="pin-msg" id="pinMsg"></div>
   </div>
-  <button class="celebration-action" id="celebActionBtn" onclick="claimMilestone()" style="display:none"></button>
+  <!-- Shared action button (milestone claim + dad-note read-gate); each opener sets its own onclick -->
+  <button class="celebration-action" id="celebActionBtn" style="display:none"></button>
   <button class="celebration-close" onclick="closeCelebration()">Awesome! ⭐</button>
 </div>
 
@@ -1500,6 +1503,43 @@ function sameMilestones(a, b) {
 }
 
 const DEFAULT_TIMES = { morning: '08:00', bedtime: '20:00' };
+
+// ═══════ Dad's notes — shown (rotating) before each grown-up approval ═══════
+// Verbatim copy of cosmic-math-crunch  src/content/dadGarage.js → DAILY_NOTES (origin/main).
+// Keep the two lists in sync if either side changes.
+const DAD_NOTES = [
+  "Being brave doesn't mean you're not scared. It means you're scared and you do it anyway.",
+  "Don't rush. Slow and steady beats standing still every single time.",
+  "The best time to start something? Right now. Let's go.",
+  "You don't have to be better than anyone else. Just be better than yesterday-you.",
+  "Smart people ask great questions. Keep asking why.",
+  "You're going to mess up sometimes. That's not losing — that's learning.",
+  "Be the kid who's strong AND kind. The world needs both.",
+  "Your brain is like a muscle. Every hard thing you do makes it stronger.",
+  "Don't just watch the game. Get in there and play it.",
+  "The people who care about you will remember how you made them feel. Be warm.",
+  "You don't need a lot of stuff to be happy. You need people and adventures.",
+  "If someone's having a hard day, just be nice to them. That's enough.",
+  "Every single person you meet knows something you don't. Pay attention.",
+  "It's okay to not know the answer. Say 'I don't know' and then go find out.",
+  "Hard things feel impossible right before they click. Don't quit early.",
+  "Eat good food, move your body, read books. Everything else is bonus.",
+  "Nobody gets good at anything without practicing when it's boring. Nobody.",
+  "God gave you your own gifts. Don't waste time wishing for someone else's.",
+  "When you're frustrated, take a breath. Then try one more time.",
+  "The biggest adventures start with one small brave step.",
+  "Try lots of things while you're young. You'll find what fits.",
+  "A good friend is worth more than a hundred toys. Choose your people wisely.",
+  "If you want to go far in life, bring good people with you.",
+  "Rules aren't the opposite of freedom. They're how you earn it.",
+  "Dad didn't have all the answers either. I just never stopped looking.",
+  "Be curious about everything. Bored people aren't paying attention.",
+  "Standing up for what's right is hard. Do it anyway. – Dad",
+  "Listen more than you talk. Still waters run deep.",
+  "Some days are tough. That's okay. Tomorrow you get to try again.",
+  "I'm proud of you. Not for being perfect — for being you. – Dad",
+];
+const DAD_NOTE_DELAY_MS = 8000;   // approve button stays locked this long so the note gets read
 
 // Gold/star palette for the "day complete" + "star earned" celebrations.
 const STAR_CONFETTI = ['#FFD700', '#FFC83C', '#FFE488', '#FFF3CE', '#FFFFFF', '#F2A23A'];
@@ -1635,6 +1675,7 @@ function ensureToday(state) {
   if (!state.milestones) state.milestones = freshMilestones(s);
   else s.milestones.forEach(ms => { if (!state.milestones[ms.key]) state.milestones[ms.key] = { redeemed: false, pending: false }; });
   if (typeof state.cycleBase !== 'number') state.cycleBase = 0;
+  if (typeof state.dadNoteIndex !== 'number') state.dadNoteIndex = 0;   // rotating dad-note pointer
   delete state.milestonesUnlocked;
   return state;
 }
@@ -1677,13 +1718,14 @@ function computeBestStreak(state) {
 function syncDerived(state) {
   state.streak = computeStreak(state);
   state.totalStars = computeTotalStars(state);
-  // A broken streak collapses below the current cycle's start — restart the ladder.
+  // A broken streak spills the jar: the run-stars reset to zero and the ladder re-bases to
+  // the current (short) run. Prizes already claimed this cycle STAY claimed, though — only
+  // cashing the 20-star capstone reopens the ladder (see pzConfirmPrize). Keeping the claimed
+  // flags here is what stops a kid from re-earning the 5-star prize by repeatedly breaking the
+  // streak and re-climbing to 5.
   if (state.streak < state.cycleBase) {
     if (state.cycleBase > 0) state.spilledPending = true;   // a run was lost — flag a gentle notice
     state.cycleBase = 0;
-    state.settings.milestones.forEach(ms => {
-      if (state.milestones[ms.key]) { state.milestones[ms.key].redeemed = false; state.milestones[ms.key].pending = false; }
-    });
   }
   return state;
 }
@@ -1936,6 +1978,49 @@ function toggleRoutine(r) {
 // ═══════ PIN (gates kid approval + parent zone) ═══════
 let pinEntry = '';
 let pinMode = null;   // 'morning' | 'bedtime' | 'parent'
+let dadNoteTimer = null;   // interval id for the dad-note read-gate countdown
+
+// A "note from Dad" read-gate shown before the grown-up PIN check. The approve button stays
+// locked for DAD_NOTE_DELAY_MS so the note actually gets read, then hands off to the unchanged
+// openPin() flow. One note per half-star, memoized on the day record so re-taps (or "Not yet")
+// re-show the SAME note — the global pointer only advances the first time a half-star is claimed.
+function dadNoteFor(state, mode) {
+  const day = state.days[getToday()];
+  if (!day.dadNote) day.dadNote = {};
+  if (typeof day.dadNote[mode] === 'number') return DAD_NOTES[day.dadNote[mode] % DAD_NOTES.length];
+  const idx = (typeof state.dadNoteIndex === 'number' ? state.dadNoteIndex : 0) % DAD_NOTES.length;
+  day.dadNote[mode] = idx;
+  state.dadNoteIndex = (idx + 1) % DAD_NOTES.length;
+  saveState(state);
+  return DAD_NOTES[idx];
+}
+
+function showDadNote(mode) {
+  const state = ensureToday(loadState());
+  resetCelebrationUI();
+  document.getElementById('celebIcon').textContent = '💛';
+  document.getElementById('celebTitle').textContent = 'A note from Dad';
+  document.getElementById('celebText').textContent = dadNoteFor(state, mode);
+  const action = document.getElementById('celebActionBtn');
+  const readyLabel = mode === 'bedtime' ? 'Ask a grown-up to check 🌙' : 'Ask a grown-up to check ☀️';
+  action.onclick = () => openPin(mode);     // disabled buttons don't fire clicks, so the countdown gates this
+  action.disabled = true;
+  action.style.display = '';
+  document.querySelector('.celebration-close').textContent = 'Not yet';
+  document.getElementById('celebration').classList.add('show');
+  // Lock + count down so the note gets read before the approve button unlocks.
+  let left = Math.ceil(DAD_NOTE_DELAY_MS / 1000);
+  action.textContent = `Read it… ${left}`;
+  if (dadNoteTimer) clearInterval(dadNoteTimer);
+  dadNoteTimer = setInterval(() => {
+    left--;
+    if (left > 0) { action.textContent = `Read it… ${left}`; return; }
+    clearInterval(dadNoteTimer);
+    dadNoteTimer = null;
+    action.disabled = false;
+    action.textContent = readyLabel;
+  }, 1000);
+}
 
 function openPin(mode) {
   resetCelebrationUI();
@@ -2585,6 +2670,8 @@ function openClaim(key) {
   document.getElementById('celebText').textContent = `You earned: ${ms.label}`;
   const action = document.getElementById('celebActionBtn');
   action.textContent = 'Claim it! 🎁';
+  action.onclick = claimMilestone;      // reclaim the shared button from any prior dad-note gate
+  action.disabled = false;
   action.style.display = '';
   document.querySelector('.celebration-close').textContent = 'Maybe later';
   document.getElementById('celebration').classList.add('show');
@@ -2629,9 +2716,13 @@ function spawnConfetti(colors) {
 // Reset the shared overlay to a clean base so claim / day-complete / PIN / star-earned
 // modes never leak UI into one another.
 function resetCelebrationUI() {
+  if (dadNoteTimer) { clearInterval(dadNoteTimer); dadNoteTimer = null; }   // kill any running read-gate countdown
   document.getElementById('pinPad').style.display = 'none';
   document.getElementById('pinMsg').textContent = '';
-  document.getElementById('celebActionBtn').style.display = 'none';
+  const action = document.getElementById('celebActionBtn');
+  action.style.display = 'none';
+  action.disabled = false;
+  action.onclick = null;                 // drop any dad-note/claim handler so it can't leak between modes
   document.querySelector('.celebration-close').textContent = 'Awesome! ⭐';
   document.getElementById('celebration').querySelectorAll('.confetti-piece').forEach(p => p.remove());
 }
