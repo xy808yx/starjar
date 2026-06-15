@@ -152,7 +152,7 @@
   [data-theme="dark"] #morningBlock .routine-target { background: linear-gradient(160deg, #4A3A22, #3A2E1C); color: #F4CD82; }
   [data-theme="dark"] #bedtimeBlock .routine-target { background: linear-gradient(160deg, #3A3358, #2A2440); color: #C9B8E8; }
 
-  [data-theme="dark"] .toast { background: linear-gradient(180deg, #332A1F, #2A2219); }
+  [data-theme="dark"] .toast { background: linear-gradient(180deg, #332A1F, #2A2219); box-shadow: var(--card-shadow), inset 0 1px 0 var(--edge-hi); }
 
   [data-theme="dark"] .milestone-card { background: linear-gradient(160deg, #2A2219, #221B14); }
   [data-theme="dark"] .milestone-card.claimed { background: linear-gradient(160deg, #221C15, #1A150F); }
@@ -160,6 +160,8 @@
   [data-theme="dark"] .milestone-card.claimed .milestone-days,
   [data-theme="dark"] .milestone-card.claimed .milestone-label { color: var(--text-faint); }
   /* NB: unlocked / ready / pending cards stay GOLD in both themes — their dark text is left intact. */
+  /* Locked (un-earned) icon is near-invisible at 0.32 opacity on the dark card — lift it in dark only. */
+  [data-theme="dark"] .milestone-card:not(.unlocked):not(.claimed) .milestone-icon { filter: grayscale(0.85) opacity(0.5); }
 
   [data-theme="dark"] .parent-panel { background-image: radial-gradient(120% 60% at 50% 0%, #2A2016, rgba(42, 32, 22, 0) 60%); }
   [data-theme="dark"] .close-parent { background: rgba(255, 233, 205, 0.1); }
@@ -288,7 +290,7 @@
     font-size: 21px;
     font-weight: 700;
     letter-spacing: 0.3px;
-    color: white;
+    color: #6B4A12;
     background: linear-gradient(180deg, var(--accent-glow) 0%, var(--accent) 55%, var(--accent-deep) 100%);
     border: none;
     border-radius: 60px;
@@ -445,6 +447,17 @@
     font-size: 30px;
     font-weight: 800;
     vertical-align: -3px;
+  }
+
+  /* warm invite shown under the count only while the jar is empty */
+  .jar-hint {
+    text-align: center;
+    margin-top: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-soft);
+    z-index: 1;
+    min-height: 17px;
   }
 
   /* ─── Star fly animation ─── */
@@ -712,8 +725,8 @@
     transform: translateY(-1px);
   }
 
-  /* metallic sheen sweep on unlocked badges */
-  .milestone-card.unlocked::before {
+  /* metallic sheen sweep — only on the actionable "ready" badge (pending sits quiet) */
+  .milestone-card.ready::before {
     content: '';
     position: absolute;
     top: 0; left: -60%;
@@ -760,7 +773,7 @@
     font-family: 'Baloo 2', cursive;
     font-size: 13px;
     font-weight: 700;
-    color: var(--text-faint);
+    color: var(--text-soft);
     margin-bottom: 3px;
     position: relative;
   }
@@ -806,7 +819,7 @@
   .milestone-progress {
     font-size: 11px;
     font-weight: 700;
-    color: var(--text-faint);
+    color: var(--text-soft);
     margin-top: 5px;
     position: relative;
   }
@@ -952,7 +965,7 @@
 
   .pz-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
   .pz-weekdays { margin-bottom: 6px; }
-  .pz-weekday { text-align: center; font-size: 11px; font-weight: 800; color: var(--text-faint); }
+  .pz-weekday { text-align: center; font-size: 11px; font-weight: 800; color: var(--text-soft); }
 
   .pz-day {
     position: relative;
@@ -1064,7 +1077,7 @@
   }
   .pz-tab.active {
     background: linear-gradient(180deg, var(--accent-glow), var(--accent));
-    color: #fff; box-shadow: 0 4px 14px rgba(232, 151, 46, 0.35);
+    color: #6B4A12; box-shadow: 0 4px 14px rgba(232, 151, 46, 0.35);
   }
   .pz-tab:active { transform: scale(0.97); }
 
@@ -1113,14 +1126,14 @@
     color: var(--text-soft); background: transparent;
     transition: background 0.2s, color 0.2s, transform 0.15s;
   }
-  .set-seg-btn.on { background: linear-gradient(180deg, var(--accent-glow), var(--accent)); color: #fff; box-shadow: 0 3px 10px rgba(232, 151, 46, 0.3); }
+  .set-seg-btn.on { background: linear-gradient(180deg, var(--accent-glow), var(--accent)); color: #6B4A12; box-shadow: 0 3px 10px rgba(232, 151, 46, 0.3); }
   .set-seg-btn:active { transform: scale(0.96); }
   .set-msg { text-align: center; font-weight: 700; font-size: 14px; min-height: 18px; margin: 16px 0 4px; }
   .set-msg.ok { color: var(--check-green-deep); }
   .set-msg.err { color: var(--streak-flame); }
   .set-save {
     width: 100%; padding: 16px; border: none; border-radius: 60px; margin-top: 6px;
-    font-family: 'Baloo 2', cursive; font-size: 18px; font-weight: 700; color: #fff;
+    font-family: 'Baloo 2', cursive; font-size: 18px; font-weight: 700; color: #6B4A12;
     background: linear-gradient(180deg, var(--accent-glow), var(--accent) 60%, var(--accent-deep));
     box-shadow: 0 8px 20px rgba(232, 151, 46, 0.4), inset 0 1.5px 0 rgba(255, 255, 255, 0.4); cursor: pointer;
     transition: transform 0.18s var(--ease-bounce);
@@ -1179,7 +1192,7 @@
     font-size: 18px;
     font-weight: 700;
     background: linear-gradient(180deg, var(--accent-glow), var(--accent) 60%, var(--accent-deep));
-    color: white;
+    color: #6B4A12;
     border: none;
     border-radius: 60px;
     padding: 15px 44px;
@@ -1469,7 +1482,7 @@
     <rect x="22" y="17.5" width="76" height="2.4" rx="1.2" fill="rgba(255,255,255,0.5)"/>
   </svg>
   <h1>Star Jar</h1>
-  <p>Build your habits, fill your jar!<br>What's your name?</p>
+  <p>Do your jobs, fill your jar with stars!<br>What's your name?</p>
   <input type="text" class="name-input" id="nameInput" placeholder="Your name" maxlength="12" autocomplete="off" autocapitalize="words">
   <button class="start-btn" id="startBtn" disabled>Let's Go! ✨</button>
 </div>
@@ -1595,6 +1608,7 @@
     <div class="jar-count">
       <span class="jar-num" id="jarStars">0</span> / 20 stars
     </div>
+    <div class="jar-hint" id="jarHint"></div>
   </div>
 
   <!-- Kid-initiated checks: each shown when its routine is fully done and not yet checked -->
@@ -1791,7 +1805,8 @@ function defaultSettings() {
     milestones: clone(DEFAULT_MILESTONES),
     pin: '8888',
     muted: false,
-    theme: 'auto'
+    theme: 'auto',
+    birthday: ''
   };
 }
 
@@ -1870,6 +1885,7 @@ function ensureToday(state) {
   delete state.muted;
   // Theme preference (auto follows the OS setting). Seeds existing installs on next load.
   if (!['auto', 'light', 'dark'].includes(s.theme)) s.theme = 'auto';
+  if (typeof s.birthday !== 'string') s.birthday = '';   // optional birthday surprise (off when blank)
 
   // ── v2 routines: bump task lists on devices still running the untouched originals.
   //    Custom-edited devices are left as-is; the version flag makes this run once. ──
@@ -1911,6 +1927,8 @@ function ensureToday(state) {
   else s.milestones.forEach(ms => { if (!state.milestones[ms.key]) state.milestones[ms.key] = { redeemed: false, pending: false }; });
   if (typeof state.cycleBase !== 'number') state.cycleBase = 0;
   if (typeof state.dadNoteIndex !== 'number') state.dadNoteIndex = 0;   // rotating dad-note pointer
+  if (typeof state.cyclesCompleted !== 'number') state.cyclesCompleted = 0;  // lifetime full jars
+  if (typeof state.lastBirthdayYear !== 'string') state.lastBirthdayYear = '';  // year the birthday moment last fired
   delete state.milestonesUnlocked;
   return state;
 }
@@ -2063,7 +2081,10 @@ function render(state) {
   const hour = new Date().getHours();
   let greetWord = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
   document.getElementById('greeting').textContent = `${greetWord}, ${state.name}!`;
-  document.getElementById('todayDate').textContent = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const _dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+  const _streakNow = state.streak || 0;
+  document.getElementById('todayDate').innerHTML = escapeHtml(_dateStr) +
+    (_streakNow >= 2 ? ` · <span style="color:var(--streak-flame);font-weight:800">🔥 ${_streakNow} in a row</span>` : '');
 
   // Whole-day-done state (both checks): dim everything
   const app = document.getElementById('app');
@@ -2091,6 +2112,8 @@ function render(state) {
   }
   document.getElementById('jarStars').textContent = shown;
   renderJarStars(shown, forming);
+  const jarHint = document.getElementById('jarHint');
+  if (jarHint) jarHint.textContent = (shown === 0 && !forming) ? 'Your jar is ready for stars! ✨' : '';
 
   // Per-routine check CTAs — shown when a routine is fully ticked but not yet checked by a grown-up
   const mDone = defs.morning.length > 0 && defs.morning.every(t => dayState.tasks[t.id]);
@@ -2104,11 +2127,30 @@ function render(state) {
   // Foreground the routine relevant to the time of day
   applyForegrounding();
 
-  // Gentle one-time notice when a run was just lost (the jar spilled)
-  if (state.spilledPending && document.getElementById('parentOverlay').style.display !== 'block') {
-    state.spilledPending = false;
-    saveState(state);
-    showSpillNotice(state.name);
+  // One-time deferred celebrations/notices — shown only when the kid is actually looking
+  // (not while a parent overlay or another celebration is already up). Priority: birthday → full jar → spill.
+  const _overlayUp = document.getElementById('parentOverlay').style.display === 'block'
+    || document.getElementById('celebration').classList.contains('show');
+  if (!_overlayUp) {
+    // The show* helpers reach resetCelebrationUI(), which reads module state (dadNoteTimer)
+    // declared below INIT — so the very first render (during INIT) must not call them
+    // synchronously. Consume the flag now; defer the overlay one tick so init can finish.
+    const nm = state.name;
+    const bday = state.settings.birthday;
+    if (bday && bday.length >= 10 && bday.slice(5) === today.slice(5) && state.lastBirthdayYear !== today.slice(0, 4)) {
+      state.lastBirthdayYear = today.slice(0, 4);
+      saveState(state);
+      setTimeout(() => showBirthday(nm), 0);
+    } else if (state.jarCompletePending) {
+      state.jarCompletePending = false;
+      saveState(state);
+      const n = state.cyclesCompleted;
+      setTimeout(() => showJarComplete(nm, n), 0);
+    } else if (state.spilledPending) {
+      state.spilledPending = false;
+      saveState(state);
+      setTimeout(() => showSpillNotice(nm), 0);
+    }
   }
 }
 
@@ -2400,9 +2442,9 @@ function approveRoutineAfterPin(state, which) {
     document.getElementById('celebIcon').textContent = sun ? '☀️' : '🌙';
     document.getElementById('celebTitle').textContent = sun ? 'Morning star!' : 'Bedtime star!';
     document.getElementById('celebText').textContent = sun
-      ? `Half a star, ${state.name} — bedtime to go!`
-      : `Half a star, ${state.name} — morning to go!`;
-    document.querySelector('.celebration-close').textContent = 'Yay!';
+      ? `Half a star, ${state.name} — finish bedtime for the whole one! ⭐`
+      : `Half a star, ${state.name} — finish your morning for the whole one! ⭐`;
+    document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
     spawnConfetti(STAR_CONFETTI);
     chimeRoutine();
     buzz([20, 30, 20]);
@@ -2413,10 +2455,37 @@ function approveRoutineAfterPin(state, which) {
 function showSpillNotice(name) {
   resetCelebrationUI();
   document.getElementById('celebIcon').textContent = '🌱';
-  document.getElementById('celebTitle').textContent = "Yesterday's star got away";
-  document.getElementById('celebText').textContent = `Let's fill a fresh jar today${name ? ', ' + name : ''}!`;
+  document.getElementById('celebTitle').textContent = 'A fresh start today';
+  document.getElementById('celebText').textContent = `Let's earn some new stars${name ? ', ' + name : ''}!`;
   document.querySelector('.celebration-close').textContent = "Let's go!";
   document.getElementById('celebration').classList.add('show');
+}
+
+// A full jar was cashed in the parent zone — the KID's big "you filled it!" moment, deferred
+// until they're next looking at the app (see the drain in render()).
+function showJarComplete(name, n) {
+  resetCelebrationUI();
+  document.getElementById('celebIcon').textContent = '🫙';
+  document.getElementById('celebTitle').textContent = (n > 1) ? `Jar #${n} full! 🏆` : 'You filled the whole jar! 🏆';
+  document.getElementById('celebText').textContent = `Twenty stars${name ? ', ' + name : ''} — amazing! A fresh jar starts now.`;
+  document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
+  document.getElementById('celebration').classList.add('show');
+  spawnConfetti(STAR_CONFETTI);
+  chimeDay();
+  buzz([30, 40, 30, 40, 70]);
+}
+
+// Optional once-a-year birthday surprise — only fires when a birthday is set in Settings.
+function showBirthday(name) {
+  resetCelebrationUI();
+  document.getElementById('celebIcon').textContent = '🎂';
+  document.getElementById('celebTitle').textContent = `Happy Birthday${name ? ', ' + name : ''}! 🎉`;
+  document.getElementById('celebText').textContent = 'Hope your day is full of stars.';
+  document.querySelector('.celebration-close').textContent = 'Yay! 🎈';
+  document.getElementById('celebration').classList.add('show');
+  spawnConfetti(['#FFD700', '#FFC83C', '#FFE488', '#8BBE72', '#C9B6EC', '#F2762E', '#FFFFFF']);
+  chimeDay();
+  buzz([30, 40, 30, 40, 70]);
 }
 
 // ═══════ STAR ANIMATION ═══════
@@ -2662,7 +2731,7 @@ function renderMilestones(state) {
     if (status === 'ready') footer = `<div class="milestone-cta">🎁 Tap to claim!</div>`;
     else if (status === 'pending') footer = `<div class="milestone-cta">⏳ Ask a grown-up</div>`;
     else if (status === 'claimed') footer = `<div class="milestone-cta claimed-cta">Claimed ✓</div>`;
-    else { const left = Math.max(0, ms.days - pos); footer = `<div class="milestone-progress">${left} more ${left === 1 ? 'star' : 'stars'}</div>`; }
+    else { const left = Math.max(0, ms.days - pos); footer = `<div class="milestone-progress">${left} ${left === 1 ? 'star' : 'stars'} to go</div>`; }
     const tap = status === 'ready' ? `onclick="openClaim('${ms.key}')"` : '';
     return `
       <div class="milestone-card ${cls}" ${tap}>
@@ -2739,10 +2808,12 @@ function renderDashboard(state) {
 
   return `
     <h2>Parent Dashboard</h2>
-    <div class="date-label">${escapeHtml(state.name)}'s progress · ${monthApproved} streak ${monthApproved === 1 ? 'day' : 'days'} this month</div>
+    <div class="date-label">${escapeHtml(state.name)}'s progress · ${monthApproved} star ${monthApproved === 1 ? 'day' : 'days'} this month</div>
 
     <div class="pz-stats">
       <div class="pz-stat pz-stat-jar"><div class="pz-stat-num">⭐ ${Math.max(0, state.streak - state.cycleBase)} / 20</div><div class="pz-stat-lbl">Stars in the jar</div></div>
+      <div class="pz-stat"><div class="pz-stat-num">🏆 ${computeBestStreak(state)}</div><div class="pz-stat-lbl">Best run</div></div>
+      ${state.cyclesCompleted ? `<div class="pz-stat"><div class="pz-stat-num">🫙 ${state.cyclesCompleted}</div><div class="pz-stat-lbl">${state.cyclesCompleted === 1 ? 'Jar filled' : 'Jars filled'}</div></div>` : ''}
     </div>
     ${prizesSection}
 
@@ -2823,6 +2894,10 @@ function renderSettingsForm() {
       <button type="button" class="set-seg-btn ${d.theme === 'dark' ? 'on' : ''}" onclick="setTheme('dark', this)">🌙 Dark</button>
     </div>
 
+    <div class="set-section-title">Birthday surprise</div>
+    <div class="date-label">Optional — a once-a-year celebration on this day. Leave blank to turn it off.</div>
+    <label class="set-time"><span>🎂 Birthday</span><input type="date" value="${escapeHtml(d.birthday || '')}" oninput="setBirthday(this.value)"></label>
+
     <div class="set-msg" id="setMsg"></div>
     <button class="set-save" onclick="saveSettings()">Save settings</button>
   `;
@@ -2832,6 +2907,7 @@ function renderSettingsForm() {
 function setTaskField(routine, i, field, val) { if (settingsDraft.tasks[routine][i]) settingsDraft.tasks[routine][i][field] = val; }
 function setMsField(i, field, val) { if (settingsDraft.milestones[i]) settingsDraft.milestones[i][field] = val; }
 function setTime(which, val) { settingsDraft.times[which] = val; }
+function setBirthday(val) { settingsDraft.birthday = val; }
 function setPin(val) { settingsDraft.pin = val.replace(/\D/g, '').slice(0, 4); }
 function addTask(routine) { settingsDraft.tasks[routine].push({ id: genTaskId(), label: '', emoji: '⭐' }); renderParentPanel(); }
 function removeTask(routine, i) { settingsDraft.tasks[routine].splice(i, 1); renderParentPanel(); }
@@ -2985,6 +3061,8 @@ function pzConfirmPrize(key) {
   if (key === capstone.key) {
     state.cycleBase += capstone.days;
     list.forEach(ms => { if (state.milestones[ms.key]) { state.milestones[ms.key].redeemed = false; state.milestones[ms.key].pending = false; } });
+    state.cyclesCompleted = (state.cyclesCompleted || 0) + 1;
+    state.jarCompletePending = true;   // one-shot: celebrate on the kid's next view (drained in render)
   }
   syncDerived(state);
   saveState(state);
@@ -3045,12 +3123,14 @@ function claimMilestone() {
   render(state);
   claimKey = null;
   document.getElementById('celebTitle').textContent = 'Yay!';
-  document.getElementById('celebText').textContent = 'Go tell a grown-up to give you your prize! 🎉';
+  document.getElementById('celebText').textContent = 'Ask a grown-up for your prize! 🎉';
   document.getElementById('celebActionBtn').style.display = 'none';
   document.querySelector('.celebration-close').textContent = 'Okay! ⭐';
 }
 
 function spawnConfetti(colors) {
+  // JS-spawned motion must check reduced-motion itself — the global CSS rule can't reach it.
+  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const wrap = document.getElementById('celebration');
   wrap.querySelectorAll('.confetti-piece').forEach(p => p.remove());
   colors = colors || ['#FFC83C', '#F2A23A', '#E8972E', '#8BBE72', '#C9B6EC', '#FFE488', '#FFFDF8'];
