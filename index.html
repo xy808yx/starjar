@@ -466,30 +466,44 @@
   /* shelf of completed trophy jars under the active jar */
   .jar-shelf {
     display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 7px;
+    margin-top: 14px;
+    z-index: 1;
+  }
+  .jar-shelf-cap {
+    font-family: 'Baloo 2', cursive;
+    font-size: 13px;
+    font-weight: 800;
+    color: var(--accent);
+  }
+  .jar-shelf-row {
+    display: flex;
     flex-wrap: wrap;
     justify-content: center;
     align-items: center;
-    gap: 4px 6px;
-    margin-top: 10px;
-    z-index: 1;
+    gap: 5px 8px;
+    max-width: 290px;
   }
   .jar-shelf .shelf-jar {
-    font-size: 22px;
-    line-height: 1;
-    filter: drop-shadow(0 2px 2px rgba(150, 116, 74, 0.22));
+    display: inline-flex;
     animation: shelfPop 0.5s var(--ease-bounce);
   }
+  .shelf-jar-svg { width: 30px; height: 34px; display: block; filter: drop-shadow(0 2px 3px rgba(150, 116, 74, 0.25)); }
   @keyframes shelfPop { 0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
   .jar-shelf .shelf-more {
     font-family: 'Baloo 2', cursive;
-    font-size: 15px;
+    font-size: 16px;
     font-weight: 800;
     color: var(--accent);
     background: rgba(244, 180, 60, 0.16);
     border-radius: 40px;
-    padding: 2px 11px;
-    margin-left: 2px;
+    padding: 3px 12px;
+    align-self: center;
   }
+  /* the "jar full!" celebration shows the same jar icon, bigger */
+  #celebIcon .shelf-jar-svg { width: 76px; height: 86px; margin: 0 auto; }
 
   /* ─── Star fly animation ─── */
   .flying-star {
@@ -1162,6 +1176,17 @@
     transition: transform 0.15s, background 0.2s;
   }
   .set-remove:active { transform: scale(0.88); background: rgba(201, 74, 46, 0.2); }
+  /* reorder a task up/down within its routine */
+  .set-move-col { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
+  .set-move {
+    width: 26px; height: 16px; border: none; border-radius: 6px; padding: 0;
+    background: rgba(120, 90, 50, 0.12); color: var(--text-soft);
+    font-size: 9px; line-height: 1; cursor: pointer;
+    transition: transform 0.12s, background 0.2s;
+  }
+  .set-move:active:not(:disabled) { transform: scale(0.85); background: var(--accent-soft); }
+  .set-move:disabled { opacity: 0.28; cursor: default; }
+  [data-theme="dark"] .set-move { background: rgba(255, 233, 205, 0.1); }
   .set-add {
     width: 100%; padding: 11px; border: 1.5px dashed var(--text-faint); border-radius: 12px;
     background: none; color: var(--text-soft); font-family: 'Baloo 2', cursive; font-size: 14px; font-weight: 700;
@@ -2579,7 +2604,7 @@ function approveRoutineAfterPin(state, which) {
 // "you filled it!" moment, deferred until they're next looking at the app (see the drain in render()).
 function showJarComplete(name, n) {
   resetCelebrationUI();
-  document.getElementById('celebIcon').textContent = '🫙';
+  document.getElementById('celebIcon').innerHTML = fullJarIcon();
   document.getElementById('celebTitle').textContent = (n > 1) ? `Jar #${n} full! 🏆` : 'You filled the whole jar! 🏆';
   document.getElementById('celebText').textContent = `Twenty stars${name ? ', ' + name : ''} — amazing! A fresh jar starts now.`;
   document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
@@ -2833,8 +2858,22 @@ function playJarEntrances() {
 }
 
 // ═══════ MILESTONES ═══════
-// The shelf of completed trophy jars, shown under the active jar. Caps the glyph row and
-// switches to a "×N" pill once there are too many to line up.
+// A little jar packed full of gold stars — clearly reads as "a jar you filled up" (the bare
+// 🫙 emoji looked empty). Reuses the main jar's #jarStar art so the stars match.
+function fullJarIcon() {
+  const star = (x, y) => `<use href="#jarStar" xlink:href="#jarStar" x="${x}" y="${y}" width="8.4" height="8.4"/>`;
+  return `<svg class="shelf-jar-svg" viewBox="0 0 30 34" aria-hidden="true" focusable="false">
+    <ellipse cx="15" cy="32.4" rx="9" ry="1.5" fill="rgba(150,116,74,0.22)"/>
+    <path d="M5 9 Q5 7.6 6.4 7.6 L23.6 7.6 Q25 7.6 25 9 L25 27 Q25 31.5 20.5 31.5 L9.5 31.5 Q5 31.5 5 27 Z" fill="rgba(255,224,150,0.30)" stroke="rgba(150,116,74,0.45)" stroke-width="1"/>
+    ${star(5.8,9.8)}${star(14.3,9.8)}${star(5.8,15.6)}${star(14.3,15.6)}${star(5.8,21.4)}${star(14.3,21.4)}
+    <rect x="3.5" y="3" width="23" height="5.6" rx="2.8" fill="#CDD1D8"/>
+    <rect x="3.5" y="4.2" width="23" height="2" rx="1" fill="rgba(255,255,255,0.55)"/>
+    <rect x="7" y="10" width="1.6" height="15" rx="0.8" fill="rgba(255,255,255,0.32)"/>
+  </svg>`;
+}
+
+// The shelf of completed trophy jars, shown under the active jar. Caps the row and switches to
+// a "×N" pill once there are too many to line up. A caption keeps it clear for the kids.
 function renderJarShelf(state) {
   const shelf = document.getElementById('jarShelf');
   if (!shelf) return;
@@ -2842,11 +2881,12 @@ function renderJarShelf(state) {
   if (n <= 0) { shelf.style.display = 'none'; shelf.innerHTML = ''; return; }
   shelf.style.display = '';
   const CAP = 6;
-  let html = '';
   const glyphs = (n <= CAP) ? n : CAP - 1;
-  for (let i = 0; i < glyphs; i++) html += '<span class="shelf-jar">🫙</span>';
-  if (n > CAP) html += `<span class="shelf-more">×${n}</span>`;
-  shelf.innerHTML = html;
+  let jars = '';
+  for (let i = 0; i < glyphs; i++) jars += `<span class="shelf-jar">${fullJarIcon()}</span>`;
+  if (n > CAP) jars += `<span class="shelf-more">×${n}</span>`;
+  shelf.innerHTML = `<div class="jar-shelf-cap">🏆 ${n} full ${n === 1 ? 'jar' : 'jars'} filled!</div>` +
+    `<div class="jar-shelf-row">${jars}</div>`;
 }
 
 // Milestone cards + owed summary, driven by the stacking-prize ledger (prizeCounts).
@@ -3003,12 +3043,18 @@ function renderDashboard(state) {
 // ═══════ SETTINGS FORM (PIN-gated, inside the parent zone) ═══════
 function renderSettingsForm() {
   const d = settingsDraft;
-  const taskGroup = (routine, label, icon) => `
+  const taskGroup = (routine, label, icon) => {
+    const arr = d.tasks[routine];
+    return `
     <div class="set-group">
       <div class="set-grouphead">${icon} ${label}</div>
       <div class="set-tasks">
-        ${d.tasks[routine].map((t, i) => `
+        ${arr.map((t, i) => `
           <div class="set-task-row">
+            <span class="set-move-col">
+              <button class="set-move" onclick="moveTask('${routine}',${i},-1)" ${i === 0 ? 'disabled' : ''} aria-label="Move up">▲</button>
+              <button class="set-move" onclick="moveTask('${routine}',${i},1)" ${i === arr.length - 1 ? 'disabled' : ''} aria-label="Move down">▼</button>
+            </span>
             <input class="set-emoji" value="${escapeHtml(t.emoji)}" maxlength="4" oninput="setTaskField('${routine}',${i},'emoji',this.value)">
             <input class="set-label" value="${escapeHtml(t.label)}" maxlength="28" placeholder="Task name" oninput="setTaskField('${routine}',${i},'label',this.value)">
             <button class="set-remove" onclick="removeTask('${routine}',${i})" aria-label="Remove">✕</button>
@@ -3016,6 +3062,7 @@ function renderSettingsForm() {
       </div>
       <button class="set-add" onclick="addTask('${routine}')">＋ Add task</button>
     </div>`;
+  };
 
   const msRows = d.milestones.map((ms, i) => `
     <div class="set-ms-row">
@@ -3074,6 +3121,14 @@ function setBirthday(val) { settingsDraft.birthday = val; }
 function setPin(val) { settingsDraft.pin = val.replace(/\D/g, '').slice(0, 4); }
 function addTask(routine) { settingsDraft.tasks[routine].push({ id: genTaskId(), label: '', emoji: '⭐' }); renderParentPanel(); }
 function removeTask(routine, i) { settingsDraft.tasks[routine].splice(i, 1); renderParentPanel(); }
+// Reorder a task within its routine (dir = -1 up, +1 down). Applies on Save like any task edit.
+function moveTask(routine, i, dir) {
+  const arr = settingsDraft.tasks[routine];
+  const j = i + dir;
+  if (j < 0 || j >= arr.length) return;
+  [arr[i], arr[j]] = [arr[j], arr[i]];
+  renderParentPanel();
+}
 function toggleMute(btn) { settingsDraft.muted = !settingsDraft.muted; btn.classList.toggle('on', !settingsDraft.muted); }
 // Live-preview the theme as the parent taps; persisted only on Save. An unsaved preview is
 // reverted to the saved theme when the panel closes or the tab switches away (see below).
