@@ -172,6 +172,9 @@
   [data-theme="dark"] .pz-prizes { background: linear-gradient(160deg, #332815, #2A2113); }
   [data-theme="dark"] .pz-prizes-title { color: #F4CD82; }
   [data-theme="dark"] .pz-prize-later { background: rgba(255, 233, 205, 0.1); }
+  [data-theme="dark"] .pz-prize-counts b.owed { color: #F4CD82; }
+  [data-theme="dark"] .pz-give-chip { background: rgba(255, 233, 205, 0.12); color: #F0DCB0; border-color: rgba(244, 205, 130, 0.5); }
+  [data-theme="dark"] .pz-give-undo { background: rgba(255, 233, 205, 0.1); }
 
   [data-theme="dark"] .set-remove { background: rgba(255, 120, 90, 0.14); color: #FF8A6B; }
   [data-theme="dark"] .set-remove:active { background: rgba(255, 120, 90, 0.26); }
@@ -460,6 +463,34 @@
     min-height: 17px;
   }
 
+  /* shelf of completed trophy jars under the active jar */
+  .jar-shelf {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 4px 6px;
+    margin-top: 10px;
+    z-index: 1;
+  }
+  .jar-shelf .shelf-jar {
+    font-size: 22px;
+    line-height: 1;
+    filter: drop-shadow(0 2px 2px rgba(150, 116, 74, 0.22));
+    animation: shelfPop 0.5s var(--ease-bounce);
+  }
+  @keyframes shelfPop { 0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
+  .jar-shelf .shelf-more {
+    font-family: 'Baloo 2', cursive;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--accent);
+    background: rgba(244, 180, 60, 0.16);
+    border-radius: 40px;
+    padding: 2px 11px;
+    margin-left: 2px;
+  }
+
   /* ─── Star fly animation ─── */
   .flying-star {
     position: fixed;
@@ -707,6 +738,37 @@
     grid-template-columns: 1fr 1fr 1fr;
     gap: 12px;
   }
+
+  /* "ready for you" owed-prize summary above the cards */
+  .prize-tally {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+    margin-bottom: 12px;
+    padding: 9px 13px;
+    background: linear-gradient(160deg, #FFF6DC, #FFE9B8);
+    border: 1.5px solid rgba(214, 150, 40, 0.4);
+    border-radius: var(--radius-sm);
+  }
+  .prize-tally-lbl {
+    font-family: 'Baloo 2', cursive;
+    font-size: 13px;
+    font-weight: 800;
+    color: #8A5A12;
+  }
+  .prize-tally-item {
+    font-family: 'Baloo 2', cursive;
+    font-size: 14px;
+    font-weight: 800;
+    color: #7E5A1E;
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 40px;
+    padding: 2px 10px;
+  }
+  [data-theme="dark"] .prize-tally { background: linear-gradient(160deg, #332815, #2A2113); border-color: rgba(244, 205, 130, 0.3); }
+  [data-theme="dark"] .prize-tally-lbl { color: #F4CD82; }
+  [data-theme="dark"] .prize-tally-item { color: #F0DCB0; background: rgba(255, 233, 205, 0.1); }
 
   .milestone-card {
     background: linear-gradient(160deg, #FFFDF8, #F2E9DA);
@@ -1303,15 +1365,42 @@
   }
   .pz-prize-row {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 9px 0;
+    flex-direction: column;
+    gap: 9px;
+    padding: 11px 0;
     border-top: 1px solid rgba(214, 150, 40, 0.22);
   }
   .pz-prize-row:first-of-type { border-top: none; }
-  .pz-prize-info { font-size: 14px; font-weight: 600; color: var(--text); }
-  .pz-prize-actions { display: flex; gap: 7px; flex-shrink: 0; }
+  .pz-prize-head { display: flex; align-items: baseline; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; }
+  .pz-prize-info { font-size: 15px; font-weight: 700; color: var(--text); }
+  .pz-prize-counts { font-size: 12px; font-weight: 700; color: var(--text-soft); white-space: nowrap; }
+  .pz-prize-counts b.owed { color: #B26A00; font-weight: 800; }
+  /* one tickable check-off box per owed prize, so every claimable prize is visible */
+  .pz-give-chips { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+  .pz-give-chip {
+    font-family: 'Baloo 2', cursive;
+    font-size: 13px; font-weight: 700;
+    color: #6B4A12;
+    background: rgba(255, 255, 255, 0.6);
+    border: 1.5px dashed rgba(214, 150, 40, 0.7);
+    border-radius: 12px;
+    padding: 7px 12px;
+    cursor: pointer;
+    transition: transform 0.15s var(--ease-bounce);
+  }
+  .pz-give-chip:active { transform: scale(0.94); }
+  .pz-give-chip.all { border-style: solid; border-color: transparent; background: var(--check-green); color: #fff; }
+  .pz-give-more { font-size: 12px; font-weight: 700; color: var(--text-soft); }
+  .pz-give-undo {
+    font-family: 'Baloo 2', cursive;
+    font-size: 12px; font-weight: 700;
+    color: var(--text-soft);
+    background: rgba(120, 90, 50, 0.1);
+    border: none; border-radius: 40px;
+    padding: 6px 12px; cursor: pointer;
+    transition: transform 0.15s var(--ease-bounce);
+  }
+  .pz-give-undo:active { transform: scale(0.95); }
   .pz-prize-give, .pz-prize-later {
     font-family: 'Baloo 2', cursive;
     font-size: 13px;
@@ -1608,6 +1697,8 @@
     <div class="jar-count">
       <span class="jar-num" id="jarStars">0</span> / 20 stars
     </div>
+    <!-- Shelf of completed trophy jars (filled in by renderJarShelf) -->
+    <div class="jar-shelf" id="jarShelf"></div>
     <div class="jar-hint" id="jarHint"></div>
   </div>
 
@@ -1646,6 +1737,7 @@
   <!-- Milestones -->
   <div class="milestones-section">
     <div class="milestones-title">🏆 Milestones</div>
+    <div class="prize-tally" id="prizeTally" style="display:none"></div>
     <div class="milestones-grid" id="milestonesGrid"></div>
   </div>
 </div>
@@ -1738,6 +1830,9 @@ const DEFAULT_MILESTONES = [
 
 // Pre-v3 prize ladder — used only to detect an un-customized install during the v3 migration.
 const MODEL_VERSION = 3;
+// v4 prize model: a shelf of auto-advancing jars + a stacking-prize ledger (prizesGiven).
+// Supersedes the old "prizes re-open only on cash-in / a missed day spills the jar" rule.
+const PRIZE_MODEL_VERSION = 4;
 const OLD_DEFAULT_MILESTONES = [
   { days: 7, icon: '🎬', label: 'Pick a show to watch', key: 'ms7' },
   { days: 14, icon: '🍦', label: 'Choose an ice cream flavor', key: 'ms14' },
@@ -1862,6 +1957,8 @@ function initState(name) {
     streak: 0,
     totalStars: 0,
     cycleBase: 0,
+    prizesGiven: { ms7: 0, ms14: 0, ms30: 0 },   // stacking-prize ledger (parent hand-overs)
+    jarsSeen: 0,                                  // high-water mark for the "jar full!" celebration
     settings,
     milestones: freshMilestones(settings),
     days: { [getToday()]: freshDayState(settings) }
@@ -1927,9 +2024,24 @@ function ensureToday(state) {
   else s.milestones.forEach(ms => { if (!state.milestones[ms.key]) state.milestones[ms.key] = { redeemed: false, pending: false }; });
   if (typeof state.cycleBase !== 'number') state.cycleBase = 0;
   if (typeof state.dadNoteIndex !== 'number') state.dadNoteIndex = 0;   // rotating dad-note pointer
-  if (typeof state.cyclesCompleted !== 'number') state.cyclesCompleted = 0;  // lifetime full jars
+  if (typeof state.cyclesCompleted !== 'number') state.cyclesCompleted = 0;  // legacy; superseded by fullJars
   if (typeof state.lastBirthdayYear !== 'string') state.lastBirthdayYear = '';  // year the birthday moment last fired
   delete state.milestonesUnlocked;
+
+  // ── v4 prize model: stacking-prize ledger + auto-advancing jar shelf ──
+  if (!state.prizesGiven || typeof state.prizesGiven !== 'object') state.prizesGiven = {};
+  s.milestones.forEach(ms => { if (typeof state.prizesGiven[ms.key] !== 'number') state.prizesGiven[ms.key] = 0; });
+  if (s.prizeModelVersion !== PRIZE_MODEL_VERSION) {
+    // One-shot catch-up: start every existing kid "all caught up" (owed = 0) so the parent isn't
+    // told they owe a backlog for stars already banked, and seed the celebration high-water mark
+    // so old saves don't fire a storm of "jar full!" popups on first load.
+    syncDerived(state);                                 // populate goodDays/fullJars/currentJarFill
+    const c = prizeCounts(state);
+    s.milestones.forEach(ms => { state.prizesGiven[ms.key] = c[ms.key].earned; });
+    state.jarsSeen = state.fullJars;
+    s.prizeModelVersion = PRIZE_MODEL_VERSION;
+  }
+  if (typeof state.jarsSeen !== 'number') state.jarsSeen = state.fullJars || 0;
   return state;
 }
 
@@ -1956,6 +2068,13 @@ function computeTotalStars(state) {
   return n;
 }
 
+// Lifetime count of good days (NOT consecutive) — the cumulative fuel for the jar shelf.
+function computeGoodDays(state) {
+  let n = 0;
+  for (const k in state.days) if (dayStarred(state.days[k])) n++;
+  return n;
+}
+
 function computeBestStreak(state) {
   const keys = Object.keys(state.days).filter(k => dayStarred(state.days[k])).sort();
   let best = 0, cur = 0, prev = null;
@@ -1971,24 +2090,30 @@ function computeBestStreak(state) {
 function syncDerived(state) {
   state.streak = computeStreak(state);
   state.totalStars = computeTotalStars(state);
-  // A broken streak spills the jar: the run-stars reset to zero and the ladder re-bases to
-  // the current (short) run. Prizes already claimed this cycle STAY claimed, though — only
-  // cashing the 20-star capstone reopens the ladder (see pzConfirmPrize). Keeping the claimed
-  // flags here is what stops a kid from re-earning the 5-star prize by repeatedly breaking the
-  // streak and re-climbing to 5.
-  if (state.streak < state.cycleBase) {
-    if (state.cycleBase > 0) state.spilledPending = true;   // a run was lost — flag a gentle notice
-    state.cycleBase = 0;
-  }
+  // Jar fill is cumulative & forgiving: every good day counts toward a 20-star jar, and the jar
+  // auto-advances at 20 (a fresh one starts). A missed day no longer spills it — the streak above
+  // survives only as its own 🔥 badge. fullJars are permanent trophies on the shelf.
+  const goodDays = computeGoodDays(state);
+  state.goodDays = goodDays;
+  state.fullJars = Math.floor(goodDays / 20);     // completed trophy jars
+  state.currentJarFill = goodDays % 20;           // the active jar, always 0–19
   return state;
 }
 
-// 'locked' | 'ready' | 'pending' | 'claimed' — availability is relative to the cycle, not the raw streak.
-function milestoneStatus(state, ms) {
-  const m = state.milestones[ms.key];
-  if (m.pending) return 'pending';
-  if (m.redeemed) return 'claimed';
-  return (state.streak - state.cycleBase) >= ms.days ? 'ready' : 'locked';
+// Stacking-prize ledger. Every completed jar earns all three prizes; the active jar earns the
+// 5/10-star prizes as it passes them. `prizesGiven` is what the parent has actually handed over,
+// so OWED = earned − given (floored at 0). Capstone (20★) only earns on a full jar.
+function prizeCounts(state) {
+  const list = state.settings.milestones;
+  const fill = state.currentJarFill || 0, full = state.fullJars || 0;
+  const out = {};
+  list.forEach((ms, i) => {
+    const isCapstone = (i === list.length - 1);
+    const earned = isCapstone ? full : full + (fill >= ms.days ? 1 : 0);
+    const given = (state.prizesGiven && state.prizesGiven[ms.key]) || 0;
+    out[ms.key] = { earned, given, owed: Math.max(0, earned - given) };
+  });
+  return out;
 }
 
 // ═══════ ONBOARDING ═══════
@@ -2102,8 +2227,8 @@ function render(state) {
   renderTaskList('morningTasks', defs.morning, dayState, 'morningProgress', checks.morning);
   renderTaskList('bedtimeTasks', defs.bedtime, dayState, 'bedtimeProgress', checks.bedtime);
 
-  // Jar — banked run-stars (one per good day) toward the 20-star grand prize
-  const jarStars = Math.max(0, (state.streak || 0) - (state.cycleBase || 0));
+  // Jar — the active jar fills with cumulative good-days (0–19); full jars live on the shelf
+  const jarStars = state.currentJarFill || 0;
   const shown = Math.min(20, jarStars);
   let forming = null;                              // today's in-progress half-star
   if (!isStarred) {
@@ -2112,6 +2237,7 @@ function render(state) {
   }
   document.getElementById('jarStars').textContent = shown;
   renderJarStars(shown, forming);
+  renderJarShelf(state);
   const jarHint = document.getElementById('jarHint');
   if (jarHint) jarHint.textContent = (shown === 0 && !forming) ? 'Your jar is ready for stars! ✨' : '';
 
@@ -2128,7 +2254,7 @@ function render(state) {
   applyForegrounding();
 
   // One-time deferred celebrations/notices — shown only when the kid is actually looking
-  // (not while a parent overlay or another celebration is already up). Priority: birthday → full jar → spill.
+  // (not while a parent overlay or another celebration is already up). Priority: birthday → full jar.
   const _overlayUp = document.getElementById('parentOverlay').style.display === 'block'
     || document.getElementById('celebration').classList.contains('show');
   if (!_overlayUp) {
@@ -2141,15 +2267,12 @@ function render(state) {
       state.lastBirthdayYear = today.slice(0, 4);
       saveState(state);
       setTimeout(() => showBirthday(nm), 0);
-    } else if (state.jarCompletePending) {
-      state.jarCompletePending = false;
+    } else if (state.fullJars > (state.jarsSeen || 0)) {
+      // A jar just auto-completed — celebrate once, then catch the high-water mark up so a
+      // multi-jar jump (e.g. parent backfills days) fires a single popup, not a storm.
+      state.jarsSeen = state.fullJars;
       saveState(state);
-      const n = state.cyclesCompleted;
-      setTimeout(() => showJarComplete(nm, n), 0);
-    } else if (state.spilledPending) {
-      state.spilledPending = false;
-      saveState(state);
-      setTimeout(() => showSpillNotice(nm), 0);
+      setTimeout(() => showJarComplete(nm, state.fullJars), 0);
     }
   }
 }
@@ -2452,17 +2575,8 @@ function approveRoutineAfterPin(state, which) {
 }
 
 // Gentle, no-confetti notice shown once after a missed day spills the jar.
-function showSpillNotice(name) {
-  resetCelebrationUI();
-  document.getElementById('celebIcon').textContent = '🌱';
-  document.getElementById('celebTitle').textContent = 'A fresh start today';
-  document.getElementById('celebText').textContent = `Let's earn some new stars${name ? ', ' + name : ''}!`;
-  document.querySelector('.celebration-close').textContent = "Let's go!";
-  document.getElementById('celebration').classList.add('show');
-}
-
-// A full jar was cashed in the parent zone — the KID's big "you filled it!" moment, deferred
-// until they're next looking at the app (see the drain in render()).
+// A jar just auto-completed (the kid passed another multiple of 20) — the KID's big
+// "you filled it!" moment, deferred until they're next looking at the app (see the drain in render()).
 function showJarComplete(name, n) {
   resetCelebrationUI();
   document.getElementById('celebIcon').textContent = '🫙';
@@ -2719,20 +2833,38 @@ function playJarEntrances() {
 }
 
 // ═══════ MILESTONES ═══════
+// The shelf of completed trophy jars, shown under the active jar. Caps the glyph row and
+// switches to a "×N" pill once there are too many to line up.
+function renderJarShelf(state) {
+  const shelf = document.getElementById('jarShelf');
+  if (!shelf) return;
+  const n = state.fullJars || 0;
+  if (n <= 0) { shelf.style.display = 'none'; shelf.innerHTML = ''; return; }
+  shelf.style.display = '';
+  const CAP = 6;
+  let html = '';
+  const glyphs = (n <= CAP) ? n : CAP - 1;
+  for (let i = 0; i < glyphs; i++) html += '<span class="shelf-jar">🫙</span>';
+  if (n > CAP) html += `<span class="shelf-more">×${n}</span>`;
+  shelf.innerHTML = html;
+}
+
+// Milestone cards + owed summary, driven by the stacking-prize ledger (prizeCounts).
 function renderMilestones(state) {
+  const counts = prizeCounts(state);
+  const fill = state.currentJarFill || 0;
   const grid = document.getElementById('milestonesGrid');
-  const pos = state.streak - state.cycleBase;
   grid.innerHTML = state.settings.milestones.map(ms => {
-    const status = milestoneStatus(state, ms);
-    const cls = status === 'ready' ? 'unlocked ready'
-      : status === 'pending' ? 'unlocked pending'
-      : status === 'claimed' ? 'claimed' : '';
-    let footer;
-    if (status === 'ready') footer = `<div class="milestone-cta">🎁 Tap to claim!</div>`;
-    else if (status === 'pending') footer = `<div class="milestone-cta">⏳ Ask a grown-up</div>`;
-    else if (status === 'claimed') footer = `<div class="milestone-cta claimed-cta">Claimed ✓</div>`;
-    else { const left = Math.max(0, ms.days - pos); footer = `<div class="milestone-progress">${left} ${left === 1 ? 'star' : 'stars'} to go</div>`; }
-    const tap = status === 'ready' ? `onclick="openClaim('${ms.key}')"` : '';
+    const owed = counts[ms.key].owed;
+    let cls = '', footer, tap = '';
+    if (owed > 0) {
+      cls = 'unlocked ready';
+      footer = `<div class="milestone-cta">🎁 ${owed > 1 ? '×' + owed + ' ready!' : 'Ready!'}</div>`;
+      tap = `onclick="openClaim('${ms.key}')"`;
+    } else {
+      let d = ms.days - fill; if (d <= 0) d += 20;     // stars until the NEXT one of this prize
+      footer = `<div class="milestone-progress">${d} ${d === 1 ? 'star' : 'stars'} to go</div>`;
+    }
     return `
       <div class="milestone-card ${cls}" ${tap}>
         <div class="milestone-icon">${escapeHtml(ms.icon)}</div>
@@ -2742,6 +2874,20 @@ function renderMilestones(state) {
       </div>
     `;
   }).join('');
+
+  // Owed summary strip — only the tiers with a prize waiting to be claimed.
+  const tally = document.getElementById('prizeTally');
+  if (tally) {
+    const owedList = state.settings.milestones.filter(ms => counts[ms.key].owed > 0);
+    if (owedList.length) {
+      tally.style.display = '';
+      tally.innerHTML = `<span class="prize-tally-lbl">🎁 Ready for you:</span>` +
+        owedList.map(ms => `<span class="prize-tally-item">${escapeHtml(ms.icon)} ×${counts[ms.key].owed}</span>`).join('');
+    } else {
+      tally.style.display = 'none';
+      tally.innerHTML = '';
+    }
+  }
 }
 
 // ═══════ PARENT ZONE ═══════
@@ -2788,18 +2934,35 @@ function renderParentPanel() {
 function renderDashboard(state) {
   const today = getToday();
   const monthName = pzMonth.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-  const pending = state.settings.milestones.filter(ms => state.milestones[ms.key] && state.milestones[ms.key].pending);
-  const prizesSection = pending.length ? `
+  const pc = prizeCounts(state);
+  const anyPrize = state.settings.milestones.some(ms => pc[ms.key].owed > 0 || pc[ms.key].given > 0);
+  const CHIP_CAP = 6;   // show one check-off box per owed prize, up to this many, then a "+N more"
+  const prizesSection = anyPrize ? `
     <div class="pz-prizes">
-      <div class="pz-prizes-title">🎁 Prizes to hand out</div>
-      ${pending.map(ms => `
+      <div class="pz-prizes-title">🎁 Prizes to give</div>
+      ${state.settings.milestones.map(ms => {
+        const c = pc[ms.key];
+        let chips = '';
+        if (c.owed > 0) {
+          const shown = Math.min(c.owed, CHIP_CAP);
+          for (let i = 0; i < shown; i++) chips += `<button class="pz-give-chip" onclick="pzGivePrize('${ms.key}')">☐ Gave it</button>`;
+          if (c.owed > CHIP_CAP) chips += `<span class="pz-give-more">+${c.owed - CHIP_CAP} more</span>`;
+          if (c.owed > 1) chips += `<button class="pz-give-chip all" onclick="pzGiveAllPrize('${ms.key}')">Gave all ${c.owed} ✓</button>`;
+        }
+        const undo = c.given > 0 ? `<button class="pz-give-undo" onclick="pzUndoPrize('${ms.key}')">↩︎ undo one</button>` : '';
+        const summary = c.owed > 0
+          ? `<b class="owed">${c.owed} to give</b>${c.given > 0 ? ` · ${c.given} given` : ''}`
+          : `all ${c.given} given ✓`;
+        return `
         <div class="pz-prize-row">
-          <span class="pz-prize-info">${escapeHtml(ms.icon)} ${escapeHtml(ms.label)}</span>
-          <span class="pz-prize-actions">
-            <button class="pz-prize-give" onclick="pzConfirmPrize('${ms.key}')">Gave it ✓</button>
-            <button class="pz-prize-later" onclick="pzCancelPrize('${ms.key}')">Not yet</button>
-          </span>
-        </div>`).join('')}
+          <div class="pz-prize-head">
+            <span class="pz-prize-info">${escapeHtml(ms.icon)} ${escapeHtml(ms.label)}</span>
+            <span class="pz-prize-counts">${summary}</span>
+          </div>
+          ${chips ? `<div class="pz-give-chips">${chips}</div>` : ''}
+          ${undo ? `<div class="pz-give-foot">${undo}</div>` : ''}
+        </div>`;
+      }).join('')}
     </div>` : '';
   const monthApproved = Object.keys(state.days).filter(k => {
     const d = parseKey(k);
@@ -2811,9 +2974,9 @@ function renderDashboard(state) {
     <div class="date-label">${escapeHtml(state.name)}'s progress · ${monthApproved} star ${monthApproved === 1 ? 'day' : 'days'} this month</div>
 
     <div class="pz-stats">
-      <div class="pz-stat pz-stat-jar"><div class="pz-stat-num">⭐ ${Math.max(0, state.streak - state.cycleBase)} / 20</div><div class="pz-stat-lbl">Stars in the jar</div></div>
+      <div class="pz-stat pz-stat-jar"><div class="pz-stat-num">⭐ ${state.currentJarFill || 0} / 20</div><div class="pz-stat-lbl">Stars in the jar</div></div>
       <div class="pz-stat"><div class="pz-stat-num">🏆 ${computeBestStreak(state)}</div><div class="pz-stat-lbl">Best run</div></div>
-      ${state.cyclesCompleted ? `<div class="pz-stat"><div class="pz-stat-num">🫙 ${state.cyclesCompleted}</div><div class="pz-stat-lbl">${state.cyclesCompleted === 1 ? 'Jar filled' : 'Jars filled'}</div></div>` : ''}
+      ${state.fullJars ? `<div class="pz-stat"><div class="pz-stat-num">🫙 ${state.fullJars}</div><div class="pz-stat-lbl">${state.fullJars === 1 ? 'Jar filled' : 'Jars filled'}</div></div>` : ''}
     </div>
     ${prizesSection}
 
@@ -3049,30 +3212,34 @@ function pzToggleCheck(key, which) {
   renderParentPanel();
 }
 
-function pzConfirmPrize(key) {
+// Parent hands a prize over — increment the ledger by one, never past what's earned.
+function pzGivePrize(key) {
   const state = ensureToday(loadState());
-  const m = state.milestones[key];
-  if (!m) return;
-  m.pending = false;
-  m.redeemed = true;
-  // Cashing out the top prize completes the cycle and restarts the ladder.
-  const list = state.settings.milestones;
-  const capstone = list[list.length - 1];
-  if (key === capstone.key) {
-    state.cycleBase += capstone.days;
-    list.forEach(ms => { if (state.milestones[ms.key]) { state.milestones[ms.key].redeemed = false; state.milestones[ms.key].pending = false; } });
-    state.cyclesCompleted = (state.cyclesCompleted || 0) + 1;
-    state.jarCompletePending = true;   // one-shot: celebrate on the kid's next view (drained in render)
-  }
+  syncDerived(state);
+  const c = prizeCounts(state)[key];
+  if (c && c.owed > 0) state.prizesGiven[key] = Math.min(c.earned, (state.prizesGiven[key] || 0) + 1);
   syncDerived(state);
   saveState(state);
   render(state);
   renderParentPanel();
 }
 
-function pzCancelPrize(key) {
+// Clear the whole owed pile for one prize at once.
+function pzGiveAllPrize(key) {
   const state = ensureToday(loadState());
-  if (state.milestones[key]) state.milestones[key].pending = false;
+  syncDerived(state);
+  const c = prizeCounts(state)[key];
+  if (c) state.prizesGiven[key] = c.earned;
+  syncDerived(state);
+  saveState(state);
+  render(state);
+  renderParentPanel();
+}
+
+// Undo a hand-over (fat-finger), floored at zero so owed never goes negative.
+function pzUndoPrize(key) {
+  const state = ensureToday(loadState());
+  state.prizesGiven[key] = Math.max(0, (state.prizesGiven[key] || 0) - 1);
   syncDerived(state);
   saveState(state);
   render(state);
@@ -3097,13 +3264,15 @@ function openClaim(key) {
   const state = ensureToday(loadState());
   const ms = state.settings.milestones.find(m => m.key === key);
   if (!ms) return;
+  const owed = prizeCounts(state)[key].owed;
+  if (owed <= 0) return;                  // nothing waiting — guard against a stale tap
   resetCelebrationUI();
   claimKey = key;
   document.getElementById('celebIcon').textContent = ms.icon;
-  document.getElementById('celebTitle').textContent = `${ms.days}-Star Prize!`;
-  document.getElementById('celebText').textContent = `You earned: ${ms.label}`;
+  document.getElementById('celebTitle').textContent = owed > 1 ? `${owed} prizes ready! 🎁` : `${ms.days}-Star Prize!`;
+  document.getElementById('celebText').textContent = owed > 1 ? `You have ${owed} × ${ms.label} waiting!` : `You earned: ${ms.label}`;
   const action = document.getElementById('celebActionBtn');
-  action.textContent = 'Claim it! 🎁';
+  action.textContent = 'Show a grown-up! 🎁';
   action.onclick = claimMilestone;      // reclaim the shared button from any prior dad-note gate
   action.disabled = false;
   action.style.display = '';
@@ -3114,16 +3283,12 @@ function openClaim(key) {
   buzz([30, 40, 30, 40, 70]);
 }
 
+// Claiming is a kid ritual only — handing the prize over (the ledger write) is the parent's action.
 function claimMilestone() {
   if (!claimKey) return;
-  const state = ensureToday(loadState());
-  if (state.milestones[claimKey]) state.milestones[claimKey].pending = true;
-  syncDerived(state);
-  saveState(state);
-  render(state);
   claimKey = null;
   document.getElementById('celebTitle').textContent = 'Yay!';
-  document.getElementById('celebText').textContent = 'Ask a grown-up for your prize! 🎉';
+  document.getElementById('celebText').textContent = 'Show a grown-up to get your prize! 🎉';
   document.getElementById('celebActionBtn').style.display = 'none';
   document.querySelector('.celebration-close').textContent = 'Okay! ⭐';
 }
