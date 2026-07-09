@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -74,8 +74,9 @@
     --bedtime-deep: #CFC3E9;
     --bedtime-accent: #7C6BA6;
 
-    /* streak flame */
-    --streak-flame: #F2762E;
+    /* streak flame — deepened so it stays AA-legible as text on the cream surfaces
+       (drives the PIN-fail + settings-error messages and the "N in a row" streak line) */
+    --streak-flame: #C0492E;
     --streak-flame-glow: rgba(242, 118, 46, 0.35);
 
     --radius: 22px;
@@ -144,8 +145,6 @@
 
   [data-theme="dark"] .onboarding h1 { text-shadow: none; }
 
-  [data-theme="dark"] .streak-badge { background: linear-gradient(135deg, #2E2415, #3A2C18); }
-
   [data-theme="dark"] .routine-block { border-color: var(--hairline); }
   [data-theme="dark"] .routine-icon.morning { background: linear-gradient(145deg, #4A3A22, var(--morning-deep)); }
   [data-theme="dark"] .routine-icon.bedtime { background: linear-gradient(145deg, #3A3358, var(--bedtime-deep)); }
@@ -155,13 +154,9 @@
   [data-theme="dark"] .toast { background: linear-gradient(180deg, #332A1F, #2A2219); box-shadow: var(--card-shadow), inset 0 1px 0 var(--edge-hi); }
 
   [data-theme="dark"] .milestone-card { background: linear-gradient(160deg, #2A2219, #221B14); }
-  [data-theme="dark"] .milestone-card.claimed { background: linear-gradient(160deg, #221C15, #1A150F); }
-  /* claimed cards lose the gold bg, so their (otherwise dark-amber) text needs to go light */
-  [data-theme="dark"] .milestone-card.claimed .milestone-days,
-  [data-theme="dark"] .milestone-card.claimed .milestone-label { color: var(--text-faint); }
-  /* NB: unlocked / ready / pending cards stay GOLD in both themes — their dark text is left intact. */
+  /* NB: unlocked / ready cards stay GOLD in both themes — their dark text is left intact. */
   /* Locked (un-earned) icon is near-invisible at 0.32 opacity on the dark card — lift it in dark only. */
-  [data-theme="dark"] .milestone-card:not(.unlocked):not(.claimed) .milestone-icon { filter: grayscale(0.85) opacity(0.5); }
+  [data-theme="dark"] .milestone-card:not(.unlocked) .milestone-icon { filter: grayscale(0.85) opacity(0.5); }
 
   [data-theme="dark"] .parent-panel { background-image: radial-gradient(120% 60% at 50% 0%, #2A2016, rgba(42, 32, 22, 0) 60%); }
   [data-theme="dark"] .close-parent { background: rgba(255, 233, 205, 0.1); }
@@ -171,7 +166,6 @@
 
   [data-theme="dark"] .pz-prizes { background: linear-gradient(160deg, #332815, #2A2113); }
   [data-theme="dark"] .pz-prizes-title { color: #F4CD82; }
-  [data-theme="dark"] .pz-prize-later { background: rgba(255, 233, 205, 0.1); }
   [data-theme="dark"] .pz-prize-counts b.owed { color: #F4CD82; }
   [data-theme="dark"] .pz-give-chip { background: rgba(255, 233, 205, 0.12); color: #F0DCB0; border-color: rgba(244, 205, 130, 0.5); }
   [data-theme="dark"] .pz-give-undo { background: rgba(255, 233, 205, 0.1); }
@@ -349,35 +343,6 @@
     margin-top: 3px;
   }
 
-  .streak-badge {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    background: linear-gradient(135deg, #FFF1DD, #FFE2BE);
-    border-radius: 40px;
-    padding: 8px 16px 8px 13px;
-    font-family: 'Baloo 2', cursive;
-    font-weight: 700;
-    font-size: 18px;
-    color: var(--streak-flame);
-    box-shadow: 0 4px 14px var(--streak-flame-glow), inset 0 1px 0 var(--edge-hi);
-    flex-shrink: 0;
-  }
-
-  .streak-badge .flame {
-    font-size: 21px;
-    transform-origin: center 80%;
-    animation: flicker 2.6s ease-in-out infinite;
-    filter: drop-shadow(0 0 5px rgba(242, 118, 46, 0.5));
-  }
-
-  @keyframes flicker {
-    0%, 100% { transform: scale(1) rotate(-1.5deg); opacity: 0.94; }
-    25% { transform: scale(1.09, 0.95) rotate(1.5deg); opacity: 1; }
-    50% { transform: scale(0.96, 1.06) rotate(-1deg); opacity: 0.88; }
-    75% { transform: scale(1.04, 0.99) rotate(1.2deg); opacity: 1; }
-  }
-
   /* ─── Jar Section ─── */
   .jar-section {
     display: flex;
@@ -504,33 +469,6 @@
   }
   /* the "jar full!" celebration shows the same jar icon, bigger */
   #celebIcon .shelf-jar-svg { width: 76px; height: 86px; margin: 0 auto; }
-
-  /* ─── Star fly animation ─── */
-  .flying-star {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 30px;
-    height: 30px;
-    pointer-events: none;
-    z-index: 1000;
-    will-change: transform, offset-distance;
-    filter: drop-shadow(0 3px 6px rgba(242, 170, 58, 0.5));
-  }
-  .flying-star svg { width: 100%; height: 100%; display: block; }
-
-  .fly-sparkle {
-    position: fixed;
-    left: 0;
-    top: 0;
-    width: 11px;
-    height: 11px;
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 999;
-    background: radial-gradient(circle, rgba(255, 236, 156, 0.95) 0%, rgba(255, 205, 80, 0) 70%);
-    will-change: transform, opacity;
-  }
 
   /* ─── Routine Blocks ─── */
   .routine-block {
@@ -872,16 +810,8 @@
     0%, 100% { transform: translateY(-1px) scale(1); }
     50% { transform: translateY(-3px) scale(1.035); }
   }
-  .milestone-card.ready:active { transform: scale(0.97); }
-  .milestone-card.pending { filter: saturate(0.85); }
-
-  .milestone-card.claimed {
-    background: linear-gradient(160deg, #F3EEE4, #E7DECB);
-    box-shadow: var(--card-shadow-soft), inset 0 1px 0 rgba(255, 255, 255, 0.6);
-    opacity: 0.6;
-  }
-  .milestone-card.claimed .milestone-icon { filter: grayscale(0.3) opacity(0.75); }
-
+  /* !important so the press-scale wins over the always-running milestonePulse animation */
+  .milestone-card.ready:active { transform: scale(0.97) !important; }
   .milestone-cta {
     font-family: 'Baloo 2', cursive;
     font-size: 11px;
@@ -890,8 +820,6 @@
     position: relative;
     color: #B26A00;
   }
-  .milestone-card.pending .milestone-cta { color: #9A6512; }
-  .milestone-cta.claimed-cta { color: var(--check-green); }
   .milestone-progress {
     font-size: 11px;
     font-weight: 700;
@@ -1004,7 +932,7 @@
     text-align: center;
     margin-top: 18px;
     font-size: 13px;
-    color: var(--text-faint);
+    color: var(--text-soft);
     cursor: pointer;
     text-decoration: underline;
   }
@@ -1022,7 +950,7 @@
   .pz-stat-num { font-family: 'Baloo 2', cursive; font-size: 20px; font-weight: 800; color: var(--text); }
   .pz-stat-lbl { font-size: 11px; font-weight: 700; color: var(--text-soft); margin-top: 2px; }
   .pz-stat-jar { flex: 1; }
-  .pz-stat-jar .pz-stat-num { font-size: 26px; }
+  .pz-stat-jar .pz-stat-num { font-size: 21px; white-space: nowrap; }
 
   .pz-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
   .pz-month { font-family: 'Baloo 2', cursive; font-size: 18px; font-weight: 700; color: var(--text); }
@@ -1057,7 +985,7 @@
   .pz-day.empty, .pz-day.future { background: none; box-shadow: none; cursor: default; }
   .pz-daynum { font-size: 13px; font-weight: 700; color: var(--text-soft); }
   .pz-day.future .pz-daynum { color: var(--text-faint); opacity: 0.45; }
-  .pz-day.none .pz-daynum { color: var(--text-faint); }
+  .pz-day.none .pz-daynum { color: var(--text-soft); }
   .pz-day.partial { box-shadow: inset 0 0 0 2px var(--accent-glow); }
   .pz-day.partial .pz-daynum { color: var(--accent-deep); }
   .pz-day.approved { background: linear-gradient(160deg, #FFE39E, #F6C45A); box-shadow: inset 0 0 0 1px rgba(214, 150, 40, 0.5); }
@@ -1070,7 +998,7 @@
   .pz-legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
   .pz-legend .dot.approved { background: #F6C45A; }
   .pz-legend .dot.partial { background: var(--accent-glow); }
-  .pz-hint { color: var(--text-faint); font-weight: 600; }
+  .pz-hint { color: var(--text-soft); font-weight: 600; }
 
   .pz-day-detail {
     background: var(--card);
@@ -1327,7 +1255,8 @@
     transition: transform 0.18s var(--ease-bounce);
   }
   .check-btn:last-of-type { margin-bottom: 22px; }
-  .check-btn:active { transform: scale(0.95); }
+  /* !important so the press-scale wins over the always-running getStarPulse animation */
+  .check-btn:active { transform: scale(0.95) !important; }
   @keyframes getStarPulse {
     0%, 100% { transform: translateY(0) scale(1); box-shadow: 0 10px 26px rgba(244, 180, 60, 0.5), inset 0 1.5px 0 rgba(255, 255, 255, 0.6); }
     50% { transform: translateY(-3px) scale(1.03); box-shadow: 0 16px 34px rgba(244, 180, 60, 0.62), inset 0 1.5px 0 rgba(255, 255, 255, 0.6); }
@@ -1426,20 +1355,6 @@
     transition: transform 0.15s var(--ease-bounce);
   }
   .pz-give-undo:active { transform: scale(0.95); }
-  .pz-prize-give, .pz-prize-later {
-    font-family: 'Baloo 2', cursive;
-    font-size: 13px;
-    font-weight: 700;
-    border: none;
-    border-radius: 40px;
-    padding: 8px 14px;
-    cursor: pointer;
-    transition: transform 0.15s var(--ease-bounce);
-  }
-  .pz-prize-give { background: var(--check-green); color: white; }
-  .pz-prize-later { background: rgba(120, 90, 50, 0.1); color: var(--text-soft); }
-  .pz-prize-give:active, .pz-prize-later:active { transform: scale(0.95); }
-
   /* celebration confetti */
   .confetti-piece {
     position: absolute;
@@ -1879,7 +1794,7 @@ const DAD_NOTES = [
   "The best time to start something? Right now. Let's go.",
   "You don't have to be better than anyone else. Just be better than yesterday-you.",
   "Smart people ask great questions. Keep asking why.",
-  "You're going to mess up sometimes. That's not losing — that's learning.",
+  "You're going to mess up sometimes. That's not losing, that's learning.",
   "Be the kid who's strong AND kind. The world needs both.",
   "Your brain is like a muscle. Every hard thing you do makes it stronger.",
   "Don't just watch the game. Get in there and play it.",
@@ -1903,7 +1818,7 @@ const DAD_NOTES = [
   "Standing up for what's right is hard. Do it anyway. – Dad",
   "Listen more than you talk. Still waters run deep.",
   "Some days are tough. That's okay. Tomorrow you get to try again.",
-  "I'm proud of you. Not for being perfect — for being you. – Dad",
+  "I'm proud of you. Not for being perfect, for being you. – Dad",
 ];
 const DAD_NOTE_DELAY_MS = 8000;   // approve button stays locked this long so the note gets read
 
@@ -1953,7 +1868,9 @@ function loadState() {
 }
 
 function saveState(state) {
-  localStorage.setItem('starjar_state', JSON.stringify(state));
+  // Guard the write: a private-mode / quota-exceeded throw here would otherwise blank the
+  // app mid-action (e.g. mid task-toggle). Failing to persist beats a white screen for a kid.
+  try { localStorage.setItem('starjar_state', JSON.stringify(state)); } catch (e) {}
 }
 
 // A day snapshots the task set in force when it was created, so history stays immutable
@@ -2035,7 +1952,7 @@ function ensureToday(state) {
   // ── Immutability: days recorded before settings existed get the original task set ──
   for (const k in state.days) {
     if (!state.days[k].taskDefs) {
-      state.days[k].taskDefs = { morning: clone(DEFAULT_MORNING_TASKS), bedtime: clone(DEFAULT_BEDTIME_TASKS) };
+      state.days[k].taskDefs = { morning: clone(OLD_DEFAULT_MORNING_TASKS), bedtime: clone(OLD_DEFAULT_BEDTIME_TASKS) };
     }
   }
 
@@ -2432,18 +2349,6 @@ function showToast(msg) {
   _toastTimer = setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-// Big "whole day done" celebration — distinct from milestone confetti (gold/star palette).
-function celebrateDay(name) {
-  resetCelebrationUI();
-  document.getElementById('celebIcon').textContent = '🌟';
-  document.getElementById('celebTitle').textContent = 'Day Complete!';
-  document.getElementById('celebText').textContent = `Every star earned today${name ? ', ' + name : ''}! 🎉`;
-  document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
-  document.getElementById('celebration').classList.add('show');
-  spawnConfetti(STAR_CONFETTI);
-  chimeDay();
-  buzz([30, 40, 30, 40, 70]);
-}
 function cueRoutine(which) {
   showToast(which === 'morning' ? 'Morning all done! ☀️' : 'Bedtime all done! 🌙');
   chimeRoutine();
@@ -2557,7 +2462,7 @@ function verifyPin() {
 
 function pinFail() {
   const pad = document.getElementById('pinPad');
-  document.getElementById('pinMsg').textContent = 'Oops — try again';
+  document.getElementById('pinMsg').textContent = 'Oops! Try again';
   pad.classList.remove('shake'); void pad.offsetWidth; pad.classList.add('shake');
   buzz([40, 60, 40]);
   pinEntry = '';
@@ -2579,7 +2484,7 @@ function approveRoutineAfterPin(state, which) {
   if (whole) {
     document.getElementById('celebIcon').textContent = '⭐';
     document.getElementById('celebTitle').textContent = "Today's star! ⭐";
-    document.getElementById('celebText').textContent = `Great day, ${state.name} — one more star in the jar!`;
+    document.getElementById('celebText').textContent = `Great day, ${state.name}! One more star in the jar!`;
     document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
     spawnConfetti(STAR_CONFETTI);
     chimeDay();
@@ -2590,8 +2495,8 @@ function approveRoutineAfterPin(state, which) {
     document.getElementById('celebIcon').textContent = sun ? '☀️' : '🌙';
     document.getElementById('celebTitle').textContent = sun ? 'Morning star!' : 'Bedtime star!';
     document.getElementById('celebText').textContent = sun
-      ? `Half a star, ${state.name} — finish bedtime for the whole one! ⭐`
-      : `Half a star, ${state.name} — finish your morning for the whole one! ⭐`;
+      ? `Half a star, ${state.name}! Finish bedtime for the whole one! ⭐`
+      : `Half a star, ${state.name}! Finish your morning for the whole one! ⭐`;
     document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
     spawnConfetti(STAR_CONFETTI);
     chimeRoutine();
@@ -2599,14 +2504,13 @@ function approveRoutineAfterPin(state, which) {
   }
 }
 
-// Gentle, no-confetti notice shown once after a missed day spills the jar.
 // A jar just auto-completed (the kid passed another multiple of 20) — the KID's big
 // "you filled it!" moment, deferred until they're next looking at the app (see the drain in render()).
 function showJarComplete(name, n) {
   resetCelebrationUI();
   document.getElementById('celebIcon').innerHTML = fullJarIcon();
   document.getElementById('celebTitle').textContent = (n > 1) ? `Jar #${n} full! 🏆` : 'You filled the whole jar! 🏆';
-  document.getElementById('celebText').textContent = `Twenty stars${name ? ', ' + name : ''} — amazing! A fresh jar starts now.`;
+  document.getElementById('celebText').textContent = `Twenty stars${name ? ', ' + name : ''}! Amazing! A fresh jar starts now.`;
   document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
   document.getElementById('celebration').classList.add('show');
   spawnConfetti(STAR_CONFETTI);
@@ -2636,74 +2540,6 @@ function popJar() {
   jarC.classList.remove('jar-pop');
   void jarC.offsetWidth;          // restart the animation
   jarC.classList.add('jar-pop');
-}
-
-function animateStarToJar(taskEl) {
-  if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    popJar();
-    return;
-  }
-
-  const cb = taskEl.querySelector('.task-checkbox') || taskEl;
-  const rect = cb.getBoundingClientRect();
-  const jarRect = document.getElementById('jarSvg').getBoundingClientRect();
-
-  const sx = rect.left + rect.width / 2;
-  const sy = rect.top + rect.height / 2;
-  const ex = jarRect.left + jarRect.width / 2;
-  const ey = jarRect.top + jarRect.height * 0.52;
-
-  // arc up and over into the jar
-  const cx = (sx + ex) / 2;
-  const cy = Math.min(sy, ey) - Math.max(72, Math.abs(ex - sx) * 0.32);
-  const pathStr = `path('M ${sx} ${sy} Q ${cx} ${cy} ${ex} ${ey}')`;
-
-  const DUR = 760;
-  const supportsPath = window.CSS && CSS.supports && CSS.supports('offset-path', "path('M0 0 L1 1')");
-
-  const star = document.createElement('div');
-  star.className = 'flying-star';
-  star.innerHTML = STAR_SVG;
-
-  if (supportsPath) {
-    star.style.offsetPath = pathStr;
-    star.style.offsetRotate = '0deg';
-    document.body.appendChild(star);
-    star.animate([
-      { offsetDistance: '0%',   transform: 'translate(-50%,-50%) scale(0.5) rotate(-30deg)', opacity: 0 },
-      { offsetDistance: '12%',  transform: 'translate(-50%,-50%) scale(1.2) rotate(-16deg)', opacity: 1, offset: 0.15 },
-      { offsetDistance: '82%',  transform: 'translate(-50%,-50%) scale(1.0) rotate(10deg)',  opacity: 1, offset: 0.8 },
-      { offsetDistance: '100%', transform: 'translate(-50%,-50%) scale(0.42) rotate(22deg)', opacity: 0 }
-    ], { duration: DUR, easing: 'cubic-bezier(0.45, 0, 0.25, 1)', fill: 'forwards' });
-
-    // sparkle trail tracing the same arc, just behind the star
-    for (let i = 0; i < 6; i++) {
-      const sp = document.createElement('div');
-      sp.className = 'fly-sparkle';
-      sp.style.offsetPath = pathStr;
-      document.body.appendChild(sp);
-      const delay = 70 + i * 38;
-      sp.animate([
-        { offsetDistance: '0%',  transform: 'translate(-50%,-50%) scale(1)', opacity: 0.9 },
-        { offsetDistance: '84%', transform: `translate(-50%,-50%) scale(${0.3 + Math.random() * 0.3})`, opacity: 0 }
-      ], { duration: DUR - delay, delay, easing: 'cubic-bezier(0.45,0,0.25,1)', fill: 'forwards' });
-      setTimeout(() => sp.remove(), DUR + 60);
-    }
-  } else {
-    // fallback: faux-arc with a mid keyframe
-    star.style.left = sx + 'px';
-    star.style.top = sy + 'px';
-    document.body.appendChild(star);
-    const dx = ex - sx, dy = ey - sy;
-    star.animate([
-      { transform: 'translate(-50%,-50%) scale(1.1)', opacity: 0 },
-      { transform: `translate(calc(-50% + ${dx * 0.5}px), calc(-50% + ${dy * 0.5 - 72}px)) scale(1.15)`, opacity: 1, offset: 0.5 },
-      { transform: `translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px)) scale(0.42)`, opacity: 0 }
-    ], { duration: DUR, easing: 'cubic-bezier(0.45,0,0.25,1)', fill: 'forwards' });
-  }
-
-  setTimeout(popJar, DUR - 130);
-  setTimeout(() => star.remove(), DUR + 60);
 }
 
 // ═══════ JAR RENDERING ═══════
@@ -3014,7 +2850,7 @@ function renderDashboard(state) {
     <div class="date-label">${escapeHtml(state.name)}'s progress · ${monthApproved} star ${monthApproved === 1 ? 'day' : 'days'} this month</div>
 
     <div class="pz-stats">
-      <div class="pz-stat pz-stat-jar"><div class="pz-stat-num">⭐ ${state.currentJarFill || 0} / 20</div><div class="pz-stat-lbl">Stars in the jar</div></div>
+      <div class="pz-stat pz-stat-jar"><div class="pz-stat-num">⭐ ${state.currentJarFill || 0}/20</div><div class="pz-stat-lbl">Stars in the jar</div></div>
       <div class="pz-stat"><div class="pz-stat-num">🏆 ${computeBestStreak(state)}</div><div class="pz-stat-lbl">Best run</div></div>
       ${state.fullJars ? `<div class="pz-stat"><div class="pz-stat-num">🫙 ${state.fullJars}</div><div class="pz-stat-lbl">${state.fullJars === 1 ? 'Jar filled' : 'Jars filled'}</div></div>` : ''}
     </div>
@@ -3073,7 +2909,7 @@ function renderSettingsForm() {
 
   return `
     <h2>Settings</h2>
-    <div class="date-label">Changes apply going forward — past days keep their tasks.</div>
+    <div class="date-label">Changes apply going forward. Past days keep their tasks.</div>
 
     <div class="set-section-title">Routines</div>
     ${taskGroup('morning', 'Morning', '☀️')}
@@ -3086,7 +2922,7 @@ function renderSettingsForm() {
     </div>
 
     <div class="set-section-title">Milestone rewards</div>
-    <div class="date-label">Edit the prize — the 5 / 10 / 20-star goals stay fixed.</div>
+    <div class="date-label">Edit the prize. The 5 / 10 / 20-star goals stay fixed.</div>
     <div class="set-ms">${msRows}</div>
 
     <div class="set-section-title">Grown-up PIN</div>
@@ -3105,7 +2941,7 @@ function renderSettingsForm() {
     </div>
 
     <div class="set-section-title">Birthday surprise</div>
-    <div class="date-label">Optional — a once-a-year celebration on this day. Leave blank to turn it off.</div>
+    <div class="date-label">Optional: a once-a-year celebration on this day. Leave blank to turn it off.</div>
     <label class="set-time"><span>🎂 Birthday</span><input type="date" value="${escapeHtml(d.birthday || '')}" oninput="setBirthday(this.value)"></label>
 
     <div class="set-msg" id="setMsg"></div>
@@ -3151,7 +2987,7 @@ function saveSettings() {
       .map(t => ({ id: t.id || genTaskId(), label: (t.label || '').trim(), emoji: (t.emoji || '').trim() || '⭐' }))
       .filter(t => t.label.length > 0);
   });
-  if (draft.tasks.morning.length + draft.tasks.bedtime.length === 0) { setSettingsMsg('Add at least one task.'); return; }
+  if (draft.tasks.morning.length === 0 || draft.tasks.bedtime.length === 0) { setSettingsMsg('Keep at least one task in each routine.'); return; }
   const pin = (draft.pin || '').replace(/\D/g, '');
   if (pin.length !== 4) { setSettingsMsg('PIN must be exactly 4 digits.'); return; }
   draft.pin = pin;
