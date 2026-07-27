@@ -173,7 +173,10 @@
   [data-theme="dark"] .set-remove { background: rgba(255, 120, 90, 0.14); color: #FF8A6B; }
   [data-theme="dark"] .set-remove:active { background: rgba(255, 120, 90, 0.26); }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  /* touch-action: manipulation kills iOS double-tap-to-zoom (fast repeat taps on the
+     PIN pad were reading as double-taps and zooming the page). Panning and pinch-zoom
+     are untouched, so the deliberate accessibility zoom still works. */
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
 
   html { -webkit-text-size-adjust: 100%; }
 
@@ -1090,13 +1093,16 @@
   .set-group { background: var(--card); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 12px; box-shadow: var(--card-shadow-soft); }
   .set-grouphead { font-family: 'Baloo 2', cursive; font-size: 15px; font-weight: 700; color: var(--text-soft); margin-bottom: 10px; }
   .set-task-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  /* 16px is the floor: iOS auto-zooms the page on focus for any smaller field. */
   .set-emoji, .set-label, .set-pin, .set-time input {
-    font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 700; color: var(--text);
+    font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700; color: var(--text);
     background: var(--card-2); border: 1.5px solid var(--hairline); border-radius: 12px;
     padding: 10px 12px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
   }
-  .set-emoji { width: 50px; flex-shrink: 0; text-align: center; padding: 10px 4px; }
-  .set-label { flex: 1; min-width: 0; }
+  /* emoji box + label padding trimmed to buy back the width the 16px floor took, so no
+     task name truncates any earlier than it did at 15px. 46px keeps the 44px tap target. */
+  .set-emoji { width: 46px; flex-shrink: 0; text-align: center; padding: 10px 3px; }
+  .set-label { flex: 1; min-width: 0; padding-left: 8px; padding-right: 8px; }
   .set-emoji:focus, .set-label:focus, .set-pin:focus, .set-time input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232, 151, 46, 0.14); }
   .set-remove {
     width: 36px; height: 36px; flex-shrink: 0; border: none; border-radius: 10px;
