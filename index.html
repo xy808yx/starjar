@@ -1474,6 +1474,191 @@
     65% { transform: translate(-16px, 64vh) rotate(350deg); }
     100% { transform: translate(8px, 105vh) rotate(560deg); opacity: 0.9; }
   }
+
+  /* ═══════ Freshen-up layer (Aug 2026): quick wins, Living Clock, Golden Five Seconds ═══════ */
+
+  /* the trophy jars sit on a real wooden plank instead of floating in space */
+  .jar-shelf-unit { display: flex; flex-direction: column; align-items: center; }
+  .jar-shelf-plank {
+    align-self: stretch;
+    height: 9px;
+    margin: -2px -12px 0;
+    border-radius: 4px;
+    background: linear-gradient(180deg, #B98A5A, #8A6038);
+    box-shadow: 0 2px 5px rgba(90, 60, 30, 0.35), inset 0 1px 0 #D9B183;
+  }
+  [data-theme="dark"] .jar-shelf-plank { box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5), inset 0 1px 0 #C79A66; }
+
+  /* drawn celebration art (replaces emoji icons in the flows this layer touches) */
+  #celebIcon .celeb-art { width: 84px; height: 84px; display: block; margin: 0 auto; }
+
+  /* sealed dad note: the note arrives folded shut and one tap on the star seal opens it */
+  #celebIcon.tappable { cursor: pointer; }
+  .sealed-note-svg {
+    width: 138px; height: auto; display: block; margin: 0 auto;
+    filter: drop-shadow(0 8px 16px rgba(120, 90, 40, 0.28));
+  }
+  .sealed-note-svg .seal-star { transform-box: fill-box; transform-origin: center; animation: sealPulse 1.7s ease-in-out infinite; }
+  @keyframes sealPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  .sealed-note-svg.unfolding { animation: noteUnfold 0.3s var(--ease-out) both; }
+  @keyframes noteUnfold {
+    to { transform: scale(0.55) rotate(-6deg); opacity: 0; }
+  }
+  .open-note-svg {
+    width: 120px; height: auto; display: block; margin: 0 auto;
+    filter: drop-shadow(0 6px 12px rgba(120, 90, 40, 0.22));
+  }
+  #celebIcon .note-opened { animation: noteOpened 0.42s var(--ease-bounce) both; }
+  @keyframes noteOpened {
+    from { transform: scale(0.7); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  /* ── Living Clock: the room tints itself from the clock ──
+     A fixed wash behind the content (cards stay opaque, so reading contrast is untouched). */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  [data-daypart="dawn"] body::after {
+    background: radial-gradient(120% 75% at 50% -12%, rgba(249, 206, 122, 0.5), rgba(249, 206, 122, 0) 62%);
+  }
+  [data-daypart="dusk"] body::after {
+    background: linear-gradient(180deg, rgba(240, 150, 90, 0.2), rgba(170, 130, 190, 0.14) 70%);
+  }
+  [data-daypart="night"] body::after {
+    background: linear-gradient(180deg, rgba(44, 38, 74, 0.26), rgba(110, 96, 160, 0.1) 75%);
+  }
+  [data-theme="dark"][data-daypart="dawn"] body::after {
+    background: radial-gradient(120% 75% at 50% -12%, rgba(249, 206, 122, 0.12), rgba(249, 206, 122, 0) 62%);
+  }
+  [data-theme="dark"][data-daypart="dusk"] body::after {
+    background: linear-gradient(180deg, rgba(240, 150, 90, 0.1), rgba(140, 110, 190, 0.08) 70%);
+  }
+  [data-theme="dark"][data-daypart="night"] body::after {
+    background: linear-gradient(180deg, rgba(70, 64, 130, 0.22), rgba(40, 36, 80, 0.1) 75%);
+  }
+
+  /* tonight's real moon: a plain disc, only out at night */
+  .sky-moon {
+    display: none;
+    position: absolute;
+    top: 0;
+    right: 6px;
+    width: 42px;
+    height: 42px;
+    z-index: 0;
+    filter: drop-shadow(0 0 7px rgba(230, 220, 255, 0.45));
+  }
+  [data-daypart="night"] .sky-moon { display: block; }
+  /* light theme: the sky behind the moon is light, so the disc needs an outline and a
+     genuinely darker shadow half or the phase is unreadable (measured ~1.1:1 without) */
+  .moon-disc { fill: #F4EFFC; stroke: rgba(110, 96, 160, 0.5); stroke-width: 1; }
+  .moon-shadow { fill: #8578A8; }
+  [data-theme="dark"] .moon-disc { fill: #E8E2F4; stroke: none; }
+  [data-theme="dark"] .moon-shadow { fill: #2E2A44; }
+
+  /* one quiet seasonal visitor at a time, nature only */
+  .season-layer { position: absolute; inset: 0; pointer-events: none; z-index: 2; overflow: hidden; }
+  /* base opacity 0 (like .jar-twinkle): no opaque sprite frozen at the top during the
+     animation delay, and nothing left parked on screen under reduced motion */
+  .season-leaf, .season-petal, .season-firefly { display: none; position: absolute; opacity: 0; }
+  .season-leaf { left: 16%; top: 0; width: 22px; height: 24px; animation: leafFall 17s linear 2s infinite; }
+  [data-season="fall"] .season-leaf { display: block; }
+  @keyframes leafFall {
+    0% { transform: translate(0, -24px) rotate(-14deg); opacity: 0; }
+    6% { opacity: 0.9; }
+    45% { transform: translate(44px, 210px) rotate(52deg); }
+    68% { transform: translate(6px, 320px) rotate(24deg); }
+    92% { opacity: 0.85; }
+    100% { transform: translate(52px, 450px) rotate(88deg); opacity: 0; }
+  }
+  .season-petal { left: 70%; top: 0; width: 15px; height: 15px; animation: petalFall 14s ease-in-out 1s infinite; }
+  [data-season="spring"] .season-petal { display: block; }
+  @keyframes petalFall {
+    0% { transform: translate(0, -18px) rotate(10deg); opacity: 0; }
+    7% { opacity: 0.9; }
+    40% { transform: translate(-36px, 190px) rotate(-60deg); }
+    70% { transform: translate(-4px, 310px) rotate(-20deg); }
+    93% { opacity: 0.85; }
+    100% { transform: translate(-40px, 440px) rotate(-95deg); opacity: 0; }
+  }
+  .season-firefly {
+    left: 26%;
+    top: 44%;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #F9E08A;
+    box-shadow: 0 0 10px 4px rgba(249, 224, 138, 0.5);
+    animation: fireflyWander 13s ease-in-out infinite;
+  }
+  [data-season="summer"][data-daypart="dusk"] .season-firefly,
+  [data-season="summer"][data-daypart="night"] .season-firefly { display: block; }
+  @keyframes fireflyWander {
+    0% { transform: translate(0, 0); opacity: 0; }
+    10% { opacity: 0.9; }
+    30% { transform: translate(52px, -44px); opacity: 0.2; }
+    50% { transform: translate(104px, 10px); opacity: 0.9; }
+    70% { transform: translate(48px, 48px); opacity: 0.25; }
+    88% { opacity: 0.85; }
+    100% { transform: translate(0, 0); opacity: 0; }
+  }
+
+  /* winter frost on the glass lives inside the jar SVG; CSS just switches it on */
+  .jar-frost { display: none; }
+  [data-season="winter"] .jar-frost { display: block; }
+
+  /* ── Golden Five Seconds ── */
+  /* the flying star (a fixed-position element arcing from the celebration into the jar) */
+  /* below the toast (250), parent overlay (200 is beneath, but the flyer must not
+     paint over a newly opened overlay), and celebration (300): if any overlay opens
+     mid-flight, the star finishes its arc behind it instead of on top of it */
+  .arc-star {
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 150;
+    pointer-events: none;
+    will-change: transform;
+    filter: drop-shadow(0 4px 10px rgba(242, 170, 58, 0.5));
+  }
+  /* landing squash for the star the flyer just delivered */
+  .star-arrive {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: starArrive 0.42s var(--ease-bounce) both;
+  }
+  @keyframes starArrive {
+    0% { transform: scale(0.55); }
+    55% { transform: scale(1.16); }
+    100% { transform: scale(1); }
+  }
+  /* neighbors scoot away and settle back, keeping their own lean */
+  .star-nudge { animation: starNudge 0.4s var(--ease-out); }
+  @keyframes starNudge {
+    0%, 100% { transform: translate(0, 0) rotate(var(--tilt, 0deg)); }
+    45% { transform: translate(var(--nx, 0px), var(--ny, 0px)) rotate(var(--tilt, 0deg)); }
+  }
+  /* one quick lid-glint pass at landing (the daily loop resumes right after) */
+  @keyframes lidGlintOnce {
+    0% { transform: translateX(-32px); opacity: 0; }
+    18% { opacity: 0.85; }
+    100% { transform: translateX(146px); opacity: 0; }
+  }
+  /* the wish star's occasional glint (reuses the twinkle keyframes) */
+  .wish-glint {
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: twinkle 5.2s ease-in-out 2s infinite;
+  }
 </style>
 </head>
 <body>
@@ -1540,6 +1725,24 @@
 
   <!-- Jar -->
   <div class="jar-section">
+    <!-- Living Clock: tonight's real moon (plain disc, phase set by JS) -->
+    <svg class="sky-moon" viewBox="0 0 44 44" aria-hidden="true">
+      <defs><clipPath id="moonClip"><circle cx="22" cy="22" r="15"/></clipPath></defs>
+      <circle class="moon-disc" cx="22" cy="22" r="15"/>
+      <circle class="moon-shadow" id="moonShadow" cx="22" cy="22" r="14.6" clip-path="url(#moonClip)"/>
+    </svg>
+    <!-- Living Clock: one quiet seasonal visitor at a time (CSS picks by season/daypart) -->
+    <div class="season-layer" aria-hidden="true">
+      <svg class="season-leaf" viewBox="0 0 24 26">
+        <path d="M12 1 C 19 5, 21 14, 12 21 C 3 14, 5 5, 12 1 Z" fill="#C57432"/>
+        <path d="M12 3 L12 21 M12 8 L8.5 11 M12 8 L15.5 11 M12 13 L9 16 M12 13 L15 16" stroke="#8F4E1E" stroke-width="1" fill="none"/>
+        <path d="M12 21 L12 25" stroke="#8F4E1E" stroke-width="1.4"/>
+      </svg>
+      <svg class="season-petal" viewBox="0 0 20 20">
+        <path d="M10 1 C 15 4, 16 11, 10 19 C 4 11, 5 4, 10 1 Z" fill="#F4C6D0" stroke="#E8A8B8" stroke-width="0.8"/>
+      </svg>
+      <div class="season-firefly"></div>
+    </div>
     <div class="jar-container">
       <svg class="jar-svg" viewBox="0 0 160 206" id="jarSvg">
         <defs>
@@ -1583,6 +1786,28 @@
           <symbol id="jarStar" viewBox="0 0 24 24">
             <path d="M12 2 L14.9 8.6 L22 9.2 L16.6 14 L18.3 21 L12 17.3 L5.7 21 L7.4 14 L2 9.2 L9.1 8.6 Z" fill="url(#starGrad)" stroke="rgba(214,140,40,0.5)" stroke-width="0.5" stroke-linejoin="round"/>
             <path d="M12 4.4 L13.5 8 L10.3 9.6 Z" fill="rgba(255,255,255,0.5)"/>
+          </symbol>
+          <!-- Golden Five Seconds: fixed-schedule star tints (white-gold, rose-gold) + the wish star -->
+          <linearGradient id="starGradChamp" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFF7DA"/><stop offset="55%" stop-color="#FFE9A8"/><stop offset="100%" stop-color="#E9C97E"/>
+          </linearGradient>
+          <symbol id="jarStarChamp" viewBox="0 0 24 24">
+            <path d="M12 2 L14.9 8.6 L22 9.2 L16.6 14 L18.3 21 L12 17.3 L5.7 21 L7.4 14 L2 9.2 L9.1 8.6 Z" fill="url(#starGradChamp)" stroke="rgba(196,158,84,0.55)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M12 4.4 L13.5 8 L10.3 9.6 Z" fill="rgba(255,255,255,0.6)"/>
+          </symbol>
+          <linearGradient id="starGradRose" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFDFC9"/><stop offset="55%" stop-color="#FFB27A"/><stop offset="100%" stop-color="#E8935A"/>
+          </linearGradient>
+          <symbol id="jarStarRose" viewBox="0 0 24 24">
+            <path d="M12 2 L14.9 8.6 L22 9.2 L16.6 14 L18.3 21 L12 17.3 L5.7 21 L7.4 14 L2 9.2 L9.1 8.6 Z" fill="url(#starGradRose)" stroke="rgba(200,110,50,0.5)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M12 4.4 L13.5 8 L10.3 9.6 Z" fill="rgba(255,255,255,0.55)"/>
+          </symbol>
+          <linearGradient id="starGradWish" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#FFF6CF"/><stop offset="55%" stop-color="#FFDF80"/><stop offset="100%" stop-color="#F2B93C"/>
+          </linearGradient>
+          <symbol id="jarStarWish" viewBox="0 0 24 24">
+            <path d="M12 2 L14.9 8.6 L22 9.2 L16.6 14 L18.3 21 L12 17.3 L5.7 21 L7.4 14 L2 9.2 L9.1 8.6 Z" fill="url(#starGradWish)" stroke="rgba(214,150,40,0.55)" stroke-width="0.5" stroke-linejoin="round"/>
+            <path d="M12 4.4 L13.5 8 L10.3 9.6 Z" fill="rgba(255,255,255,0.65)"/>
           </symbol>
           <clipPath id="halfL" clipPathUnits="objectBoundingBox"><rect x="0" y="0" width="0.5" height="1"/></clipPath>
           <clipPath id="halfR" clipPathUnits="objectBoundingBox"><rect x="0.5" y="0" width="0.5" height="1"/></clipPath>
@@ -1631,6 +1856,16 @@
           <path d="M119 64 L119 166" stroke="rgba(255,255,255,0.15)" stroke-width="3.5" stroke-linecap="round" fill="none"/>
         </g>
 
+        <!-- Living Clock: winter frost creeping in from the glass corners (shown by CSS in winter) -->
+        <g class="jar-frost" clip-path="url(#jarClip)" pointer-events="none">
+          <path d="M30 158 Q 50 164 56 190 L 30 190 Z" fill="rgba(255,255,255,0.26)" filter="url(#jarBlur)"/>
+          <path d="M130 158 Q 110 164 104 190 L 130 190 Z" fill="rgba(255,255,255,0.26)" filter="url(#jarBlur)"/>
+          <path d="M30 44 Q 45 48 51 63" stroke="rgba(255,255,255,0.28)" stroke-width="5" fill="none" filter="url(#jarBlur)"/>
+          <path d="M130 44 Q 115 48 109 63" stroke="rgba(255,255,255,0.28)" stroke-width="5" fill="none" filter="url(#jarBlur)"/>
+          <path d="M40 176 l 2.4 0 M41.2 174.8 l 0 2.4 M118 170 l 2.4 0 M119.2 168.8 l 0 2.4 M36 62 l 2.4 0 M37.2 60.8 l 0 2.4 M122 58 l 2.4 0 M123.2 56.8 l 0 2.4"
+            stroke="rgba(255,255,255,0.65)" stroke-width="0.9"/>
+        </g>
+
         <!-- frosted neck + lid ring -->
         <rect x="33" y="33" width="94" height="7" rx="3" fill="rgba(255,255,255,0.16)"/>
         <rect x="23" y="16" width="114" height="15" rx="6" fill="url(#jarLip)" stroke="rgba(120,150,180,0.45)" stroke-width="1"/>
@@ -1639,7 +1874,7 @@
 
         <!-- passing glint on the lid (decorative only) -->
         <g clip-path="url(#lidClip)" pointer-events="none">
-          <g style="animation: lidGlint 8.5s ease-in-out 3s infinite; opacity: 0;">
+          <g class="lid-glint" style="animation: lidGlint 8.5s ease-in-out 3s infinite; opacity: 0;">
             <rect x="14" y="15" width="26" height="17" fill="url(#glintGrad)" transform="skewX(-14)"/>
           </g>
         </g>
@@ -2026,6 +2261,133 @@ function dadNoteDelayMs(note) {
 
 // Gold/star palette for the "day complete" + "star earned" celebrations.
 const STAR_CONFETTI = ['#FFD700', '#FFC83C', '#FFE488', '#FFF3CE', '#FFFFFF', '#F2A23A'];
+// Night-time whole-star celebration: calmer lavender and gold, fewer and slower pieces.
+const BEDTIME_CONFETTI = ['#C9B6EC', '#B6A6D6', '#E4DCF1', '#9C8CC6', '#FFE488', '#F5B942'];
+
+// Celebration headlines, drawn from a shuffled bag (the dad-note trick) so the
+// most-watched five seconds of the day is never word-for-word identical two days
+// running. Shared by the half-star and whole-star celebrations, so every line must
+// stay accomplishment-neutral: no "star earned" style claims that would contradict
+// the "Half a star..." body copy underneath. Plain text only.
+const STAR_HEADLINES = [
+  'You did it!',
+  'Look at you go!',
+  'Great work!',
+  'Shine on!',
+  'High five!',
+  'Way to go!',
+  'You make it look easy!',
+  'The jar is happy!',
+  'Sparkly work!',
+  'Super job!'
+];
+
+// Generic shuffled-bag draw, the same pattern refillDadNoteBag uses: every entry
+// comes out once before any repeats, and a refilled bag never opens on the entry
+// the old bag closed with. Mutates state; the caller saves.
+function drawFromBag(state, bagKey, lastKey, len) {
+  let bag = Array.isArray(state[bagKey]) ? state[bagKey] : [];
+  bag = bag.filter(i => Number.isInteger(i) && i >= 0 && i < len);
+  if (!bag.length) {
+    bag = Array.from({ length: len }, (_, i) => i);
+    for (let i = bag.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      const t = bag[i]; bag[i] = bag[j]; bag[j] = t;
+    }
+    if (bag.length > 1 && bag[bag.length - 1] === state[lastKey]) {
+      const t = bag[bag.length - 1]; bag[bag.length - 1] = bag[0]; bag[0] = t;
+    }
+  }
+  const idx = bag.pop();
+  state[bagKey] = bag;
+  state[lastKey] = idx;
+  return idx;
+}
+
+// ── Daily-seeded ambience: a tiny deterministic PRNG keyed to today's date ──
+// Same day, same scene; new day, new scene. Never random within a day.
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+function daySeed(extra) {
+  const k = getToday();
+  let h = 2166136261 ^ (extra || 0);
+  for (let i = 0; i < k.length; i++) { h ^= k.charCodeAt(i); h = Math.imul(h, 16777619); }
+  return h >>> 0;
+}
+// Jitter the twinkle positions, mote lanes, and lid-glint timing inside the jar,
+// so the scene is literally never the same two days in a row.
+function seedDailyAmbience() {
+  const rnd = mulberry32(daySeed(1));
+  document.querySelectorAll('#jarSvg .jar-twinkle').forEach(tw => {
+    const x = 46 + rnd() * 70;      // stays well inside the glass (30..130)
+    const y = 64 + rnd() * 100;
+    const s = 0.55 + rnd() * 0.5;
+    tw.parentElement.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)}) scale(${s.toFixed(2)})`);
+    tw.style.animation = `twinkle ${(3.2 + rnd() * 1.6).toFixed(2)}s ease-in-out ${(rnd() * 4).toFixed(2)}s infinite`;
+  });
+  document.querySelectorAll('#jarSvg .jar-mote').forEach(m => {
+    m.setAttribute('cx', (46 + rnd() * 70).toFixed(1));
+    m.setAttribute('cy', (168 + rnd() * 14).toFixed(1));
+    m.setAttribute('r', (1.3 + rnd() * 1).toFixed(2));
+    m.style.animation = `moteRise ${(7 + rnd() * 2.6).toFixed(2)}s linear ${(rnd() * 6).toFixed(2)}s infinite`;
+  });
+  const glint = document.querySelector('#jarSvg .lid-glint');
+  if (glint) {
+    _seededGlintAnim = `lidGlint ${(7.5 + rnd() * 3).toFixed(2)}s ease-in-out ${(2 + rnd() * 3).toFixed(2)}s infinite`;
+    glint.style.animation = _seededGlintAnim;
+  }
+}
+
+// ═══════ LIVING CLOCK ═══════
+// The clock and the calendar author the scene: daypart tints, tonight's real moon,
+// one seasonal visitor. Nothing here is random and nothing needs upkeep.
+function currentDaypart(d) {
+  const h = (d || new Date()).getHours();
+  if (h >= 5 && h < 9) return 'dawn';
+  if (h >= 9 && h < 17) return 'day';
+  if (h >= 17 && h < 20) return 'dusk';
+  return 'night';
+}
+function currentSeason(d) {
+  const m = (d || new Date()).getMonth();
+  return m >= 2 && m <= 4 ? 'spring' : m >= 5 && m <= 7 ? 'summer' : m >= 8 && m <= 10 ? 'fall' : 'winter';
+}
+// Fraction of the synodic month since a known new moon: 0 = new, 0.5 = full.
+function moonPhaseFraction(d) {
+  const SYNODIC = 29.530588853;
+  const days = (d.getTime() - Date.UTC(2000, 0, 6, 18, 14)) / 86400000;
+  return (((days % SYNODIC) + SYNODIC) % SYNODIC) / SYNODIC;
+}
+// Plain-disc moon: a lit disc with a shadow disc slid across it. Waxing light grows
+// from the right edge (northern-sky reading), waning shrinks toward the left.
+function renderMoon(d) {
+  const shadow = document.getElementById('moonShadow');
+  if (!shadow) return;
+  const p = moonPhaseFraction(d);
+  const ill = (1 - Math.cos(2 * Math.PI * p)) / 2;
+  const dir = p < 0.5 ? -1 : 1;
+  shadow.setAttribute('cx', (22 + dir * ill * 30).toFixed(1));
+}
+let _lcDayKey = null;
+function applyLivingClock() {
+  const now = new Date();
+  document.documentElement.setAttribute('data-daypart', currentDaypart(now));
+  document.documentElement.setAttribute('data-season', currentSeason(now));
+  renderMoon(now);
+  // Midnight rollover while the app sits open: re-seed the daily ambience once.
+  const k = getToday();
+  if (_lcDayKey !== null && _lcDayKey !== k) seedDailyAmbience();
+  _lcDayKey = k;
+}
+setInterval(applyLivingClock, 60000);
 
 const clone = (x) => JSON.parse(JSON.stringify(x));
 let _idSeq = 0;
@@ -2169,6 +2531,8 @@ function ensureToday(state) {
   if (typeof state.cycleBase !== 'number') state.cycleBase = 0;
   if (!Array.isArray(state.dadNoteBag)) state.dadNoteBag = [];          // shuffled dad-note bag, refilled when empty
   if (typeof state.dadNoteLast !== 'number') state.dadNoteLast = -1;    // last note drawn, so a refill can avoid repeating it
+  if (!Array.isArray(state.headlineBag)) state.headlineBag = [];        // shuffled celebration-headline bag
+  if (typeof state.headlineLast !== 'number') state.headlineLast = -1;
   // state.dadNoteIndex is vestigial (the old sequential pointer), left alone for save-compat.
   if (typeof state.cyclesCompleted !== 'number') state.cyclesCompleted = 0;  // legacy; superseded by fullJars
   if (typeof state.lastBirthdayYear !== 'string') state.lastBirthdayYear = '';  // year the birthday moment last fired
@@ -2295,6 +2659,8 @@ let _prevJarShown = null;
 let _prevForming = null;
 let _jarFxQueued = false;
 let _numPopPending = false;
+let _pendingArcIndex = null;   // slot index for the arc-into-jar entrance, when exactly one whole star banked
+let _seededGlintAnim = '';     // today's seeded lid-glint loop, restored after a one-shot glint
 
 // Theme: resolve 'auto' against the OS setting, then reflect it onto <html data-theme>
 // (which drives the dark CSS) and the address-bar color. Mirrors the pre-paint script in <head>.
@@ -2337,6 +2703,8 @@ function showApp(state) {
   app.style.display = 'flex';
   document.getElementById('parentToggle').style.display = 'flex';
   render(state);
+  seedDailyAmbience();
+  applyLivingClock();
 }
 
 function render(state) {
@@ -2382,7 +2750,7 @@ function render(state) {
     else if (checks.bedtime && !checks.morning) forming = 'bedtime';
   }
   document.getElementById('jarStars').textContent = shown;
-  renderJarStars(shown, forming);
+  renderJarStars(shown, forming, wishIndexFor(state.fullJars || 0));
   renderJarShelf(state);
   const jarHint = document.getElementById('jarHint');
   if (jarHint) jarHint.textContent = (shown === 0 && !forming) ? 'Your jar is ready for stars! ✨' : '';
@@ -2578,7 +2946,8 @@ function toggleRoutine(r) {
 // ═══════ PIN (gates kid approval + parent zone) ═══════
 let pinEntry = '';
 let pinMode = null;   // 'morning' | 'bedtime' | 'parent'
-let dadNoteTimer = null;   // interval id for the dad-note read-gate countdown
+let dadNoteTimer = null;         // interval id for the dad-note read-gate countdown
+let dadNoteUnfoldTimer = null;   // timeout id for the sealed-note unfold beat
 
 // A "note from Dad" read-gate shown before the grown-up PIN check. The approve button stays
 // locked for DAD_NOTE_DELAY_MS so the note actually gets read, then hands off to the unchanged
@@ -2617,31 +2986,98 @@ function dadNoteFor(state, mode) {
   return DAD_NOTES[idx];
 }
 
+// ── Drawn celebration art (no emoji): sealed/opened dad note, sun, moon, star ──
+function sealedNoteSvg() {
+  return `<svg class="sealed-note-svg" viewBox="0 0 120 84" aria-hidden="true">
+    <rect x="4" y="6" width="112" height="72" rx="9" fill="#F6EAD3" stroke="#E0CFA9" stroke-width="1.5"/>
+    <path d="M 5 11 L 60 46 L 115 11" fill="none" stroke="#D9C6A2" stroke-width="2" stroke-linejoin="round"/>
+    <path d="M 5 73 L 44 49 M 115 73 L 76 49" fill="none" stroke="#E7D8B8" stroke-width="1.5"/>
+    <g class="seal-star">
+      <circle cx="60" cy="46" r="15" fill="#F5B942" stroke="#D9932C" stroke-width="1.5"/>
+      <path d="M60 37.4 L62.1 42.3 L67.4 42.7 L63.4 46.2 L64.6 51.4 L60 48.6 L55.4 51.4 L56.6 46.2 L52.6 42.7 L57.9 42.3 Z" fill="#6B4A12"/>
+    </g>
+  </svg>`;
+}
+function openNoteSvg() {
+  return `<svg class="open-note-svg" viewBox="0 0 120 88" aria-hidden="true">
+    <rect x="6" y="6" width="108" height="76" rx="8" fill="#F6EAD3" stroke="#E0CFA9" stroke-width="1.5"/>
+    <path d="M 26 6 L 26 82 M 94 6 L 94 82" fill="none" stroke="#EDE0C4" stroke-width="1.5"/>
+    <path d="M60 36 C 56 28, 45 29, 45 39 C 45 48, 56 55, 60 60 C 64 55, 75 48, 75 39 C 75 29, 64 28, 60 36 Z"
+      fill="#F5B942" stroke="#D9932C" stroke-width="1.5" stroke-linejoin="round"/>
+  </svg>`;
+}
+function celebStarSvg(symId) {
+  const s = symId || 'jarStar';
+  return `<svg class="celeb-art" viewBox="0 0 24 24" aria-hidden="true"><use href="#${s}" xlink:href="#${s}"/></svg>`;
+}
+function celebSunSvg() {
+  return `<svg class="celeb-art" viewBox="0 0 48 48" aria-hidden="true">
+    <defs><linearGradient id="celebSunGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFE488"/><stop offset="100%" stop-color="#F2A23A"/>
+    </linearGradient></defs>
+    <g stroke="#F2A93C" stroke-width="3.4" stroke-linecap="round">
+      <path d="M40.5 24 L45.5 24 M35.7 35.7 L39.2 39.2 M24 40.5 L24 45.5 M12.3 35.7 L8.8 39.2 M7.5 24 L2.5 24 M12.3 12.3 L8.8 8.8 M24 7.5 L24 2.5 M35.7 12.3 L39.2 8.8"/>
+    </g>
+    <circle cx="24" cy="24" r="12.5" fill="url(#celebSunGrad)" stroke="#D9932C" stroke-width="1"/>
+    <circle cx="20.5" cy="20.5" r="4" fill="rgba(255,255,255,0.35)"/>
+  </svg>`;
+}
+function celebMoonSvg() {
+  return `<svg class="celeb-art" viewBox="0 0 48 48" aria-hidden="true">
+    <defs><mask id="celebMoonMask"><rect width="48" height="48" fill="#fff"/><circle cx="32" cy="18" r="14.5" fill="#000"/></mask></defs>
+    <circle cx="24" cy="24" r="16" fill="var(--bedtime-accent)" mask="url(#celebMoonMask)"/>
+  </svg>`;
+}
+
+// The note now arrives sealed: folded kraft paper with a gold star seal, and one tap
+// unfolds it. Same note, same read-gate; the tap just makes it feel like a small gift.
 function showDadNote(mode) {
   const state = ensureToday(loadState());
   resetCelebrationUI();
-  document.getElementById('celebIcon').textContent = '💛';
+  const note = dadNoteFor(state, mode);
+  const icon = document.getElementById('celebIcon');
+  icon.innerHTML = sealedNoteSvg();
+  icon.classList.add('tappable');
+  icon.onclick = () => unfoldDadNote(note, mode);
   document.getElementById('celebTitle').textContent = 'A note from Dad';
-  document.getElementById('celebText').textContent = dadNoteFor(state, mode);
-  const action = document.getElementById('celebActionBtn');
-  const readyLabel = mode === 'bedtime' ? 'Ask a grown-up to check 🌙' : 'Ask a grown-up to check ☀️';
-  action.onclick = () => openPin(mode);     // disabled buttons don't fire clicks, so the countdown gates this
-  action.disabled = true;
-  action.style.display = '';
+  document.getElementById('celebText').textContent = 'Tap the star to open it';
   document.querySelector('.celebration-close').textContent = 'Not yet';
   document.getElementById('celebration').classList.add('show');
-  // Lock + count down so the note gets read before the approve button unlocks.
-  let left = Math.ceil(dadNoteDelayMs(document.getElementById('celebText').textContent) / 1000);
-  action.textContent = `Read it… ${left}`;
-  if (dadNoteTimer) clearInterval(dadNoteTimer);
-  dadNoteTimer = setInterval(() => {
-    left--;
-    if (left > 0) { action.textContent = `Read it… ${left}`; return; }
-    clearInterval(dadNoteTimer);
-    dadNoteTimer = null;
-    action.disabled = false;
-    action.textContent = readyLabel;
-  }, 1000);
+}
+
+function unfoldDadNote(note, mode) {
+  const icon = document.getElementById('celebIcon');
+  icon.onclick = null;
+  icon.classList.remove('tappable');
+  const sealed = icon.querySelector('.sealed-note-svg');
+  if (sealed) sealed.classList.add('unfolding');
+  buzz(12);
+  // Under reduced motion the unfold beat is skipped entirely: swap immediately.
+  const beat = (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) ? 0 : 300;
+  if (dadNoteUnfoldTimer) clearTimeout(dadNoteUnfoldTimer);
+  dadNoteUnfoldTimer = setTimeout(() => {
+    dadNoteUnfoldTimer = null;
+    // Bail if the overlay was closed (or repurposed) during the unfold beat.
+    if (!document.getElementById('celebration').classList.contains('show')) return;
+    icon.innerHTML = `<div class="note-opened">${openNoteSvg()}</div>`;
+    document.getElementById('celebText').textContent = note;
+    const action = document.getElementById('celebActionBtn');
+    action.onclick = () => openPin(mode);   // disabled buttons don't fire clicks, so the countdown gates this
+    action.disabled = true;
+    action.style.display = '';
+    // Lock + count down so the note gets read before the approve button unlocks.
+    let left = Math.ceil(dadNoteDelayMs(note) / 1000);
+    action.textContent = `Read it… ${left}`;
+    if (dadNoteTimer) clearInterval(dadNoteTimer);
+    dadNoteTimer = setInterval(() => {
+      left--;
+      if (left > 0) { action.textContent = `Read it… ${left}`; return; }
+      clearInterval(dadNoteTimer);
+      dadNoteTimer = null;
+      action.disabled = false;
+      action.textContent = 'Ask a grown-up to check';
+    }, 1000);
+  }, beat);
 }
 
 function openPin(mode) {
@@ -2702,28 +3138,48 @@ function approveRoutineAfterPin(state, which) {
   if (!day.checks) day.checks = { morning: false, bedtime: false };
   day.checks[which] = true;
   const whole = day.checks.morning && day.checks.bedtime;
+  // Evening whole-stars get the fixed wind-down line instead of the bag, so bedtime
+  // stays a calm ritual; the bag is only drawn (and advanced) when it will be shown.
+  // Dusk counts when it is the bedtime check landing: the default target is 8:00 PM,
+  // so an ON-TIME bedtime approval happens before the clock reads night.
+  const _dp = currentDaypart();
+  const night = whole && (_dp === 'night' || (_dp === 'dusk' && which === 'bedtime'));
+  const headline = night ? null :
+    STAR_HEADLINES[drawFromBag(state, 'headlineBag', 'headlineLast', STAR_HEADLINES.length)];
   syncDerived(state);
   saveState(state);
   render(state);
   // morph the same overlay into a celebration
   resetCelebrationUI();
   if (whole) {
-    document.getElementById('celebIcon').textContent = '⭐';
-    document.getElementById('celebTitle').textContent = "Today's star! ⭐";
-    document.getElementById('celebText').textContent = `Great day, ${state.name}! One more star in the jar!`;
-    document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
-    spawnConfetti(STAR_CONFETTI);
+    // Which star just banked (1..20 within its jar), and what color the schedule says.
+    // After the 20th star, currentJarFill wraps to 0 and fullJars has already advanced,
+    // so the star belongs to the previous jar number.
+    const jn = state.currentJarFill === 0 ? 20 : state.currentJarFill;
+    const jarNum = Math.max(0, (state.fullJars || 0) - (state.currentJarFill === 0 ? 1 : 0));
+    const symId = starSymbolFor(jn - 1, wishIndexFor(jarNum));
+    let announce = '';
+    if (symId === 'jarStarWish') announce = `The wish star! Star number ${jn}! Make a wish.`;
+    else if (symId === 'jarStarChamp') announce = `A white-gold star! Star number ${jn}!`;
+    else if (symId === 'jarStarRose') announce = `A rose-gold star! Star number ${jn}!`;
+    document.getElementById('celebIcon').innerHTML = celebStarSvg(symId);
+    document.getElementById('celebTitle').textContent = night ? 'A star for tonight.' : headline;
+    document.getElementById('celebText').textContent = night
+      ? (announce ? `${announce} Sleep well, ${state.name}.` : `Sleep well, ${state.name}.`)
+      : (announce ? `${announce} Great day, ${state.name}!` : `Great day, ${state.name}! One more star in the jar!`);
+    document.querySelector('.celebration-close').textContent = night ? 'Good night!' : 'Yay!';
+    spawnConfetti(night ? BEDTIME_CONFETTI : STAR_CONFETTI, night ? { calm: true } : null);
     chimeDay();
     buzz([30, 40, 30, 40, 70]);
     popJar();
   } else {
     const sun = which === 'morning';
-    document.getElementById('celebIcon').textContent = sun ? '☀️' : '🌙';
-    document.getElementById('celebTitle').textContent = sun ? 'Morning star!' : 'Bedtime star!';
+    document.getElementById('celebIcon').innerHTML = sun ? celebSunSvg() : celebMoonSvg();
+    document.getElementById('celebTitle').textContent = headline;
     document.getElementById('celebText').textContent = sun
-      ? `Half a star, ${state.name}! Finish bedtime for the whole one! ⭐`
-      : `Half a star, ${state.name}! Finish your morning for the whole one! ⭐`;
-    document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
+      ? `Half a star, ${state.name}! Finish bedtime for the whole one!`
+      : `Half a star, ${state.name}! Finish your morning for the whole one!`;
+    document.querySelector('.celebration-close').textContent = 'Yay!';
     spawnConfetti(STAR_CONFETTI);
     chimeRoutine();
     buzz([20, 30, 20]);
@@ -2769,6 +3225,28 @@ function popJar() {
 }
 
 // ═══════ JAR RENDERING ═══════
+// Fixed slight lean per star slot, so the jar stops looking like stamped copies.
+// Deterministic (period 17 over -8..8 degrees), never random: slot 3 leans the
+// same way every day, on every device.
+function starTilt(i) { return ((i * 47) % 17) - 8; }
+
+// Golden Five Seconds: star colors follow a FIXED, findable schedule, never a dice
+// roll (variable rewards are a dark pattern for a five-year-old). In every jar,
+// stars 5, 10 and 15 come out white-gold, star 20 rose-gold, and one wish star
+// hides in a slot seeded by the jar number so each jar hides it somewhere new.
+// Every star counts exactly the same; only the paint changes.
+function starSymbolFor(i, wishIdx) {
+  if (i === wishIdx) return 'jarStarWish';
+  if (i === 4 || i === 9 || i === 14) return 'jarStarChamp';
+  if (i === 19) return 'jarStarRose';
+  return 'jarStar';
+}
+function wishIndexFor(jarNumber) {
+  let idx = ((jarNumber * 7) + 3) % 20;
+  while (idx === 4 || idx === 9 || idx === 14 || idx === 19) idx = (idx + 1) % 20;
+  return idx;
+}
+
 // Lay out `total` star slots bottom-up in a centered cluster, sized to fit the jar.
 // The first `count` are revealed, so slots never shift as the jar fills.
 function jarStarLayout(total) {
@@ -2802,11 +3280,12 @@ function jarStarLayout(total) {
   return { positions, size };
 }
 
-function renderJarStars(shown, forming) {
+function renderJarStars(shown, forming, wishIdx) {
   const SVGNS = 'http://www.w3.org/2000/svg';
   const fill = document.getElementById('starFill');
   const warm = document.getElementById('warmFillRect');
   fill.innerHTML = '';
+  if (typeof wishIdx !== 'number') wishIdx = -1;
 
   const CAP = 20;
   shown = Math.max(0, Math.min(CAP, shown | 0));
@@ -2832,7 +3311,8 @@ function renderJarStars(shown, forming) {
   for (let i = 0; i < n; i++) {
     const pos = positions[i];
 
-    // static group sets the position; an entrance wrapper plays the drop-in; inner group bobs
+    // static group sets the position; an entrance wrapper plays the drop-in; a static
+    // tilt wrapper gives each star its own slight lean; inner group bobs
     const pivot = document.createElementNS(SVGNS, 'g');
     pivot.setAttribute('transform', `translate(${pos.x} ${pos.y})`);
 
@@ -2842,22 +3322,33 @@ function renderJarStars(shown, forming) {
       enterG.style.animationDelay = ((i - grewFrom) * 0.12).toFixed(2) + 's'; // cascade if several banked at once
     }
 
+    // Seeded per-slot tilt so twenty stars stop looking like twenty stamped copies.
+    // Its own wrapper, styled (not the transform attribute) so the neighbor-nudge
+    // animation can preserve the lean via var(--tilt). The entrance drop above stays
+    // vertical, and animated transforms never share a group with a positioning one.
+    const tiltG = document.createElementNS(SVGNS, 'g');
+    tiltG.setAttribute('class', 'star-tilt');
+    tiltG.style.setProperty('--tilt', starTilt(i) + 'deg');
+    tiltG.style.transform = 'rotate(var(--tilt))';
+
     const floatG = document.createElementNS(SVGNS, 'g');
     floatG.setAttribute('class', 'jar-star');
     floatG.style.animation = `starFloat ${(3 + (i % 4) * 0.55).toFixed(2)}s ease-in-out ${(i * 0.31).toFixed(2)}s infinite`;
 
+    const isWish = (i === wishIdx);
     const glow = document.createElementNS(SVGNS, 'circle');
     glow.setAttribute('class', 's-glow');
     glow.setAttribute('cx', '0');
     glow.setAttribute('cy', '0');
-    glow.setAttribute('r', String((size * 0.55).toFixed(2)));
+    glow.setAttribute('r', String((isWish ? size * 0.72 : size * 0.55).toFixed(2)));
     glow.setAttribute('fill', 'url(#starGlow)');
     glow.style.animation = `starGlowPulse ${(2.6 + (i % 3) * 0.5).toFixed(2)}s ease-in-out ${(i * 0.22).toFixed(2)}s infinite`;
     floatG.appendChild(glow);
 
+    const sym = '#' + starSymbolFor(i, wishIdx);
     const star = document.createElementNS(SVGNS, 'use');
-    star.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#jarStar');
-    star.setAttribute('href', '#jarStar');
+    star.setAttributeNS('http://www.w3.org/1999/xlink', 'href', sym);
+    star.setAttribute('href', sym);
     star.setAttribute('class', 's-star');
     star.setAttribute('x', String(-size / 2));
     star.setAttribute('y', String(-size / 2));
@@ -2866,18 +3357,32 @@ function renderJarStars(shown, forming) {
     star.style.animation = `starPulse ${(2.4 + (i % 3) * 0.5).toFixed(2)}s ease-in-out ${(i * 0.18).toFixed(2)}s infinite`;
     floatG.appendChild(star);
 
-    enterG.appendChild(floatG);
+    // the wish star glints now and then, so the kids can hunt for it
+    if (isWish) {
+      const glintG = document.createElementNS(SVGNS, 'g');
+      glintG.setAttribute('transform', `translate(${(size * 0.34).toFixed(1)} ${(-size * 0.34).toFixed(1)}) scale(0.8)`);
+      const spark = document.createElementNS(SVGNS, 'use');
+      spark.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#spk4');
+      spark.setAttribute('href', '#spk4');
+      spark.setAttribute('class', 'wish-glint');
+      glintG.appendChild(spark);
+      floatG.appendChild(glintG);
+    }
+
+    tiltG.appendChild(floatG);
+    enterG.appendChild(tiltG);
     pivot.appendChild(enterG);
     fill.appendChild(pivot);
   }
 
   // today's in-progress star: a faint outline in the next slot with the earned half lit
+  // (tilted like the real star will be, so nothing jumps when it banks)
   if (forming && n < positions.length) {
     const pos = positions[n];
     const half = forming === 'morning' ? 'url(#halfL)' : 'url(#halfR)';
     [true, false].forEach((ghost) => {
       const pivot = document.createElementNS(SVGNS, 'g');
-      pivot.setAttribute('transform', `translate(${pos.x} ${pos.y})`);
+      pivot.setAttribute('transform', `translate(${pos.x} ${pos.y}) rotate(${starTilt(n)})`);
       const enterG = document.createElementNS(SVGNS, 'g');
       if (formingNew) enterG.setAttribute('data-form', '1');
       const star = document.createElementNS(SVGNS, 'use');
@@ -2898,10 +3403,15 @@ function renderJarStars(shown, forming) {
 
   // Play the entrances now — or, if the celebration overlay is covering the jar,
   // queue them so the kid actually sees the star land (drained by closeCelebration).
+  // Exactly one new whole star queued behind the overlay gets the arc-into-jar
+  // entrance instead of the plain drop; multi-star jumps keep the cascade.
   if (grewFrom !== null) _numPopPending = true;
   if (grewFrom !== null || formingNew) {
     const celebShowing = document.getElementById('celebration').classList.contains('show');
-    if (celebShowing) _jarFxQueued = true;
+    if (celebShowing) {
+      _jarFxQueued = true;
+      _pendingArcIndex = (grewFrom !== null && shown - grewFrom === 1 && !forming) ? shown - 1 : null;
+    }
     else playJarEntrances();
   }
 }
@@ -2910,6 +3420,7 @@ function renderJarStars(shown, forming) {
 // the star-count number if it just went up. Safe to call when nothing is marked.
 function playJarEntrances() {
   _jarFxQueued = false;
+  _pendingArcIndex = null;
   document.querySelectorAll('#starFill [data-land]').forEach(g => { g.removeAttribute('data-land'); g.classList.add('star-enter'); });
   document.querySelectorAll('#starFill [data-form]').forEach(g => { g.removeAttribute('data-form'); g.classList.add('star-enter-soft'); });
   if (_numPopPending) {
@@ -2919,15 +3430,108 @@ function playJarEntrances() {
   }
 }
 
+// ═══════ THE LONG DROP (Golden Five Seconds) ═══════
+// The just-banked star arcs from where the celebration stood into its slot in the
+// jar: the lid glints, the neighbors scoot over. All under a second and a half.
+// Uses the Web Animations API, so it guards reduced-motion itself and falls back
+// to the plain drop-in entrance.
+function arcStarIntoJar(i) {
+  const jarSvg = document.getElementById('jarSvg');
+  const pivots = document.querySelectorAll('#starFill > g');
+  const landing = pivots[i] ? pivots[i].firstChild : null;   // the entrance wrapper
+  const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced || !jarSvg || !landing) { playJarEntrances(); popJar(); return; }
+  _jarFxQueued = false;
+  _pendingArcIndex = null;
+  landing.removeAttribute('data-land');
+  landing.style.opacity = '0';                               // hidden until the flyer lands
+
+  const { positions, size } = jarStarLayout(20);
+  const rect = jarSvg.getBoundingClientRect();
+  const scale = rect.width / 160;
+  const tx = rect.left + positions[i].x * scale;
+  const ty = rect.top + positions[i].y * scale;
+  const sx = window.innerWidth / 2;
+  const sy = Math.max(60, Math.min(window.innerHeight * 0.3, ty - 160));
+  const px = Math.max(24, size * scale);
+
+  const st = loadState();
+  const symId = starSymbolFor(i, wishIndexFor((st && st.fullJars) || 0));
+  const flyer = document.createElement('div');
+  flyer.className = 'arc-star';
+  flyer.innerHTML = `<svg viewBox="0 0 24 24" style="width:${px.toFixed(0)}px;height:${px.toFixed(0)}px;display:block">` +
+    `<use href="#${symId}" xlink:href="#${symId}"/></svg>`;
+  document.body.appendChild(flyer);
+
+  // quadratic arc sampled into keyframes: rises over the jar mouth, then dives in
+  const cx = (sx + tx) / 2, cy = Math.min(sy, ty) - 90;
+  const STEPS = 14;
+  const frames = [];
+  for (let s = 0; s <= STEPS; s++) {
+    const t = s / STEPS;
+    const x = (1 - t) * (1 - t) * sx + 2 * (1 - t) * t * cx + t * t * tx;
+    const y = (1 - t) * (1 - t) * sy + 2 * (1 - t) * t * cy + t * t * ty;
+    frames.push({ transform: `translate(${x.toFixed(1)}px, ${y.toFixed(1)}px) translate(-50%, -50%) rotate(${(t * 90).toFixed(0)}deg) scale(${(1.9 - 0.9 * t).toFixed(2)})` });
+  }
+  const anim = flyer.animate(frames, { duration: 680, easing: 'cubic-bezier(0.45, 0.05, 0.65, 1)', fill: 'forwards' });
+  const land = () => {
+    flyer.remove();
+    landing.style.opacity = '';
+    landing.classList.add('star-arrive');
+    nudgeNeighbors(i, positions);
+    lidGlintNow();
+    popJar();
+    if (_numPopPending) {
+      _numPopPending = false;
+      const el = document.getElementById('jarStars');
+      if (el) { el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop'); }
+    }
+  };
+  anim.onfinish = land;
+  anim.oncancel = land;   // never leave the landed star invisible
+}
+
+// Stars near the landing slot scoot away and settle back, keeping their own lean.
+function nudgeNeighbors(i, positions) {
+  const pivots = document.querySelectorAll('#starFill > g');
+  const p0 = positions[i];
+  positions.forEach((p, j) => {
+    if (j === i || j >= pivots.length) return;
+    const dx = p.x - p0.x, dy = p.y - p0.y;
+    const d = Math.hypot(dx, dy);
+    if (d === 0 || d > 34) return;
+    const tiltG = pivots[j].querySelector('.star-tilt');
+    if (!tiltG) return;
+    const k = 6 / d;
+    tiltG.style.setProperty('--nx', (dx * k).toFixed(1) + 'px');
+    tiltG.style.setProperty('--ny', (dy * k).toFixed(1) + 'px');
+    tiltG.classList.remove('star-nudge'); void tiltG.getBBox();
+    tiltG.classList.add('star-nudge');
+    setTimeout(() => tiltG.classList.remove('star-nudge'), 480);
+  });
+}
+
+// One quick pass of the lid glint right now, then back to today's seeded loop.
+function lidGlintNow() {
+  const glint = document.querySelector('#jarSvg .lid-glint');
+  if (!glint) return;
+  const keep = _seededGlintAnim || glint.style.animation;
+  glint.style.animation = 'lidGlintOnce 0.7s ease-out';
+  setTimeout(() => { glint.style.animation = keep; }, 950);
+}
+
 // ═══════ MILESTONES ═══════
 // A little jar packed full of gold stars — clearly reads as "a jar you filled up" (the bare
 // 🫙 emoji looked empty). Reuses the main jar's #jarStar art so the stars match.
 function fullJarIcon() {
-  const star = (x, y) => `<use href="#jarStar" xlink:href="#jarStar" x="${x}" y="${y}" width="8.4" height="8.4"/>`;
+  const star = (x, y, sym) => `<use href="#${sym || 'jarStar'}" xlink:href="#${sym || 'jarStar'}" x="${x}" y="${y}" width="8.4" height="8.4"/>`;
+  // The top-right star is rose-gold: the 20th star that sealed this jar. The active
+  // jar can never show it (the fill wraps to 0 the moment it banks), so the shelf is
+  // where the promised rose-gold star lives, findable forever.
   return `<svg class="shelf-jar-svg" viewBox="0 0 30 34" aria-hidden="true" focusable="false">
     <ellipse cx="15" cy="32.4" rx="9" ry="1.5" fill="rgba(150,116,74,0.22)"/>
     <path d="M5 9 Q5 7.6 6.4 7.6 L23.6 7.6 Q25 7.6 25 9 L25 27 Q25 31.5 20.5 31.5 L9.5 31.5 Q5 31.5 5 27 Z" fill="rgba(255,224,150,0.30)" stroke="rgba(150,116,74,0.45)" stroke-width="1"/>
-    ${star(5.8,9.8)}${star(14.3,9.8)}${star(5.8,15.6)}${star(14.3,15.6)}${star(5.8,21.4)}${star(14.3,21.4)}
+    ${star(5.8,9.8)}${star(14.3,9.8,'jarStarRose')}${star(5.8,15.6)}${star(14.3,15.6)}${star(5.8,21.4)}${star(14.3,21.4)}
     <rect x="3.5" y="3" width="23" height="5.6" rx="2.8" fill="#CDD1D8"/>
     <rect x="3.5" y="4.2" width="23" height="2" rx="1" fill="rgba(255,255,255,0.55)"/>
     <rect x="7" y="10" width="1.6" height="15" rx="0.8" fill="rgba(255,255,255,0.32)"/>
@@ -2948,7 +3552,7 @@ function renderJarShelf(state) {
   for (let i = 0; i < glyphs; i++) jars += `<span class="shelf-jar">${fullJarIcon()}</span>`;
   if (n > CAP) jars += `<span class="shelf-more">×${n}</span>`;
   shelf.innerHTML = `<div class="jar-shelf-cap">🏆 ${n} full ${n === 1 ? 'jar' : 'jars'} filled!</div>` +
-    `<div class="jar-shelf-row">${jars}</div>`;
+    `<div class="jar-shelf-unit"><div class="jar-shelf-row">${jars}</div><div class="jar-shelf-plank"></div></div>`;
 }
 
 // Milestone cards + owed summary, driven by the stacking-prize ledger (prizeCounts).
@@ -3410,14 +4014,15 @@ function claimMilestone() {
   document.querySelector('.celebration-close').textContent = 'Okay! ⭐';
 }
 
-function spawnConfetti(colors) {
+function spawnConfetti(colors, opts) {
   // JS-spawned motion must check reduced-motion itself — the global CSS rule can't reach it.
   if (window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const calm = !!(opts && opts.calm);   // bedtime: fewer pieces, drifting slower
   const wrap = document.getElementById('celebration');
   wrap.querySelectorAll('.confetti-piece').forEach(p => p.remove());
   colors = colors || ['#FFC83C', '#F2A23A', '#E8972E', '#8BBE72', '#C9B6EC', '#FFE488', '#FFFDF8'];
   const frag = document.createDocumentFragment();
-  for (let i = 0; i < 30; i++) {
+  for (let i = 0; i < (calm ? 18 : 30); i++) {
     const p = document.createElement('div');
     p.className = 'confetti-piece';
     const s = 7 + Math.floor(Math.random() * 7);
@@ -3434,8 +4039,8 @@ function spawnConfetti(colors) {
       p.style.borderRadius = Math.random() < 0.5 ? '50%' : '2px';
     }
     if (i % 2 === 0) p.classList.add('sway'); // half the pieces drift side to side as they fall
-    p.style.animationDelay = (Math.random() * 0.6) + 's';
-    p.style.animationDuration = (2.2 + Math.random() * 1.4) + 's';
+    p.style.animationDelay = (Math.random() * (calm ? 1.1 : 0.6)) + 's';
+    p.style.animationDuration = (calm ? 3.6 + Math.random() * 1.8 : 2.2 + Math.random() * 1.4) + 's';
     frag.appendChild(p);
   }
   wrap.appendChild(frag);
@@ -3445,6 +4050,10 @@ function spawnConfetti(colors) {
 // modes never leak UI into one another.
 function resetCelebrationUI() {
   if (dadNoteTimer) { clearInterval(dadNoteTimer); dadNoteTimer = null; }   // kill any running read-gate countdown
+  if (dadNoteUnfoldTimer) { clearTimeout(dadNoteUnfoldTimer); dadNoteUnfoldTimer = null; }   // and any pending unfold beat
+  const icon = document.getElementById('celebIcon');
+  icon.classList.remove('tappable');
+  icon.onclick = null;                   // drop a pending sealed-note unfold handler
   document.getElementById('pinPad').style.display = 'none';
   document.getElementById('pinMsg').textContent = '';
   const action = document.getElementById('celebActionBtn');
@@ -3461,8 +4070,12 @@ function closeCelebration() {
   claimKey = null;
   pinMode = null;
   pinEntry = '';
-  // a star banked while the overlay covered the jar — let the kid watch it drop in now
-  if (_jarFxQueued) { playJarEntrances(); popJar(); }
+  // a star banked while the overlay covered the jar, so let the kid watch it land now:
+  // a single fresh whole star takes the arc, anything else the classic drop-in
+  if (_jarFxQueued) {
+    if (_pendingArcIndex !== null) { const i = _pendingArcIndex; _pendingArcIndex = null; arcStarIntoJar(i); }
+    else { playJarEntrances(); popJar(); }
+  }
 }
 
 // ═══════ RESET ═══════
