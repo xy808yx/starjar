@@ -1674,14 +1674,6 @@
   }
   .state-band.free { background: linear-gradient(160deg, #FFF6DC, #FFE9B8); color: #8A5A12; }
   .state-band.done { background: linear-gradient(160deg, #EAF1E1, #D8E8CA); color: #4C7038; }
-  .state-band.late {
-    background: var(--card-2);
-    color: var(--text-soft);
-    box-shadow: inset 0 0 0 1px var(--hairline);
-    font-family: 'Nunito', sans-serif;
-    font-size: 13.5px;
-    font-weight: 700;
-  }
   [data-theme="dark"] .state-band.free { background: linear-gradient(160deg, #332815, #2A2113); color: #F4CD82; }
   [data-theme="dark"] .state-band.done { background: linear-gradient(160deg, #22301B, #1B2716); color: #A9CD92; }
   .routine-state .check-btn { margin: 4px auto 12px; }
@@ -1993,7 +1985,7 @@
       <div class="routine-icon morning">☀️</div>
       <div class="routine-titlegroup">
         <div class="routine-title">Morning</div>
-        <div class="routine-target"><span class="rt-pre">by</span><span class="rt-time" id="rtMorning">8:00 AM</span></div>
+        <div class="routine-target"><span class="rt-pre">by</span><span class="rt-time" id="rtMorning"></span></div>
       </div>
       <div class="routine-progress" id="morningProgress">0/5</div>
       <span class="routine-chevron">▾</span>
@@ -2008,7 +2000,7 @@
       <div class="routine-icon bedtime">🌙</div>
       <div class="routine-titlegroup">
         <div class="routine-title">Bedtime</div>
-        <div class="routine-target"><span class="rt-pre">by</span><span class="rt-time" id="rtBedtime">8:00 PM</span></div>
+        <div class="routine-target"><span class="rt-pre">by</span><span class="rt-time" id="rtBedtime"></span></div>
       </div>
       <div class="routine-progress" id="bedtimeProgress">0/5</div>
       <span class="routine-chevron">▾</span>
@@ -2138,10 +2130,16 @@ function sameMilestones(a, b) {
 // v5 "morning anchor" model: clock-anchored witnessed drops, half stars, a 10-star money
 // jar that dies with the streak, and the always-witnessed school check.
 const MODEL5_VERSION = 5;
-// Backstops: the morning star closes at 10:00 and the evening star at 8:00 (parent-configurable).
-const DEFAULT_TIMES = { morning: '10:00', bedtime: '20:00' };
-// Counting days for the streak, as getDay() numbers: Tue-Sat (homeschool week). Sun/Mon are leeway.
-const DEFAULT_COUNTING_DAYS = [2, 3, 4, 5, 6];
+// v6 (Aug 24 2026): the clock stopped judging anything. A witnessed drop earns its half star
+// whenever it happens, and a half is missed only once its day is over. The PIN in a parent's
+// hand is the whole gate. Nothing here is ever compared against the device clock.
+const MODEL6_VERSION = 6;
+// Target times, shown on the cards and the printed one-pagers as the goal to aim at.
+// Display only: they decide nothing (parent-configurable).
+const DEFAULT_TIMES = { morning: '09:30', bedtime: '20:00' };
+// School/counting days as getDay() numbers: Mon-Sat. Sunday is the only leeway day.
+const DEFAULT_COUNTING_DAYS = [1, 2, 3, 4, 5, 6];
+const COUNTING_VERSION = 2;   // moved to Mon-Sat (Aug 24 2026)
 const DEFAULT_ACADEMIC_TASKS = [
   { id: 'a1', label: 'Math block', emoji: '✏️' },
   { id: 'a2', label: 'English block', emoji: '📖' }
@@ -2508,8 +2506,9 @@ function applyLivingClock() {
 }
 setInterval(applyLivingClock, 60000);
 
-// Once a minute: if the day rolled over, or a backstop just passed and the hard cut has
-// something to say, refresh the screen so the wipe is discovered without an interaction.
+// Once a minute: if the day rolled over and the hard cut has something to say about the day
+// that just ended, refresh the screen so the wipe is discovered without an interaction.
+// Midnight is now the only moment a wipe can appear; nothing is judged mid-day.
 function maybeRefresh() {
   const app = document.getElementById('app');
   if (!app || app.style.display === 'none' || _drainRunning) return;
@@ -2571,6 +2570,11 @@ function dateKey(d) {
 }
 function getToday() { return dateKey(new Date()); }      // uses the device's local date
 function parseKey(k) { const [y, m, d] = k.split('-').map(Number); return new Date(y, m - 1, d); }
+// "9:30" as 9.5, for placing the target time on a 24-hour dial (card foregrounding only).
+function hoursOf(hhmm) {
+  const [h, m] = String(hhmm || '').split(':').map(Number);
+  return (isNaN(h) ? 0 : h) + (isNaN(m) ? 0 : m) / 60;
+}
 
 function loadState() {
   try {
@@ -2728,7 +2732,7 @@ function ensureToday(state) {
     state.wipeSeenId = '';
     state.treatSeenId = '';
     state.prizesGiven = {};            // prize tiers retire; anything still owed settles offline
-    s.times = clone(DEFAULT_TIMES);    // targets become hard backstops: reset to 10:00 / 8:00
+    s.times = clone(DEFAULT_TIMES);    // reset the shown targets to 9:30 / 8:00
     s.countingDays = DEFAULT_COUNTING_DAYS.slice();
     s.jarPayout = 10;
     s.treatLabel = 'Your choice of a treat';
@@ -2747,6 +2751,39 @@ function ensureToday(state) {
   // Per-date counting-day log, so Settings edits apply going forward only.
   if (!Array.isArray(state.countingLog) || !state.countingLog.length) {
     state.countingLog = [{ from: state.epoch || getToday(), days: s.countingDays.slice() }];
+  }
+  // ── v6: the clock stopped judging. Every witnessed drop now counts, including ones the old
+  //    backstop rejected as late, so a star a parent stood over and approved is given back. ──
+  if (s.model6Version !== MODEL6_VERSION) {
+    for (const k in state.days) {
+      const dd = state.days[k];
+      if (!dd || !dd.drop) continue;
+      ['morning', 'bedtime'].forEach(w => {
+        if (!dd.drop[w]) return;
+        if (!dd.checks) dd.checks = { morning: false, bedtime: false };
+        dd.checks[w] = true;
+        delete dd.drop[w].late;
+      });
+    }
+    s.times = clone(s.times || DEFAULT_TIMES);   // kept, but from here on they are display only
+    delete state.timesLog;
+    delete s.timesVersion;
+    s.model6Version = MODEL6_VERSION;
+  }
+  // ── School/counting days move to Mon-Sat. Applied to every device whatever it was on,
+  //    because it is a household decision, not a default. Logged from today, so past days
+  //    keep the rules they were lived under. ──
+  if (s.countingVersion !== COUNTING_VERSION) {
+    const want = DEFAULT_COUNTING_DAYS.slice();
+    const same = JSON.stringify(s.countingDays.slice().sort((a, b) => a - b)) === JSON.stringify(want);
+    if (!same) {
+      s.countingDays = want;
+      const entry = { from: getToday(), days: want.slice() };
+      const last = state.countingLog[state.countingLog.length - 1];
+      if (last && last.from === entry.from) state.countingLog[state.countingLog.length - 1] = entry;
+      else state.countingLog.push(entry);
+    }
+    s.countingVersion = COUNTING_VERSION;
   }
   if (typeof s.jarPayout !== 'number' || !(s.jarPayout > 0)) s.jarPayout = 10;
   if (typeof s.treatLabel !== 'string' || !s.treatLabel.trim()) s.treatLabel = 'Your choice of a treat';
@@ -2786,14 +2823,7 @@ function countingDaysFor(k, state) {
 function isCountingDay(k, state) {
   return countingDaysFor(k, state).includes(parseKey(k).getDay());
 }
-function backstopMs(k, hhmm) {
-  const d = parseKey(k);
-  const [h, m] = String(hhmm || '').split(':').map(Number);
-  d.setHours(isNaN(h) ? 0 : h, isNaN(m) ? 0 : m, 0, 0);
-  return d.getTime();
-}
-function replayModel(state, nowMs) {
-  const s = state.settings;
+function replayModel(state) {
   const epoch = state.epoch || getToday();
   const today = getToday();
   let fill = state.migratedFillHalves || 0;   // the active jar, in half-stars (20 halves = full)
@@ -2808,23 +2838,22 @@ function replayModel(state, nowMs) {
     const counting = isCountingDay(k, state);
     const paused = !!(day && day.paused);
     const isToday = (k === today);
-    const halves = [['morning', s.times.morning, ':1'], ['bedtime', s.times.bedtime, ':2']];
-    for (const [which, t, seq] of halves) {
+    const halves = [['morning', ':1'], ['bedtime', ':2']];
+    for (const [which, seq] of halves) {
       const earned = !!(day && day.checks && day.checks[which]);
       if (earned) {
         fill += 1;
         if (fill >= JAR_HALVES) { fill -= JAR_HALVES; banked += 1; }
-      } else if (counting && !paused && k !== epoch) {
+      } else if (counting && !paused && k !== epoch && !isToday) {
         // The hard cut: a missed half on a counting day kills the streak and the jar dies
-        // with it. No shields. Today's halves are only judged once their backstop has passed.
-        const missed = !isToday || nowMs > backstopMs(k, t);
-        if (missed) {
-          const id = k + seq;
-          if (fill > 0 || streak > 0) lossWipe = { id, fillBefore: fill, streakBefore: streak };
-          lastWipeId = id;
-          fill = 0;
-          streak = 0;
-        }
+        // with it. No shields. A half is missed only once its day is OVER: nothing is judged
+        // against the clock while the day is still live, so today can still earn both halves
+        // at any hour, and the only thing that says a half got done is the witnessed drop.
+        const id = k + seq;
+        if (fill > 0 || streak > 0) lossWipe = { id, fillBefore: fill, streakBefore: streak };
+        lastWipeId = id;
+        fill = 0;
+        streak = 0;
       }
     }
     if (day && day.checks && day.checks.morning && day.checks.bedtime && !paused) {
@@ -2841,7 +2870,7 @@ function replayModel(state, nowMs) {
 function computeBestStreak(state) { return state.bestStreak || 0; }
 
 function syncDerived(state) {
-  const r = replayModel(state, Date.now());
+  const r = replayModel(state);
   state.streak = r.streak;
   state.bestStreak = r.best;
   state.fillHalves = r.fillHalves;
@@ -2890,6 +2919,7 @@ let routineToggled = { morning: null, bedtime: null, academic: null }; // null =
 let _drainRunning = false;    // true while the somber jar drain is playing
 let _renderedDay = null;      // day key last rendered, so the minute tick can catch midnight rollover
 let _schoolTodayFlag = false; // whether the School card is shown today (drives foregrounding fallback)
+let _morningEndH = hoursOf(DEFAULT_TIMES.morning);  // morning target as an hour; only decides which card is foregrounded
 let _arcWholeOk = false;      // the arc-into-jar entrance only plays behind a whole-day celebration
 
 // Jar entrance-animation bookkeeping (decorative only). Tracks the previously rendered
@@ -2970,9 +3000,10 @@ function render(state) {
   const app = document.getElementById('app');
   app.classList.toggle('day-approved', isStarred);
 
-  // Backstop times (editable in Settings)
+  // Target times (editable in Settings). Shown as the goal to aim at; they gate nothing.
   document.getElementById('rtMorning').textContent = formatTime(state.settings.times.morning);
   document.getElementById('rtBedtime').textContent = formatTime(state.settings.times.bedtime);
+  _morningEndH = hoursOf(state.settings.times.morning);
 
   // A routine with no tasks is hidden entirely; the School card shows on school days only
   const aDefs = defs.academic || [];
@@ -3055,8 +3086,6 @@ function render(state) {
 function renderRoutineState(state, day, which) {
   const el = document.getElementById(which + 'State');
   if (!el) return;
-  const t = state.settings.times[which];
-  const dropRec = (day.drop || {})[which];
   const earned = !!(day.checks && day.checks[which]);
   const defs = (day.taskDefs || state.settings.tasks)[which] || [];
   const allTicked = defs.length > 0 && defs.every(x => day.tasks[x.id]);
@@ -3064,8 +3093,6 @@ function renderRoutineState(state, day, which) {
   let html = '';
   if (earned) {
     html = `<div class="state-band done">${which === 'morning' ? 'Your morning star is in the jar' : 'Your evening star is in the jar'}</div>`;
-  } else if (dropRec && dropRec.late) {
-    html = `<div class="state-band late">Dropped after ${escapeHtml(formatTime(t))}. Tomorrow is a fresh start.</div>`;
   } else if (gateOpen) {
     const line = which === 'morning' ? 'Your morning is yours!' : 'You are all set for bed.';
     const btn = which === 'morning' ? 'Drop your morning star' : 'Drop your evening star';
@@ -3317,8 +3344,15 @@ function cueRoutine(which) {
 // On days with no School card (leeway or no-school), midday falls back to a visible block
 // so the kid never faces two collapsed cards with nothing foregrounded.
 function currentRoutine() {
-  const h = new Date().getHours();
-  if (h < 10) return 'morning';
+  const now = new Date();
+  return currentRoutineAt(now.getHours() + now.getMinutes() / 60);
+}
+// NB: this is layout only. It decides which card is expanded, never whether a star is earned.
+function currentRoutineAt(h) {
+  if (h < _morningEndH) return 'morning';
+  // Past the morning target: school days hand over to the School card. On a day with no
+  // School card the morning card deliberately stays up until noon, rather than foregrounding
+  // bedtime in the middle of the morning.
   if (h < 14) return _schoolTodayFlag ? 'academic' : (h < 12 ? 'morning' : 'bedtime');
   return 'bedtime';
 }
@@ -3424,8 +3458,9 @@ function celebMoonSvg() {
 
 // ── The drop ──
 // Kid taps the drop button, the sealed note opens (a grown-up is there to read it), then the
-// witness PIN lands and THAT instant is judged against the backstop. With witnessing off the
-// kid's tap is the drop instant. An abandoned overlay records nothing.
+// witness PIN lands and THAT instant is recorded. Recorded, not judged: the grown-up entering
+// the PIN is the whole gate. With witnessing off the kid's tap is the drop instant. An
+// abandoned overlay records nothing.
 let _pendingDrop = null;
 let _pendingAcademic = null;
 
@@ -3555,9 +3590,9 @@ function pinFail() {
   setTimeout(renderPinDots, 130);
 }
 
-// The witnessed instant lands here and is judged against the backstop. On time: the half
-// star banks and the celebration plays. Late: the star slips away, and on a counting day
-// the hard cut follows (the drain is discovered by the next render).
+// The witnessed instant lands here and is written down. The half star banks and the
+// celebration plays, whatever the clock says. The only way to lose a half is to reach the end
+// of a counting day without one, which the replay discovers after midnight.
 function finishDrop(which, t) {
   const originDay = _pendingDrop && _pendingDrop.day;
   _pendingDrop = null;
@@ -3577,14 +3612,12 @@ function finishDrop(which, t) {
   if (!day.gate) day.gate = {};
   if (!day.gate[which]) day.gate[which] = t;
   if (!day.checks) day.checks = { morning: false, bedtime: false };
-  const late = t > backstopMs(today, state.settings.times[which]);
-  day.drop[which] = { at: t, late };
-  if (!late) day.checks[which] = true;
+  day.drop[which] = { at: t };
+  day.checks[which] = true;      // witnessed is earned. The clock gets no say.
   syncDerived(state);
   saveState(state);
   render(state);
-  if (late) showSlipAway(state, which);
-  else showStarCelebration(state, which);
+  showStarCelebration(state, which);
 }
 
 function showStarCelebration(state, which) {
@@ -3643,44 +3676,6 @@ function showStarCelebration(state, which) {
   }
 }
 
-// Late drop: the full ritual ran, and the star slips away. Her star rises, loses its
-// gold, and sinks past the bottom. Short minor-key tone, then the normal day.
-function showSlipAway(state, which) {
-  resetCelebrationUI();
-  const t = state.settings.times[which];
-  const icon = document.getElementById('celebIcon');
-  icon.innerHTML = celebStarSvg('jarStar');
-  document.getElementById('celebTitle').textContent = 'The star slipped away';
-  document.getElementById('celebText').textContent =
-    `The clock passed ${formatTime(t)}. Tomorrow is a brand new start, ${state.name}.`;
-  document.querySelector('.celebration-close').textContent = 'Okay';
-  document.getElementById('celebration').classList.add('show');
-  chimeSomber();
-  buzz(30);
-  const svg = icon.querySelector('svg');
-  const use = svg ? svg.querySelector('use') : null;
-  const toGrey = () => {
-    if (!use) return;
-    use.setAttribute('href', '#jarStarGrey');
-    use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#jarStarGrey');
-  };
-  const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (svg && !reduced) {
-    const rise = svg.animate(
-      [{ transform: 'translateY(0)' }, { transform: 'translateY(-34px)' }],
-      { duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' });
-    const sink = () => {
-      toGrey();
-      svg.animate(
-        [{ transform: 'translateY(-34px)', opacity: 1 }, { transform: 'translateY(200px)', opacity: 0 }],
-        { duration: 1500, easing: 'cubic-bezier(0.55, 0, 0.85, 0.4)', fill: 'forwards' });
-    };
-    rise.onfinish = sink;
-    rise.oncancel = sink;
-  } else {
-    toGrey();
-  }
-}
 
 // ── The School check lands (always witnessed, a tier below a star: seal and chime, no confetti) ──
 function academicDoneSvg() {
@@ -4213,7 +4208,6 @@ function _clock(ts) {
   return new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 }
 function renderReview(state) {
-  const s = state.settings;
   const today = getToday();
   const rows = [];
   const t = new Date();
@@ -4232,9 +4226,7 @@ function renderReview(state) {
       const grant = day && day.grant && day.grant[which];
       if (earned) return `<span class="rv-earned">${grant ? 'granted' : (drop ? _clock(drop.at) : 'earned')}</span>`;
       if (preEpoch) return '<span class="rv-dim">·</span>';
-      if (drop && drop.late) return `<span class="rv-miss">late ${_clock(drop.at)}</span>`;
-      const deadline = backstopMs(k, which === 'morning' ? s.times.morning : s.times.bedtime);
-      if (k === today && Date.now() <= deadline) return '<span class="rv-dim">open</span>';
+      if (k === today) return '<span class="rv-dim">open</span>';   // a live day is never graded
       return counting ? '<span class="rv-miss">missed</span>' : '<span class="rv-dim">leeway</span>';
     };
     const school = () => {
@@ -4369,15 +4361,15 @@ function renderSettingsForm() {
     <div class="date-label">The witnessed check-off after these. No star, no clock: just the record.</div>
     ${taskGroup('academic', 'School', '📖')}
 
-    <div class="set-section-title">Star backstops</div>
-    <div class="date-label">A star must be dropped by its backstop. Later, and it slips away.</div>
+    <div class="set-section-title">Target times</div>
+    <div class="date-label">Shown on the cards as the time to aim at. The clock decides nothing: a star is earned the moment a grown-up witnesses the drop, however late that is.</div>
     <div class="set-times">
       <label class="set-time"><span>☀️ Morning star by</span><input type="time" value="${escapeHtml(d.times.morning)}" oninput="setTime('morning',this.value)"></label>
       <label class="set-time"><span>🌙 Evening star by</span><input type="time" value="${escapeHtml(d.times.bedtime)}" oninput="setTime('bedtime',this.value)"></label>
     </div>
 
-    <div class="set-section-title">Counting days</div>
-    <div class="date-label">The streak counts these days. The rest are leeway: earning helps, missing costs nothing.</div>
+    <div class="set-section-title">School and counting days</div>
+    <div class="date-label">These days show the School card and count for the streak. A half not checked off by the end of one of these days breaks the streak. The rest are leeway: earning helps, missing costs nothing.</div>
     <div class="set-seg" role="group" aria-label="Counting days">${dayChips}</div>
 
     <div class="set-section-title">Money and treats</div>
@@ -4560,7 +4552,7 @@ function buildDayDetail(state, key, today) {
     const earned = which === 'morning' ? cm : cb;
     let bits = [];
     if (gate) bits.push(`gate ${_clock(gate)}`);
-    if (drop) bits.push(`drop ${_clock(drop.at)}${drop.late ? ' (late)' : ''}`);
+    if (drop) bits.push(`drop ${_clock(drop.at)}`);
     if (grant) bits.push('mercy grant');
     if (!bits.length) return '';
     return `<div class="pz-detail-count" style="margin:2px 0 4px">${earned ? '✓' : '·'} ${bits.join(' · ')}</div>`;
