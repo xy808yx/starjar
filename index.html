@@ -1674,6 +1674,14 @@
   }
   .state-band.free { background: linear-gradient(160deg, #FFF6DC, #FFE9B8); color: #8A5A12; }
   .state-band.done { background: linear-gradient(160deg, #EAF1E1, #D8E8CA); color: #4C7038; }
+  .state-band.late {
+    background: var(--card-2);
+    color: var(--text-soft);
+    box-shadow: inset 0 0 0 1px var(--hairline);
+    font-family: 'Nunito', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+  }
   [data-theme="dark"] .state-band.free { background: linear-gradient(160deg, #332815, #2A2113); color: #F4CD82; }
   [data-theme="dark"] .state-band.done { background: linear-gradient(160deg, #22301B, #1B2716); color: #A9CD92; }
   .routine-state .check-btn { margin: 4px auto 12px; }
@@ -2130,13 +2138,19 @@ function sameMilestones(a, b) {
 // v5 "morning anchor" model: clock-anchored witnessed drops, half stars, a 10-star money
 // jar that dies with the streak, and the always-witnessed school check.
 const MODEL5_VERSION = 5;
-// v6 (Aug 24 2026): the clock stopped judging anything. A witnessed drop earns its half star
-// whenever it happens, and a half is missed only once its day is over. The PIN in a parent's
-// hand is the whole gate. Nothing here is ever compared against the device clock.
+// v6 (Aug 24 2026): the deadline is the deadline. The clock rules in the moment with no adult
+// in the way, exactly as v5 did, because watching the star go is the whole point. The override
+// is after the fact and out of the kid's sight: pzGrant in the Parent Dashboard marks any past
+// half as earned, and the replay then restores the streak and the jar in full. Do NOT move that
+// judgment into the drop flow: an in-the-moment "was this on time?" was built and rejected,
+// because it makes the loss optional and hands her someone to plead with at 9:32.
 const MODEL6_VERSION = 6;
-// Target times, shown on the cards and the printed one-pagers as the goal to aim at.
-// Display only: they decide nothing (parent-configurable).
+// Backstops: the morning star closes at 9:30 and the evening at 8:00 (parent-configurable).
 const DEFAULT_TIMES = { morning: '09:30', bedtime: '20:00' };
+// The previous defaults, so a device that never edited its times follows when a default moves.
+// Safe to delete once every device has migrated (same rule as the OLD_DEFAULT_* lists above).
+const OLD_DEFAULT_TIMES = { morning: '10:00', bedtime: '20:00' };
+const TIMES_VERSION = 2;   // morning backstop moved 10:00 -> 9:30 (Aug 24 2026)
 // School/counting days as getDay() numbers: Mon-Sat. Sunday is the only leeway day.
 const DEFAULT_COUNTING_DAYS = [1, 2, 3, 4, 5, 6];
 const COUNTING_VERSION = 2;   // moved to Mon-Sat (Aug 24 2026)
@@ -2506,9 +2520,8 @@ function applyLivingClock() {
 }
 setInterval(applyLivingClock, 60000);
 
-// Once a minute: if the day rolled over and the hard cut has something to say about the day
-// that just ended, refresh the screen so the wipe is discovered without an interaction.
-// Midnight is now the only moment a wipe can appear; nothing is judged mid-day.
+// Once a minute: if the day rolled over, or a backstop just passed and the hard cut has
+// something to say, refresh the screen so the wipe is discovered without an interaction.
 function maybeRefresh() {
   const app = document.getElementById('app');
   if (!app || app.style.display === 'none' || _drainRunning) return;
@@ -2752,20 +2765,10 @@ function ensureToday(state) {
   if (!Array.isArray(state.countingLog) || !state.countingLog.length) {
     state.countingLog = [{ from: state.epoch || getToday(), days: s.countingDays.slice() }];
   }
-  // ── v6: the clock stopped judging. Every witnessed drop now counts, including ones the old
-  //    backstop rejected as late, so a star a parent stood over and approved is given back. ──
+  // ── v6: the clock stopped ruling on its own; a grown-up rules instead. History is left
+  //    exactly as it was lived, so a star ruled away stays away. (An earlier build of v6
+  //    handed those stars back; that is deliberately gone.) ──
   if (s.model6Version !== MODEL6_VERSION) {
-    for (const k in state.days) {
-      const dd = state.days[k];
-      if (!dd || !dd.drop) continue;
-      ['morning', 'bedtime'].forEach(w => {
-        if (!dd.drop[w]) return;
-        if (!dd.checks) dd.checks = { morning: false, bedtime: false };
-        dd.checks[w] = true;
-        delete dd.drop[w].late;
-      });
-    }
-    s.times = clone(s.times || DEFAULT_TIMES);   // kept, but from here on they are display only
     delete state.timesLog;
     delete s.timesVersion;
     s.model6Version = MODEL6_VERSION;
@@ -2773,6 +2776,21 @@ function ensureToday(state) {
   // ── School/counting days move to Mon-Sat. Applied to every device whatever it was on,
   //    because it is a household decision, not a default. Logged from today, so past days
   //    keep the rules they were lived under. ──
+  // Moving a backstop earlier must never retro-miss a half on the day already in progress:
+  // if the new time has passed while the old one has not, and that half is still unearned on
+  // a live counting day, the whole move waits for a later load. Past days need no such care,
+  // because the replay marks any unearned half on a FINISHED counting day as missed whatever
+  // its time was, which is why the backstops need no per-date log the way counting days do.
+  if (s.timesVersion !== TIMES_VERSION) {
+    const next = clone(s.times);
+    ['morning', 'bedtime'].forEach(w => { if (next[w] === OLD_DEFAULT_TIMES[w]) next[w] = DEFAULT_TIMES[w]; });
+    const changed = next.morning !== s.times.morning || next.bedtime !== s.times.bedtime;
+    if (!changed || timeChangeSafeToday(state, next)) {
+      s.times = next;
+      s.timesVersion = TIMES_VERSION;
+    }
+    // else: leave the old times in place and try again next load, when it costs nothing.
+  }
   if (s.countingVersion !== COUNTING_VERSION) {
     const want = DEFAULT_COUNTING_DAYS.slice();
     const same = JSON.stringify(s.countingDays.slice().sort((a, b) => a - b)) === JSON.stringify(want);
@@ -2823,7 +2841,29 @@ function countingDaysFor(k, state) {
 function isCountingDay(k, state) {
   return countingDaysFor(k, state).includes(parseKey(k).getDay());
 }
-function replayModel(state) {
+function backstopMs(k, hhmm) {
+  const d = parseKey(k);
+  const [h, m] = String(hhmm || '').split(':').map(Number);
+  d.setHours(isNaN(h) ? 0 : h, isNaN(m) ? 0 : m, 0, 0);
+  return d.getTime();
+}
+// True when moving the backstops to newTimes right now would cost nothing that is still in
+// hand. False only in the narrow window where the new time has passed, the old one has not,
+// and that half is unearned on a live counting day.
+function timeChangeSafeToday(state, newTimes) {
+  const today = getToday();
+  const day = state.days && state.days[today];
+  if (!day || day.paused || today === state.epoch || !isCountingDay(today, state)) return true;
+  const now = Date.now();
+  for (const w of ['morning', 'bedtime']) {
+    if (day.checks && day.checks[w]) continue;            // already banked, nothing to lose
+    if (now > backstopMs(today, newTimes[w]) &&
+        now <= backstopMs(today, state.settings.times[w])) return false;
+  }
+  return true;
+}
+function replayModel(state, nowMs) {
+  const s = state.settings;
   const epoch = state.epoch || getToday();
   const today = getToday();
   let fill = state.migratedFillHalves || 0;   // the active jar, in half-stars (20 halves = full)
@@ -2838,22 +2878,25 @@ function replayModel(state) {
     const counting = isCountingDay(k, state);
     const paused = !!(day && day.paused);
     const isToday = (k === today);
-    const halves = [['morning', ':1'], ['bedtime', ':2']];
-    for (const [which, seq] of halves) {
+    const halves = [['morning', s.times.morning, ':1'], ['bedtime', s.times.bedtime, ':2']];
+    for (const [which, t, seq] of halves) {
       const earned = !!(day && day.checks && day.checks[which]);
       if (earned) {
         fill += 1;
         if (fill >= JAR_HALVES) { fill -= JAR_HALVES; banked += 1; }
-      } else if (counting && !paused && k !== epoch && !isToday) {
+      } else if (counting && !paused && k !== epoch) {
         // The hard cut: a missed half on a counting day kills the streak and the jar dies
-        // with it. No shields. A half is missed only once its day is OVER: nothing is judged
-        // against the clock while the day is still live, so today can still earn both halves
-        // at any hour, and the only thing that says a half got done is the witnessed drop.
-        const id = k + seq;
-        if (fill > 0 || streak > 0) lossWipe = { id, fillBefore: fill, streakBefore: streak };
-        lastWipeId = id;
-        fill = 0;
-        streak = 0;
+        // with it. No shields. Today's halves are only judged once their backstop has passed.
+        // NB: the backstop only ever matters for TODAY. A finished day with an unearned half
+        // is missed whatever its time was, which is why the times need no per-date log.
+        const missed = !isToday || nowMs > backstopMs(k, t);
+        if (missed) {
+          const id = k + seq;
+          if (fill > 0 || streak > 0) lossWipe = { id, fillBefore: fill, streakBefore: streak };
+          lastWipeId = id;
+          fill = 0;
+          streak = 0;
+        }
       }
     }
     if (day && day.checks && day.checks.morning && day.checks.bedtime && !paused) {
@@ -2870,7 +2913,7 @@ function replayModel(state) {
 function computeBestStreak(state) { return state.bestStreak || 0; }
 
 function syncDerived(state) {
-  const r = replayModel(state);
+  const r = replayModel(state, Date.now());
   state.streak = r.streak;
   state.bestStreak = r.best;
   state.fillHalves = r.fillHalves;
@@ -3086,6 +3129,7 @@ function render(state) {
 function renderRoutineState(state, day, which) {
   const el = document.getElementById(which + 'State');
   if (!el) return;
+  const dropRec = (day.drop || {})[which];
   const earned = !!(day.checks && day.checks[which]);
   const defs = (day.taskDefs || state.settings.tasks)[which] || [];
   const allTicked = defs.length > 0 && defs.every(x => day.tasks[x.id]);
@@ -3093,6 +3137,8 @@ function renderRoutineState(state, day, which) {
   let html = '';
   if (earned) {
     html = `<div class="state-band done">${which === 'morning' ? 'Your morning star is in the jar' : 'Your evening star is in the jar'}</div>`;
+  } else if (dropRec && dropRec.late) {
+    html = `<div class="state-band late">Dropped after ${escapeHtml(formatTime(state.settings.times[which]))}. Tomorrow is a fresh start.</div>`;
   } else if (gateOpen) {
     const line = which === 'morning' ? 'Your morning is yours!' : 'You are all set for bed.';
     const btn = which === 'morning' ? 'Drop your morning star' : 'Drop your evening star';
@@ -3590,9 +3636,11 @@ function pinFail() {
   setTimeout(renderPinDots, 130);
 }
 
-// The witnessed instant lands here and is written down. The half star banks and the
-// celebration plays, whatever the clock says. The only way to lose a half is to reach the end
-// of a counting day without one, which the replay discovers after midnight.
+// The witnessed instant lands here and is judged against the backstop. On time: the half star
+// banks and the celebration plays. Late: the star slips away, and on a counting day the hard
+// cut follows (the drain is discovered by the next render). No prompt, no appeal, nothing for
+// her to argue with. If it was genuinely unfair, a grown-up grants it back later in the
+// Dashboard, where she does not see it happen.
 function finishDrop(which, t) {
   const originDay = _pendingDrop && _pendingDrop.day;
   _pendingDrop = null;
@@ -3608,16 +3656,57 @@ function finishDrop(which, t) {
   }
   const day = state.days[today];
   if ((day.checks && day.checks[which]) || (day.drop && day.drop[which])) { closeCelebration(); return; }
+  const late = t > backstopMs(today, state.settings.times[which]);
   if (!day.drop) day.drop = {};
   if (!day.gate) day.gate = {};
   if (!day.gate[which]) day.gate[which] = t;
   if (!day.checks) day.checks = { morning: false, bedtime: false };
-  day.drop[which] = { at: t };
-  day.checks[which] = true;      // witnessed is earned. The clock gets no say.
+  day.drop[which] = { at: t, late };
+  if (!late) day.checks[which] = true;
   syncDerived(state);
   saveState(state);
   render(state);
-  showStarCelebration(state, which);
+  if (late) showSlipAway(state, which);
+  else showStarCelebration(state, which);
+}
+
+// Ruled late: the full ritual ran, and the star slips away. Her star rises, loses its gold,
+// and sinks past the bottom. Short minor-key tone, then the normal day.
+function showSlipAway(state, which) {
+  resetCelebrationUI();
+  const target = state.settings.times[which];
+  const icon = document.getElementById('celebIcon');
+  icon.innerHTML = celebStarSvg('jarStar');
+  document.getElementById('celebTitle').textContent = 'The star slipped away';
+  document.getElementById('celebText').textContent =
+    `It was past ${formatTime(target)}. Tomorrow is a brand new start, ${state.name}.`;
+  document.querySelector('.celebration-close').textContent = 'Okay';
+  document.getElementById('celebration').classList.add('show');
+  chimeSomber();
+  buzz(30);
+  const svg = icon.querySelector('svg');
+  const use = svg ? svg.querySelector('use') : null;
+  const toGrey = () => {
+    if (!use) return;
+    use.setAttribute('href', '#jarStarGrey');
+    use.setAttributeNS('http://www.w3.org/1999/xlink', 'href', '#jarStarGrey');
+  };
+  const reduced = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (svg && !reduced) {
+    const rise = svg.animate(
+      [{ transform: 'translateY(0)' }, { transform: 'translateY(-34px)' }],
+      { duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)', fill: 'forwards' });
+    const sink = () => {
+      toGrey();
+      svg.animate(
+        [{ transform: 'translateY(-34px)', opacity: 1 }, { transform: 'translateY(200px)', opacity: 0 }],
+        { duration: 1500, easing: 'cubic-bezier(0.55, 0, 0.85, 0.4)', fill: 'forwards' });
+    };
+    rise.onfinish = sink;
+    rise.oncancel = sink;
+  } else {
+    toGrey();
+  }
 }
 
 function showStarCelebration(state, which) {
@@ -4208,6 +4297,7 @@ function _clock(ts) {
   return new Date(ts).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
 }
 function renderReview(state) {
+  const s = state.settings;
   const today = getToday();
   const rows = [];
   const t = new Date();
@@ -4226,7 +4316,9 @@ function renderReview(state) {
       const grant = day && day.grant && day.grant[which];
       if (earned) return `<span class="rv-earned">${grant ? 'granted' : (drop ? _clock(drop.at) : 'earned')}</span>`;
       if (preEpoch) return '<span class="rv-dim">·</span>';
-      if (k === today) return '<span class="rv-dim">open</span>';   // a live day is never graded
+      if (drop && drop.late) return `<span class="rv-miss">late ${_clock(drop.at)}</span>`;
+      const deadline = backstopMs(k, which === 'morning' ? s.times.morning : s.times.bedtime);
+      if (k === today && Date.now() <= deadline) return '<span class="rv-dim">open</span>';
       return counting ? '<span class="rv-miss">missed</span>' : '<span class="rv-dim">leeway</span>';
     };
     const school = () => {
@@ -4361,8 +4453,8 @@ function renderSettingsForm() {
     <div class="date-label">The witnessed check-off after these. No star, no clock: just the record.</div>
     ${taskGroup('academic', 'School', '📖')}
 
-    <div class="set-section-title">Target times</div>
-    <div class="date-label">Shown on the cards as the time to aim at. The clock decides nothing: a star is earned the moment a grown-up witnesses the drop, however late that is.</div>
+    <div class="set-section-title">Star backstops</div>
+    <div class="date-label">A star must be dropped by its backstop. Later, and it slips away. If that was unfair, tap the day on the Dashboard and grant it back.</div>
     <div class="set-times">
       <label class="set-time"><span>☀️ Morning star by</span><input type="time" value="${escapeHtml(d.times.morning)}" oninput="setTime('morning',this.value)"></label>
       <label class="set-time"><span>🌙 Evening star by</span><input type="time" value="${escapeHtml(d.times.bedtime)}" oninput="setTime('bedtime',this.value)"></label>
@@ -4552,7 +4644,7 @@ function buildDayDetail(state, key, today) {
     const earned = which === 'morning' ? cm : cb;
     let bits = [];
     if (gate) bits.push(`gate ${_clock(gate)}`);
-    if (drop) bits.push(`drop ${_clock(drop.at)}`);
+    if (drop) bits.push(`drop ${_clock(drop.at)}${drop.late ? ' (late)' : ''}`);
     if (grant) bits.push('mercy grant');
     if (!bits.length) return '';
     return `<div class="pz-detail-count" style="margin:2px 0 4px">${earned ? '✓' : '·'} ${bits.join(' · ')}</div>`;
