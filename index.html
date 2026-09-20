@@ -39,14 +39,15 @@
     --bg-deep: #EFE3CF;
     --card: #FFFDF8;
     --card-2: #FBF4E7;
-    --card-shadow: 0 8px 26px rgba(150, 116, 74, 0.12), 0 2px 6px rgba(150, 116, 74, 0.06);
+    --card-shadow: 0 5px 18px rgba(150, 116, 74, 0.09);
     --card-shadow-soft: 0 3px 12px rgba(150, 116, 74, 0.08);
     --hairline: rgba(150, 116, 74, 0.12);
 
     /* ink */
     --text: #463528;
-    --text-soft: #8A745C;
+    --text-soft: #725C46;
     --text-faint: #BBA488;
+    --accent-ink: #965909;
 
     /* amber accent */
     --accent: #E8972E;
@@ -106,6 +107,7 @@
     --text: #F1E7D8;
     --text-soft: #C4B59D;
     --text-faint: #8A7B64;
+    --accent-ink: #F7C76B;
 
     --accent: #F0A53E;
     --accent-deep: #E8972E;
@@ -304,11 +306,12 @@
   .start-btn:disabled { opacity: 0.4; box-shadow: none; }
 
   /* ─── Main App ─── */
+  .app.is-visible { display: flex; }
   .app {
     display: none;
     flex-direction: column;
     min-height: 100dvh;
-    padding: 20px 20px 120px;
+    padding: max(20px, env(safe-area-inset-top)) 20px calc(32px + env(safe-area-inset-bottom));
     max-width: 500px;
     margin: 0 auto;
     animation: fadeIn 0.6s ease;
@@ -324,15 +327,16 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
-    padding: 4px 6px 0;
+    gap: 12px;
+    margin-bottom: 8px;
+    padding: 4px 0 0;
   }
 
   .greet-wrap { min-width: 0; }
 
   .greeting {
     font-family: 'Baloo 2', cursive;
-    font-size: 27px;
+    font-size: 24px;
     font-weight: 800;
     color: var(--text);
     letter-spacing: -0.3px;
@@ -351,18 +355,18 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    margin: 6px 0 26px;
+    margin: 0 0 20px;
     position: relative;
   }
 
   .jar-section::after {
     content: '';
     position: absolute;
-    top: 44px;
+    top: 10px;
     left: 50%;
     transform: translateX(-50%);
-    width: min(380px, 92vw);
-    height: min(380px, 92vw);
+    width: 240px;
+    height: 240px;
     border-radius: 50%;
     background: radial-gradient(circle, rgba(255, 200, 90, 0.22) 0%, rgba(255, 200, 90, 0) 68%);
     z-index: 0;
@@ -371,7 +375,7 @@
 
   .jar-container {
     position: relative;
-    width: min(300px, 74vw);
+    width: 156px;
     aspect-ratio: 160 / 206;
     z-index: 1;
   }
@@ -405,7 +409,7 @@
 
   .jar-count {
     text-align: center;
-    margin-top: 14px;
+    margin-top: 0;
     font-size: 17px;
     font-weight: 700;
     color: var(--text-soft);
@@ -413,7 +417,7 @@
   }
 
   .jar-count .jar-num {
-    color: var(--accent);
+    color: var(--accent-ink);
     font-family: 'Baloo 2', cursive;
     font-size: 30px;
     font-weight: 800;
@@ -423,13 +427,14 @@
   /* warm invite shown under the count only while the jar is empty */
   .jar-hint {
     text-align: center;
-    margin-top: 6px;
+    margin-top: 0;
     font-size: 14px;
     font-weight: 700;
     color: var(--text-soft);
     z-index: 1;
-    min-height: 17px;
+    min-height: 0;
   }
+  .jar-hint:empty { display: none; }
 
   /* shelf of completed trophy jars under the active jar */
   .jar-shelf {
@@ -437,14 +442,14 @@
     flex-direction: column;
     align-items: center;
     gap: 7px;
-    margin-top: 14px;
+    margin-top: 8px;
     z-index: 1;
   }
   .jar-shelf-cap {
     font-family: 'Baloo 2', cursive;
     font-size: 13px;
     font-weight: 800;
-    color: var(--accent);
+    color: var(--accent-ink);
   }
   .jar-shelf-row {
     display: flex;
@@ -464,7 +469,7 @@
     font-family: 'Baloo 2', cursive;
     font-size: 16px;
     font-weight: 800;
-    color: var(--accent);
+    color: var(--accent-ink);
     background: rgba(244, 180, 60, 0.16);
     border-radius: 40px;
     padding: 3px 12px;
@@ -477,8 +482,8 @@
   .routine-block {
     background: var(--card);
     border-radius: var(--radius);
-    padding: 18px 18px 10px;
-    margin-bottom: 18px;
+    padding: 14px 16px 10px;
+    margin-bottom: 14px;
     box-shadow: var(--card-shadow);
     border: 1px solid rgba(255, 255, 255, 0.7);
     position: relative;
@@ -494,6 +499,12 @@
     gap: 12px;
     margin-bottom: 4px;
     padding-bottom: 8px;
+    width: 100%;
+    border: 0;
+    background: none;
+    color: inherit;
+    text-align: left;
+    font: inherit;
   }
 
   .routine-icon {
@@ -524,14 +535,14 @@
     align-items: baseline;
     gap: 6px;
     width: fit-content;
-    margin-top: 6px;
-    padding: 4px 14px 5px;
+    margin-top: 0;
+    padding: 2px 10px;
     border-radius: 30px;
     font-family: 'Baloo 2', cursive;
-    box-shadow: inset 0 1px 0 var(--edge-hi), 0 2px 6px rgba(150, 116, 74, 0.12);
+    box-shadow: none;
   }
   .routine-target .rt-pre { font-size: 13px; font-weight: 600; opacity: 0.8; }
-  .routine-target .rt-time { font-size: 20px; font-weight: 800; letter-spacing: 0.2px; }
+  .routine-target .rt-time { font-size: 17px; font-weight: 800; }
   #morningBlock .routine-target { background: linear-gradient(160deg, #FFF1CF, #FFDF9A); color: #97600F; }
   #bedtimeBlock .routine-target { background: linear-gradient(160deg, #F1EBFA, #DCD0F1); color: #5C4986; }
 
@@ -540,19 +551,23 @@
   .routine-chevron {
     margin-left: 8px;
     font-size: 13px;
-    color: var(--text-faint);
+    color: var(--text-soft);
     transition: transform 0.28s var(--ease-out);
     flex-shrink: 0;
   }
-  .routine-block.deemph { opacity: 0.6; }
+  .routine-block.deemph { background: var(--card-2); box-shadow: var(--card-shadow-soft); }
   .routine-block.deemph .task-list { display: none; }
   .routine-block.deemph .routine-chevron { transform: rotate(-90deg); }
+  .routine-block.completed .routine-target { display: none; }
+  .routine-block.completed .routine-progress { color: var(--text-soft); background: transparent; box-shadow: none; }
+  .routine-block.completed .state-band { margin: 0 0 4px; padding: 8px 10px; }
+  :is(button, input, textarea, [tabindex]):focus-visible { outline: 3px solid var(--accent-ink); outline-offset: 3px; }
 
   /* completion toast */
   .toast {
     position: fixed;
     left: 50%;
-    bottom: calc(94px + env(safe-area-inset-bottom));
+    bottom: calc(22px + env(safe-area-inset-bottom));
     transform: translateX(-50%) translateY(16px);
     background: linear-gradient(180deg, #FFFFFF, #FFF6E2);
     color: var(--text);
@@ -833,15 +848,14 @@
 
   /* ─── Parent Zone ─── */
   .parent-zone-toggle {
-    position: fixed;
-    bottom: calc(22px + env(safe-area-inset-bottom));
-    right: 22px;
-    width: 52px;
-    height: 52px;
+    position: relative;
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
     border-radius: 50%;
     background: var(--card);
     border: 1px solid rgba(150, 116, 74, 0.16);
-    box-shadow: 0 6px 18px rgba(150, 116, 74, 0.18), inset 0 1px 0 var(--edge-hi);
+    box-shadow: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -874,9 +888,13 @@
     background: var(--bg);
     background-image: radial-gradient(120% 60% at 50% 0%, #FFF7E9, rgba(255, 247, 233, 0) 60%);
     border-radius: 28px 28px 0 0;
-    padding: 26px 22px calc(34px + env(safe-area-inset-bottom));
-    max-height: 88vh;
-    overflow-y: auto;
+    padding: 0;
+    height: 88vh;
+    height: 88dvh;
+    max-height: 920px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     box-shadow: 0 -10px 40px rgba(74, 55, 40, 0.18);
     animation: slideUp 0.42s var(--ease-out);
   }
@@ -889,8 +907,13 @@
     border-radius: 3px;
     background: var(--text-faint);
     opacity: 0.5;
-    margin: -8px auto 16px;
+    flex-shrink: 0;
+    margin: 10px auto 0;
   }
+
+  .pz-toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 14px 12px; flex-shrink: 0; border-bottom: 1px solid var(--hairline); }
+  .pz-content { min-height: 0; overflow-y: auto; overscroll-behavior: contain; padding: 16px 18px calc(24px + env(safe-area-inset-bottom)); flex: 1; }
+  .parent-panel.has-settings .pz-content { padding-bottom: 24px; }
 
   @keyframes slideUp {
     from { transform: translateY(100%); }
@@ -912,11 +935,9 @@
   }
 
   .close-parent {
-    position: absolute;
-    top: 18px;
-    right: 18px;
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
     border-radius: 50%;
     background: rgba(150, 116, 74, 0.12);
     border: none;
@@ -958,7 +979,7 @@
   .pz-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
   .pz-month { font-family: 'Baloo 2', cursive; font-size: 18px; font-weight: 700; color: var(--text); }
   .pz-nav {
-    width: 38px; height: 38px;
+    width: 44px; height: 44px;
     border-radius: 50%;
     border: none;
     background: var(--card);
@@ -975,6 +996,8 @@
   .pz-weekday { text-align: center; font-size: 11px; font-weight: 800; color: var(--text-soft); }
 
   .pz-day {
+    border: 0;
+    font: inherit;
     position: relative;
     aspect-ratio: 1 / 1;
     border-radius: 11px;
@@ -994,6 +1017,8 @@
   .pz-day.approved { background: linear-gradient(160deg, #FFE39E, #F6C45A); box-shadow: inset 0 0 0 1px rgba(214, 150, 40, 0.5); }
   .pz-day.approved .pz-daynum { color: #7E5A1E; }
   .pz-star { position: absolute; top: 1px; right: 4px; font-size: 9px; color: #B9791E; }
+  .pz-rest-mark { position: absolute; top: 2px; right: 4px; font-size: 11px; color: var(--text-soft); }
+  .pz-day.rest { background: var(--card-2); }
   .pz-day.today { box-shadow: inset 0 0 0 2px var(--accent); }
   .pz-day.selected { box-shadow: inset 0 0 0 2px var(--accent), 0 0 0 3px rgba(232, 151, 46, 0.22); }
 
@@ -1074,48 +1099,49 @@
   .pz-check-toggle:active { transform: scale(0.97); }
 
   /* ─── Parent: Dashboard / Settings tabs ─── */
-  .pz-tabs { display: flex; gap: 8px; margin: 2px 0 16px; padding-right: 44px; /* clear the absolutely-positioned close ✕ */ }
+  .pz-tabs { display: flex; flex: 1; min-width: 0; gap: 5px; margin: 0; }
   .pz-tab {
-    flex: 1; padding: 11px; border: none; border-radius: 40px;
-    font-family: 'Baloo 2', cursive; font-size: 15px; font-weight: 700;
+    flex: 1; min-width: 0; min-height: 44px; padding: 9px 4px; border: none; border-radius: 14px; white-space: nowrap;
+    font-family: 'Baloo 2', cursive; font-size: 14px; font-weight: 700;
     color: var(--text-soft); background: var(--card-2);
     box-shadow: inset 0 0 0 1px var(--hairline); cursor: pointer;
     transition: transform 0.15s, background 0.2s, color 0.2s, box-shadow 0.2s;
   }
   .pz-tab.active {
     background: linear-gradient(180deg, var(--accent-glow), var(--accent));
-    color: #6B4A12; box-shadow: 0 4px 14px rgba(232, 151, 46, 0.35);
+    color: #6B4A12; box-shadow: inset 0 0 0 1px rgba(150, 100, 35, 0.14);
   }
   .pz-tab:active { transform: scale(0.97); }
+  .pz-tab.has-draft::after { content: ''; display: inline-block; width: 5px; height: 5px; margin-left: 4px; border-radius: 50%; background: currentColor; vertical-align: middle; }
 
   /* ─── Settings form ─── */
   .set-section-title { font-family: 'Baloo 2', cursive; font-size: 16px; font-weight: 700; color: var(--text); margin: 20px 4px 9px; }
   .set-group { background: var(--card); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 12px; box-shadow: var(--card-shadow-soft); }
   .set-grouphead { font-family: 'Baloo 2', cursive; font-size: 15px; font-weight: 700; color: var(--text-soft); margin-bottom: 10px; }
-  .set-task-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .set-task-row { display: flex; flex-direction: column; gap: 7px; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--hairline); }
+  .set-task-tools { display: flex; align-items: center; gap: 8px; width: 100%; }
   /* 16px is the floor: iOS auto-zooms the page on focus for any smaller field. */
   .set-emoji, .set-label, .set-pin, .set-time input {
     font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700; color: var(--text);
     background: var(--card-2); border: 1.5px solid var(--hairline); border-radius: 12px;
     padding: 10px 12px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
   }
-  /* emoji box + label padding trimmed to buy back the width the 16px floor took, so no
-     task name truncates any earlier than it did at 15px. 46px keeps the 44px tap target. */
-  .set-emoji { width: 46px; flex-shrink: 0; text-align: center; padding: 10px 3px; }
-  .set-label { flex: 1; min-width: 0; padding-left: 8px; padding-right: 8px; }
+  .set-emoji { width: 46px; min-height: 44px; flex-shrink: 0; text-align: center; padding: 10px 3px; }
+  .set-label { flex: 1; min-width: 0; padding-left: 10px; padding-right: 10px; }
+  .set-task-row .set-label { display: block; width: 100%; min-height: 66px; flex: none; line-height: 1.35; resize: vertical; }
   .set-emoji:focus, .set-label:focus, .set-pin:focus, .set-time input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232, 151, 46, 0.14); }
   .set-remove {
-    width: 36px; height: 36px; flex-shrink: 0; border: none; border-radius: 10px;
+    width: 44px; height: 44px; flex-shrink: 0; border: none; border-radius: 10px;
     background: rgba(201, 74, 46, 0.1); color: #C0492E; font-size: 15px; font-weight: 800; cursor: pointer;
     transition: transform 0.15s, background 0.2s;
   }
   .set-remove:active { transform: scale(0.88); background: rgba(201, 74, 46, 0.2); }
   /* reorder a task up/down within its routine */
-  .set-move-col { display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; }
+  .set-move-col { display: flex; gap: 6px; flex-shrink: 0; margin-left: auto; }
   .set-move {
-    width: 26px; height: 16px; border: none; border-radius: 6px; padding: 0;
+    width: 44px; height: 44px; border: none; border-radius: 10px; padding: 0;
     background: rgba(120, 90, 50, 0.12); color: var(--text-soft);
-    font-size: 9px; line-height: 1; cursor: pointer;
+    font-size: 16px; line-height: 1; cursor: pointer;
     transition: transform 0.12s, background 0.2s;
   }
   .set-move:active:not(:disabled) { transform: scale(0.85); background: var(--accent-soft); }
@@ -1149,17 +1175,23 @@
   }
   .set-seg-btn.on { background: linear-gradient(180deg, var(--accent-glow), var(--accent)); color: #6B4A12; box-shadow: 0 3px 10px rgba(232, 151, 46, 0.3); }
   .set-seg-btn:active { transform: scale(0.96); }
-  .set-msg { text-align: center; font-weight: 700; font-size: 14px; min-height: 18px; margin: 16px 0 4px; }
+  .set-savebar { flex-shrink: 0; padding: 10px 18px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--hairline); background: var(--bg); }
+  .set-save-status { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; min-height: 44px; }
+  .set-dirty { font-size: 13px; font-weight: 800; color: var(--text-soft); }
+  .set-discard { border: none; background: transparent; color: var(--text-soft); font-family: inherit; font-size: 13px; font-weight: 700; padding: 4px 0 4px 8px; min-height: 44px; text-decoration: underline; cursor: pointer; }
+  .set-msg { text-align: center; font-weight: 700; font-size: 14px; margin: 0 0 6px; }
+  .set-msg:empty { display: none; }
   .set-msg.ok { color: var(--check-green-deep); }
   .set-msg.err { color: var(--streak-flame); }
   .set-save {
-    width: 100%; padding: 16px; border: none; border-radius: 60px; margin-top: 6px;
-    font-family: 'Baloo 2', cursive; font-size: 18px; font-weight: 700; color: #6B4A12;
-    background: linear-gradient(180deg, var(--accent-glow), var(--accent) 60%, var(--accent-deep));
-    box-shadow: 0 8px 20px rgba(232, 151, 46, 0.4), inset 0 1.5px 0 rgba(255, 255, 255, 0.4); cursor: pointer;
+    width: 100%; min-height: 48px; padding: 10px 16px; border: none; border-radius: 16px; margin-top: 0;
+    font-family: 'Baloo 2', cursive; font-size: 17px; font-weight: 700; color: #6B4A12;
+    background: linear-gradient(180deg, var(--accent-glow), var(--accent));
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4); cursor: pointer;
     transition: transform 0.18s var(--ease-bounce);
   }
   .set-save:active { transform: scale(0.98); }
+  .set-save:disabled { opacity: 0.5; cursor: default; }
 
   /* ─── Day approved state (routine lists only; the school list keeps working) ─── */
   .app.day-approved #morningBlock .task-item, .app.day-approved #bedtimeBlock .task-item { pointer-events: none; opacity: 0.65; }
@@ -1228,6 +1260,8 @@
   }
 
   .celebration-close:active { transform: scale(0.96); }
+  .celebration-close.secondary { background: transparent; color: var(--text-soft); box-shadow: none; min-height: 44px; padding: 10px 24px; }
+  .celebration-icon.tappable { cursor: pointer; border-radius: 22px; }
 
   .celebration-action {
     font-family: 'Baloo 2', cursive;
@@ -1261,8 +1295,8 @@
     border-radius: 60px;
     padding: 14px 30px;
     cursor: pointer;
-    box-shadow: 0 10px 26px rgba(244, 180, 60, 0.5), inset 0 1.5px 0 rgba(255, 255, 255, 0.6);
-    animation: getStarPulse 1.9s var(--ease-out) infinite;
+    box-shadow: 0 4px 12px rgba(244, 180, 60, 0.24);
+    animation: none;
     transition: transform 0.18s var(--ease-bounce);
   }
   .check-btn:last-of-type { margin-bottom: 22px; }
@@ -1679,7 +1713,7 @@
     color: var(--text-soft);
     box-shadow: inset 0 0 0 1px var(--hairline);
     font-family: 'Nunito', sans-serif;
-    font-size: 13.5px;
+    font-size: 14px;
     font-weight: 700;
   }
   [data-theme="dark"] .state-band.free { background: linear-gradient(160deg, #332815, #2A2113); color: #F4CD82; }
@@ -1689,8 +1723,8 @@
   /* the School card's calmer check button (no gold pulse, a tier below the star drops) */
   .check-btn.calm {
     background: linear-gradient(180deg, #A9CD92, #7CAE63 58%, #6A9B53);
-    color: #FFFFFF;
-    box-shadow: 0 8px 20px rgba(106, 155, 83, 0.4), inset 0 1.5px 0 rgba(255, 255, 255, 0.35);
+    color: #233A19;
+    box-shadow: 0 4px 12px rgba(106, 155, 83, 0.2);
     animation: none;
   }
   .routine-icon.academic { background: linear-gradient(145deg, #EAF1E1, #C9DEB6); }
@@ -1698,7 +1732,7 @@
   [data-theme="dark"] .routine-icon.academic svg path[fill="#FFFDF8"] { fill: #2A2219; }
 
   /* ── This-week row: sun / moon / book slots, drawn SVG ── */
-  .week-section { margin: -6px 0 22px; }
+  .week-section { margin: 10px 0 0; }
   .week-row {
     display: flex;
     gap: 4px;
@@ -1719,8 +1753,8 @@
     min-height: 66px;
   }
   .wk-day.today { box-shadow: inset 0 0 0 2px var(--accent); }
-  .wk-day.future { opacity: 0.38; }
-  .wk-letter { font-family: 'Baloo 2', cursive; font-size: 11px; font-weight: 800; color: var(--text-soft); }
+  .wk-day.future .wk-g { opacity: 0.5; }
+  .wk-letter { font-family: 'Baloo 2', cursive; font-size: 13px; font-weight: 800; color: var(--text-soft); }
   .wk-g { width: 15px; height: 15px; display: block; }
   .week-caption {
     text-align: center;
@@ -1730,6 +1764,13 @@
     color: var(--text-soft);
   }
 
+  .rest-day { text-align: center; padding: 24px 20px; background: var(--card); border-radius: var(--radius); margin-bottom: 14px; }
+  .rest-day h2 { font-family: 'Baloo 2', cursive; font-size: 24px; margin-bottom: 6px; }
+  .rest-day p { font-size: 17px; line-height: 1.5; color: var(--text-soft); }
+  .rest-day[hidden] { display: none; }
+  .rest-days-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .rest-days-picker .set-seg-btn { min-width: 44px; min-height: 44px; padding: 8px; }
+
   /* the somber drain: everything else steps back while the stars sink, and nothing is
      tappable until it finishes (a mid-drain tap must not clobber the one-time moment) */
   .app.draining .routine-block, .app.draining .week-section, .app.draining .header { opacity: 0.45; transition: opacity 0.5s; }
@@ -1737,13 +1778,81 @@
 
   /* ── Weekly review table (parent zone) ── */
   .rv-table-wrap { overflow-x: auto; background: var(--card); border-radius: var(--radius-sm); box-shadow: var(--card-shadow-soft); padding: 4px 6px; }
-  .rv-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
-  .rv-table th { text-align: left; font-size: 11px; font-weight: 800; color: var(--text-soft); padding: 8px; border-bottom: 1.5px solid var(--hairline); }
+  .rv-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .rv-table th { text-align: left; font-size: 13px; font-weight: 800; color: var(--text-soft); padding: 8px; border-bottom: 1.5px solid var(--hairline); }
   .rv-table td { padding: 8px; border-bottom: 1px solid var(--hairline); font-weight: 600; color: var(--text); white-space: nowrap; }
   .rv-table tr:last-child td { border-bottom: none; }
   .rv-earned { color: var(--check-green-deep); font-weight: 800; }
   .rv-miss { color: var(--streak-flame); font-weight: 700; }
-  .rv-dim { color: var(--text-faint); }
+  .rv-dim { color: var(--text-soft); }
+
+  /* Tablet room: the jar and week stay beside the daily work. Narrow windows
+     keep the phone's single column, including iPad multitasking. */
+  @media (min-width: 760px) {
+    .app.is-visible { display: grid; }
+    .app {
+      max-width: 1100px;
+      grid-template-columns: minmax(240px, 0.8fr) minmax(0, 1.2fr);
+      grid-template-rows: auto auto 1fr;
+      column-gap: 36px;
+      row-gap: 24px;
+      align-items: start;
+      align-content: start;
+      padding: max(28px, env(safe-area-inset-top)) 32px calc(28px + env(safe-area-inset-bottom));
+    }
+    .header { grid-column: 1 / -1; grid-row: 1; margin-bottom: 0; padding: 0; }
+    .greeting { font-size: 30px; }
+    .today-date { font-size: 15px; margin-top: 4px; }
+    .parent-zone-toggle { width: 48px; height: 48px; }
+    .jar-section { grid-column: 1; grid-row: 2; margin: 0; padding-top: 12px; }
+    .jar-container { width: 226px; }
+    .jar-section::after { width: 300px; height: 300px; max-width: 100%; }
+    .jar-count { font-size: 18px; }
+    .jar-count .jar-num { font-size: 34px; }
+    .jar-hint { font-size: 15px; }
+    .daily-routines { grid-column: 2; grid-row: 2 / span 2; min-width: 0; }
+    .week-section { grid-column: 1; grid-row: 3; min-width: 0; margin: 0; }
+    .week-row { gap: 2px; padding: 8px 6px; }
+    .week-caption { font-size: 14px; line-height: 1.4; }
+    .routine-block { padding: 18px 18px 12px; margin-bottom: 14px; }
+    .routine-title { font-size: 24px; }
+    .routine-icon { width: 46px; height: 46px; flex-shrink: 0; }
+    .task-item { min-height: 64px; }
+    .task-label { font-size: 19px; }
+    .task-checkbox { width: 36px; height: 36px; }
+    .rest-day { padding: 32px 24px; }
+    .rest-day p { max-width: 30ch; margin: 0 auto; }
+
+    .parent-panel {
+      top: 0; bottom: 0; width: calc(100% - 64px); max-width: 760px;
+      height: calc(100dvh - 64px); max-height: 940px; margin: auto;
+      border-radius: 28px;
+    }
+    .pz-content { padding: 20px 28px 28px; }
+    .pz-toolbar { padding-left: 24px; padding-right: 24px; }
+    .pz-tab { font-size: 16px; }
+    .pz-day { aspect-ratio: auto; min-height: 52px; }
+    .pz-task { min-height: 44px; }
+    .pz-daynum, .pz-weekday, .pz-stat-lbl, .pz-legend { font-size: 13px; }
+    .set-task-row { flex-direction: row; align-items: center; gap: 14px; }
+    .set-task-row .set-label { flex: 1; width: 0; min-height: 54px; height: 54px; }
+    .set-task-tools { width: 208px; flex-shrink: 0; }
+    .rest-days-picker { grid-template-columns: repeat(7, 1fr); }
+    .set-savebar { padding-left: 28px; padding-right: 28px; }
+    .set-savebar .set-save { max-width: 320px; display: block; margin-left: auto; }
+    .celebration h2, .celebration p { max-width: 560px; }
+    .celebration p { font-size: 20px; }
+  }
+
+  /* Leave room for every PIN control when landscape Safari is shorter. */
+  @media (min-width: 760px) and (max-height: 850px) {
+    .celebration { padding: 24px 32px; }
+    .celebration:has(#pinPad[style*="flex"]) .celebration-icon { font-size: 54px; margin-bottom: 6px; }
+    .celebration:has(#pinPad[style*="flex"]) h2 { margin-bottom: 0; }
+    .celebration:has(#pinPad[style*="flex"]) p { margin-bottom: 12px; }
+    .pin-pad { margin-bottom: 8px; }
+    .pin-msg { margin-top: 8px; }
+  }
 </style>
 </head>
 <body>
@@ -1806,6 +1915,7 @@
       <div class="greeting" id="greeting"></div>
       <div class="today-date" id="todayDate"></div>
     </div>
+    <button type="button" class="parent-zone-toggle" id="parentToggle" style="display:none" aria-label="Parent settings">🔒</button>
   </div>
 
   <!-- Jar -->
@@ -1981,45 +2091,45 @@
     <div class="jar-hint" id="jarHint"></div>
   </div>
 
-  <!-- This week: sun and moon slots per day, a book on school days. Drawn SVG, filled when earned. -->
-  <div class="week-section">
-    <div class="week-row" id="weekRow"></div>
-    <div class="week-caption" id="weekCaption"></div>
+  <div class="daily-routines">
+  <div class="rest-day" id="restDay" hidden>
+    <h2>Rest day</h2>
+    <p>No routines today. Your stars and streak are safe.</p>
   </div>
 
   <!-- Morning -->
   <div class="routine-block" id="morningBlock">
-    <div class="routine-header" onclick="toggleRoutine('morning')">
+    <button type="button" class="routine-header" onclick="toggleRoutine('morning')" aria-expanded="true" aria-controls="morningTasks">
       <div class="routine-icon morning">☀️</div>
       <div class="routine-titlegroup">
         <div class="routine-title">Morning</div>
         <div class="routine-target"><span class="rt-pre">by</span><span class="rt-time" id="rtMorning"></span></div>
       </div>
       <div class="routine-progress" id="morningProgress">0/5</div>
-      <span class="routine-chevron">▾</span>
-    </div>
-    <div class="routine-state" id="morningState"></div>
+      <span class="routine-chevron" aria-hidden="true">▾</span>
+    </button>
     <ul class="task-list" id="morningTasks"></ul>
+    <div class="routine-state" id="morningState"></div>
   </div>
 
   <!-- Bedtime -->
   <div class="routine-block" id="bedtimeBlock">
-    <div class="routine-header" onclick="toggleRoutine('bedtime')">
+    <button type="button" class="routine-header" onclick="toggleRoutine('bedtime')" aria-expanded="true" aria-controls="bedtimeTasks">
       <div class="routine-icon bedtime">🌙</div>
       <div class="routine-titlegroup">
         <div class="routine-title">Bedtime</div>
         <div class="routine-target"><span class="rt-pre">by</span><span class="rt-time" id="rtBedtime"></span></div>
       </div>
       <div class="routine-progress" id="bedtimeProgress">0/5</div>
-      <span class="routine-chevron">▾</span>
-    </div>
-    <div class="routine-state" id="bedtimeState"></div>
+      <span class="routine-chevron" aria-hidden="true">▾</span>
+    </button>
     <ul class="task-list" id="bedtimeTasks"></ul>
+    <div class="routine-state" id="bedtimeState"></div>
   </div>
 
   <!-- School (the witnessed academic check): shown on school days only -->
   <div class="routine-block" id="academicBlock" style="display:none">
-    <div class="routine-header" onclick="toggleRoutine('academic')">
+    <button type="button" class="routine-header" onclick="toggleRoutine('academic')" aria-expanded="true" aria-controls="academicTasks">
       <div class="routine-icon academic">
         <svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true">
           <path d="M12 5.6 C10 3.8 6.6 3.4 3.6 4.1 L3.6 18 C6.6 17.3 10 17.7 12 19.5 C14 17.7 17.4 17.3 20.4 18 L20.4 4.1 C17.4 3.4 14 3.8 12 5.6 Z" fill="#FFFDF8" stroke="#6A9B53" stroke-width="1.4" stroke-linejoin="round"/>
@@ -2030,26 +2140,30 @@
         <div class="routine-title">School</div>
       </div>
       <div class="routine-progress" id="academicProgress">0/2</div>
-      <span class="routine-chevron">▾</span>
-    </div>
-    <div class="routine-state" id="academicState"></div>
+      <span class="routine-chevron" aria-hidden="true">▾</span>
+    </button>
     <ul class="task-list" id="academicTasks"></ul>
+    <div class="routine-state" id="academicState"></div>
   </div>
-</div>
+  </div>
+  <!-- This week: sun and moon slots per day, a book on school days. Drawn SVG, filled when earned. -->
+  <div class="week-section">
+    <div class="week-row" id="weekRow"></div>
+    <div class="week-caption" id="weekCaption"></div>
+  </div>
 
-<!-- Parent Zone Toggle -->
-<div class="parent-zone-toggle" id="parentToggle" style="display:none;">🔒</div>
+</div>
 
 <!-- Parent Overlay -->
 <div class="parent-overlay" id="parentOverlay">
-  <div class="parent-panel" id="parentPanel"></div>
+  <div class="parent-panel" id="parentPanel" role="dialog" aria-modal="true" aria-label="Parent tools" tabindex="-1"></div>
 </div>
 
 <!-- Completion toast -->
 <div class="toast" id="toast"></div>
 
 <!-- Celebration -->
-<div class="celebration" id="celebration">
+<div class="celebration" id="celebration" role="dialog" aria-modal="true" aria-labelledby="celebTitle" aria-describedby="celebText" tabindex="-1">
   <div class="celebration-icon" id="celebIcon"></div>
   <h2 id="celebTitle"></h2>
   <p id="celebText"></p>
@@ -2471,12 +2585,14 @@ function applyLivingClock() {
   maybeRefresh();
 }
 setInterval(applyLivingClock, 60000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) applyLivingClock(); });
+window.addEventListener('pageshow', applyLivingClock);
 
 // Once a minute: if the day rolled over, or a backstop just passed and the hard cut has
 // something to say, refresh the screen so the wipe is discovered without an interaction.
 function maybeRefresh() {
   const app = document.getElementById('app');
-  if (!app || app.style.display === 'none' || _drainRunning) return;
+  if (!app || !app.classList.contains('is-visible') || _drainRunning || Date.now() < _jarEntranceUntil) return;
   const overlayUp = document.getElementById('parentOverlay').style.display === 'block'
     || document.getElementById('celebration').classList.contains('show');
   if (overlayUp) return;
@@ -2510,6 +2626,7 @@ function defaultSettings() {
     times: clone(DEFAULT_TIMES),
     milestones: clone(DEFAULT_MILESTONES),   // legacy field, unused by v5
     countingDays: DEFAULT_COUNTING_DAYS.slice(),
+    restDays: [0],
     jarPayout: 10,
     treatLabel: 'Your choice of a treat',
     witness: true,
@@ -2712,7 +2829,7 @@ function ensureToday(state) {
   if (typeof state.jarsSeen !== 'number') state.jarsSeen = 0;
   if (typeof state.wipeSeenId !== 'string') state.wipeSeenId = '';
   if (typeof state.treatSeenId !== 'string') state.treatSeenId = '';
-  if (!Array.isArray(s.countingDays) || !s.countingDays.length) s.countingDays = DEFAULT_COUNTING_DAYS.slice();
+  if (!Array.isArray(s.countingDays) || (!s.countingDays.length && (!Array.isArray(s.restDays) || s.restDays.length !== 7))) s.countingDays = DEFAULT_COUNTING_DAYS.slice();
   // Per-date counting-day log, so Settings edits apply going forward only.
   if (!Array.isArray(state.countingLog) || !state.countingLog.length) {
     state.countingLog = [{ from: state.epoch || getToday(), days: s.countingDays.slice() }];
@@ -2755,6 +2872,12 @@ function ensureToday(state) {
     }
     s.countingVersion = COUNTING_VERSION;
   }
+  // Start recurring rest from this update, never reinterpret earlier optional days.
+  if (!Array.isArray(s.restDays)) s.restDays = [0, 1, 2, 3, 4, 5, 6].filter(d => !s.countingDays.includes(d));
+  s.restDays = [...new Set(s.restDays.filter(d => Number.isInteger(d) && d >= 0 && d <= 6))].sort((a, b) => a - b);
+  if (!Array.isArray(state.restLog) || !state.restLog.length) {
+    state.restLog = [{ from: getToday(), days: s.restDays.slice() }];
+  }
   if (typeof s.jarPayout !== 'number' || !(s.jarPayout > 0)) s.jarPayout = 10;
   if (typeof s.treatLabel !== 'string' || !s.treatLabel.trim()) s.treatLabel = 'Your choice of a treat';
   if (typeof s.witness !== 'boolean') s.witness = true;
@@ -2793,6 +2916,20 @@ function countingDaysFor(k, state) {
 function isCountingDay(k, state) {
   return countingDaysFor(k, state).includes(parseKey(k).getDay());
 }
+function restDaysFor(k, state) {
+  let days = [];
+  for (const entry of (state.restLog || [])) {
+    if (entry.from > k) break;
+    days = entry.days;
+  }
+  return days;
+}
+function isScheduledRestDay(k, state) {
+  return restDaysFor(k, state).includes(parseKey(k).getDay());
+}
+function isRestDay(k, state) {
+  return !!(state.days[k] && state.days[k].paused) || isScheduledRestDay(k, state);
+}
 function backstopMs(k, hhmm) {
   const d = parseKey(k);
   const [h, m] = String(hhmm || '').split(':').map(Number);
@@ -2805,7 +2942,7 @@ function backstopMs(k, hhmm) {
 function timeChangeSafeToday(state, newTimes) {
   const today = getToday();
   const day = state.days && state.days[today];
-  if (!day || day.paused || today === state.epoch || !isCountingDay(today, state)) return true;
+  if (!day || isRestDay(today, state) || today === state.epoch || !isCountingDay(today, state)) return true;
   const now = Date.now();
   for (const w of ['morning', 'bedtime']) {
     if (day.checks && day.checks[w]) continue;            // already banked, nothing to lose
@@ -2828,7 +2965,7 @@ function replayModel(state, nowMs) {
     const k = dateKey(d);
     const day = state.days[k];
     const counting = isCountingDay(k, state);
-    const paused = !!(day && day.paused);
+    const paused = isRestDay(k, state);
     const isToday = (k === today);
     const halves = [['morning', s.times.morning, ':1'], ['bedtime', s.times.bedtime, ':2']];
     for (const [which, t, seq] of halves) {
@@ -2910,6 +3047,9 @@ function launchApp() {
 
 // Module state read by render() on load — declared before INIT to avoid a temporal-dead-zone error.
 let appMuted = false;
+const modalReturnFocus = new Map();
+let _jarEntranceUntil = 0;
+let routineCompleted = { morning: false, bedtime: false, academic: false };
 let routineToggled = { morning: null, bedtime: null, academic: null }; // null = auto (by time); else explicit open/closed
 let _drainRunning = false;    // true while the somber jar drain is playing
 let _renderedDay = null;      // day key last rendered, so the minute tick can catch midnight rollover
@@ -2965,7 +3105,7 @@ if (existingState) {
 function showApp(state) {
   document.getElementById('onboarding').style.display = 'none';
   const app = document.getElementById('app');
-  app.style.display = 'flex';
+  app.classList.add('is-visible');
   document.getElementById('parentToggle').style.display = 'flex';
   render(state);
   seedDailyAmbience();
@@ -2974,6 +3114,7 @@ function showApp(state) {
 
 function render(state) {
   const today = getToday();
+  if (_renderedDay && _renderedDay !== today) routineToggled = { morning: null, bedtime: null, academic: null };
   _renderedDay = today;
   const dayState = state.days[today];
   const checks = dayState.checks || { morning: false, bedtime: false };
@@ -3002,16 +3143,23 @@ function render(state) {
 
   // A routine with no tasks is hidden entirely; the School card shows on school days only
   const aDefs = defs.academic || [];
-  const schoolToday = isCountingDay(today, state) && !dayState.noSchool && aDefs.length > 0;
+  const restToday = isRestDay(today, state);
+  document.getElementById('restDay').hidden = !restToday;
+  const schoolToday = !restToday && isCountingDay(today, state) && !dayState.noSchool && aDefs.length > 0;
   _schoolTodayFlag = schoolToday;
-  setRoutineVisible('morning', defs.morning.length > 0);
-  setRoutineVisible('bedtime', defs.bedtime.length > 0);
+  setRoutineVisible('morning', !restToday && defs.morning.length > 0);
+  setRoutineVisible('bedtime', !restToday && defs.bedtime.length > 0);
   setRoutineVisible('academic', schoolToday);
 
   // Tasks. A routine locks once its drop is recorded (earned or late); School locks once checked.
   const mLocked = checks.morning || !!(dayState.drop && dayState.drop.morning);
   const bLocked = checks.bedtime || !!(dayState.drop && dayState.drop.bedtime);
   const aDone = !!(dayState.academic && dayState.academic.done);
+  for (const [routine, done] of Object.entries({ morning: mLocked, bedtime: bLocked, academic: aDone })) {
+    if (done && !routineCompleted[routine]) routineToggled[routine] = null;
+    routineCompleted[routine] = done;
+    document.getElementById(routine + 'Block').classList.toggle('completed', done);
+  }
   renderTaskList('morningTasks', defs.morning, dayState, 'morningProgress', mLocked);
   renderTaskList('bedtimeTasks', defs.bedtime, dayState, 'bedtimeProgress', bLocked);
   if (schoolToday) renderTaskList('academicTasks', aDefs, dayState, 'academicProgress', aDone);
@@ -3160,7 +3308,7 @@ function renderWeekRow(state) {
     const counting = isCountingDay(k, state);
     const future = k > today;
     const preEpoch = k < (state.epoch || today);   // days before the app's rules existed
-    const paused = !!(day && day.paused);
+    const paused = isRestDay(k, state);
     const noSchool = !!(day && day.noSchool);
     const m = !!(day && day.checks && day.checks.morning);
     const e = !!(day && day.checks && day.checks.bedtime);
@@ -3174,14 +3322,14 @@ function renderWeekRow(state) {
       slots = weekGlyph('sun', m, (!counting || preEpoch) && !m) + weekGlyph('moon', e, (!counting || preEpoch) && !e) +
         (counting && !noSchool && !preEpoch ? weekGlyph('book', a, false) : '');
     }
-    html += `<div class="wk-day${k === today ? ' today' : ''}${future ? ' future' : ''}"><span class="wk-letter">${letters[i]}</span>${slots}</div>`;
+    html += `<div class="wk-day${k === today ? ' today' : ''}${future ? ' future' : ''}" aria-label="${k}${paused ? ', rest day' : ''}"><span class="wk-letter">${letters[i]}</span>${slots}</div>`;
   }
   row.innerHTML = html;
   const cap = document.getElementById('weekCaption');
   if (cap) {
     const n = state.streak || 0;
     const next = (Math.floor(n / TREAT_EVERY) + 1) * TREAT_EVERY;
-    cap.textContent = n > 0 ? `${n} in a row. Treat pick at ${next}!` : 'Both stars every day grows your streak.';
+    cap.textContent = isRestDay(today, state) ? 'Rest today. Your streak stays safe.' : n > 0 ? `${n} in a row. Treat pick at ${next}!` : 'Both stars every day grows your streak.';
   }
 }
 
@@ -3200,7 +3348,7 @@ function renderTaskList(containerId, tasks, dayState, progressId, disabled) {
   container.innerHTML = tasks.map(task => {
     const checked = dayState.tasks[task.id];
     return `
-      <li class="task-item ${checked ? 'done' : ''}${disabled ? ' locked' : ''}" data-task="${task.id}" onclick="${disabled ? '' : `toggleTask('${task.id}', this)`}">
+      <li class="task-item ${checked ? 'done' : ''}${disabled ? ' locked' : ''}" data-task="${task.id}" role="checkbox" aria-checked="${checked}" aria-disabled="${disabled}" tabindex="${disabled ? '-1' : '0'}" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();this.click()}" onclick="${disabled ? '' : `toggleTask('${task.id}', this)`}">
         <div class="task-checkbox ${checked ? 'checked' : ''}">
           <span class="check-icon">✓</span>
         </div>
@@ -3215,6 +3363,7 @@ function toggleTask(taskId, el) {
   const state = ensureToday(loadState());
   const today = getToday();
   const ds = state.days[today];
+  if (isRestDay(today, state)) return;
   const defs = ds.taskDefs;
   const which = defs.morning.some(t => t.id === taskId) ? 'morning'
     : defs.bedtime.some(t => t.id === taskId) ? 'bedtime' : 'academic';
@@ -3355,12 +3504,16 @@ function currentRoutineAt(h) {
   return 'bedtime';
 }
 function isRoutineOpen(r) {
-  return routineToggled[r] !== null ? routineToggled[r] : (currentRoutine() === r);
+  return routineToggled[r] !== null ? routineToggled[r] : (!routineCompleted[r] && currentRoutine() === r);
 }
 function applyForegrounding() {
   ['morning', 'bedtime', 'academic'].forEach(r => {
     const block = document.getElementById(r + 'Block');
-    if (block) block.classList.toggle('deemph', !isRoutineOpen(r));
+    if (block) {
+      const open = isRoutineOpen(r);
+      block.classList.toggle('deemph', !open);
+      block.querySelector('.routine-header').setAttribute('aria-expanded', String(open));
+    }
   });
 }
 function toggleRoutine(r) {
@@ -3466,6 +3619,7 @@ function openDrop(which) {
   if (_drainRunning) return;
   const state = ensureToday(loadState());
   const day = state.days[getToday()];
+  if (isRestDay(getToday(), state)) return;
   if ((day.checks && day.checks[which]) || (day.drop && day.drop[which])) return;
   _pendingDrop = { which, tapAt: Date.now(), day: getToday() };
   resetCelebrationUI();
@@ -3473,11 +3627,16 @@ function openDrop(which) {
   const icon = document.getElementById('celebIcon');
   icon.innerHTML = sealedNoteSvg();
   icon.classList.add('tappable');
+  icon.setAttribute('role', 'button');
+  icon.setAttribute('tabindex', '0');
+  icon.setAttribute('aria-label', 'Open the note');
+  icon.onkeydown = (event) => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); icon.click(); } };
   icon.onclick = () => unfoldDadNote(note, which);
   document.getElementById('celebTitle').textContent = 'A note from Dad & Mom';
   document.getElementById('celebText').textContent = 'Tap the star to open it';
   document.querySelector('.celebration-close').textContent = 'Not yet';
-  document.getElementById('celebration').classList.add('show');
+  document.querySelector('.celebration-close').classList.add('secondary');
+  showCelebration();
 }
 
 // The School check is ALWAYS witnessed: the witness toggle covers only the star drops.
@@ -3486,6 +3645,7 @@ function openAcademicCheck() {
   if (_drainRunning) return;
   const state = ensureToday(loadState());
   const day = state.days[getToday()];
+  if (isRestDay(getToday(), state)) return;
   if (day.academic && day.academic.done) return;
   _pendingAcademic = getToday();
   openPin('academic');
@@ -3495,6 +3655,10 @@ function unfoldDadNote(note, mode) {
   const icon = document.getElementById('celebIcon');
   icon.onclick = null;
   icon.classList.remove('tappable');
+  icon.removeAttribute('role');
+  icon.removeAttribute('tabindex');
+  icon.removeAttribute('aria-label');
+  icon.onkeydown = null;
   const sealed = icon.querySelector('.sealed-note-svg');
   if (sealed) sealed.classList.add('unfolding');
   buzz(12);
@@ -3531,6 +3695,7 @@ function unfoldDadNote(note, mode) {
       action.disabled = false;
       action.textContent = doneLabel;
     }, 500);
+    syncModalAccess();
   }, beat);
 }
 
@@ -3547,8 +3712,9 @@ function openPin(mode) {
     mode === 'parent' ? 'Enter the grown-up code' : 'Ask a grown-up to enter the code';
   document.getElementById('pinPad').style.display = 'flex';
   document.querySelector('.celebration-close').textContent = 'Cancel';
+  document.querySelector('.celebration-close').classList.add('secondary');
   renderPinDots();
-  document.getElementById('celebration').classList.add('show');
+  showCelebration();
 }
 
 function renderPinDots() {
@@ -3607,6 +3773,7 @@ function finishDrop(which, t) {
     return;
   }
   const day = state.days[today];
+  if (isRestDay(today, state)) { closeCelebration(); render(state); return; }
   if ((day.checks && day.checks[which]) || (day.drop && day.drop[which])) { closeCelebration(); return; }
   const late = t > backstopMs(today, state.settings.times[which]);
   if (!day.drop) day.drop = {};
@@ -3633,7 +3800,7 @@ function showSlipAway(state, which) {
   document.getElementById('celebText').textContent =
     `It was past ${formatTime(target)}. Tomorrow is a brand new start, ${state.name}.`;
   document.querySelector('.celebration-close').textContent = 'Okay';
-  document.getElementById('celebration').classList.add('show');
+  showCelebration();
   chimeSomber();
   buzz(30);
   const svg = icon.querySelector('svg');
@@ -3715,6 +3882,7 @@ function showStarCelebration(state, which) {
     chimeRoutine();
     buzz([20, 30, 20]);
   }
+  syncModalAccess();
 }
 
 
@@ -3739,6 +3907,7 @@ function finishAcademic(t) {
     return;
   }
   const day = state.days[getToday()];
+  if (isRestDay(getToday(), state)) { closeCelebration(); render(state); return; }
   if (day.academic && day.academic.done) { closeCelebration(); return; }
   day.academic = { done: t, granted: false };
   syncDerived(state);
@@ -3749,7 +3918,7 @@ function finishAcademic(t) {
   document.getElementById('celebTitle').textContent = 'School is done!';
   document.getElementById('celebText').textContent = `All your blocks are finished, ${state.name}.`;
   document.querySelector('.celebration-close').textContent = 'Yay!';
-  document.getElementById('celebration').classList.add('show');
+  showCelebration();
   chimeRoutine();
   buzz([20, 30]);
 }
@@ -3763,7 +3932,7 @@ function showJarComplete(name, payout) {
   document.getElementById('celebText').textContent =
     `Ten stars${name ? ', ' + name : ''}! That is $${payout} for you. A fresh jar starts now.`;
   document.querySelector('.celebration-close').textContent = 'Yay! ⭐';
-  document.getElementById('celebration').classList.add('show');
+  showCelebration();
   spawnConfetti(STAR_CONFETTI);
   chimeDay();
   buzz([30, 40, 30, 40, 70]);
@@ -3777,7 +3946,7 @@ function showTreat(streakVal, label) {
   document.getElementById('celebText').textContent =
     `You earned a treat pick: ${label || 'your choice of a treat'}. Tell a grown-up!`;
   document.querySelector('.celebration-close').textContent = 'Yay!';
-  document.getElementById('celebration').classList.add('show');
+  showCelebration();
   spawnConfetti(STAR_CONFETTI);
   chimeDay();
   buzz([30, 40, 30]);
@@ -3840,7 +4009,7 @@ function showBirthday(name) {
   document.getElementById('celebTitle').textContent = `Happy Birthday${name ? ', ' + name : ''}! 🎉`;
   document.getElementById('celebText').textContent = 'Hope your day is full of stars.';
   document.querySelector('.celebration-close').textContent = 'Yay! 🎈';
-  document.getElementById('celebration').classList.add('show');
+  showCelebration();
   spawnConfetti(['#FFD700', '#FFC83C', '#FFE488', '#8BBE72', '#C9B6EC', '#F2762E', '#FFFFFF']);
   chimeDay();
   buzz([30, 40, 30, 40, 70]);
@@ -4193,34 +4362,128 @@ function renderJarShelf(state) {
 // treat picks at every 5, and the kid-facing record is the this-week row.)
 
 // ═══════ PARENT ZONE ═══════
+function activeDialog() {
+  const celebration = document.getElementById('celebration');
+  if (celebration.classList.contains('show')) return celebration;
+  return document.getElementById('parentOverlay').style.display === 'block'
+    ? document.getElementById('parentPanel') : null;
+}
+
+function dialogControls(dialog) {
+  return [...dialog.querySelectorAll('button:not(:disabled), input:not(:disabled), textarea:not(:disabled), select:not(:disabled), a[href], [tabindex]:not([tabindex="-1"])')]
+    .filter(el => el.tabIndex >= 0 && !el.closest('[inert]') && el.getClientRects().length && getComputedStyle(el).visibility !== 'hidden');
+}
+
+function syncModalAccess(preferred) {
+  const dialog = activeDialog();
+  document.getElementById('app').inert = !!dialog;
+  document.getElementById('onboarding').inert = !!dialog;
+  document.getElementById('parentOverlay').inert = dialog === document.getElementById('celebration');
+  const controls = dialog ? dialogControls(dialog) : [];
+  const usable = el => el && el.isConnected && !el.closest('[inert]') && el.getClientRects().length && (!dialog || dialog.contains(el));
+  if (usable(preferred)) preferred.focus({ preventScroll: true });
+  else if (dialog && !controls.includes(document.activeElement)) (controls[0] || dialog).focus({ preventScroll: true });
+  else if (!dialog && !usable(document.activeElement)) document.getElementById('parentToggle').focus({ preventScroll: true });
+}
+
+function showCelebration() {
+  const dialog = document.getElementById('celebration');
+  if (!dialog.classList.contains('show')) modalReturnFocus.set(dialog, document.activeElement);
+  dialog.classList.add('show');
+  syncModalAccess();
+}
+
+document.addEventListener('keydown', e => {
+  const dialog = activeDialog();
+  if (!dialog) return;
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    e.stopPropagation();
+    if (dialog.id === 'celebration') closeCelebration();
+    else closeParentZone();
+    return;
+  }
+  if (e.key !== 'Tab') return;
+  const controls = dialogControls(dialog);
+  const at = controls.indexOf(document.activeElement);
+  if (!controls.length || (e.shiftKey ? at <= 0 : at === controls.length - 1 || at < 0)) {
+    e.preventDefault();
+    (controls.length ? controls[e.shiftKey ? controls.length - 1 : 0] : dialog).focus();
+  }
+}, true);
+document.addEventListener('focusin', e => {
+  const dialog = activeDialog();
+  if (dialog && !dialog.contains(e.target)) syncModalAccess();
+});
+
 const parentToggle = document.getElementById('parentToggle');
 // A single tap opens the PIN prompt; the correct PIN reveals the dashboard.
-// (It sits outside the .app container, so it needs its own guard during the drain.)
+// Keep the explicit guard while the jar drain owns the screen.
 parentToggle.addEventListener('click', () => { if (_drainRunning) return; openPin('parent'); });
 
 let pzMonth = null;     // first-of-month Date shown in the calendar
 let pzSelected = null;  // currently selected day key, or null
-let pzView = 'dashboard';   // 'dashboard' | 'settings'
-let settingsDraft = null;   // working copy while the Settings form is open
+let pzView = 'dashboard';   // 'dashboard' | 'review' | 'settings'
+let settingsDraft = null;   // unsaved edits survive tabs and closing for this page session
+let settingsBaseline = '';
+const pzScroll = {};
+
+function resetSettingsDraft(state) {
+  settingsDraft = clone(state.settings);
+  settingsDraft._name = state.name || '';
+  settingsBaseline = JSON.stringify(settingsDraft);
+}
+
+function settingsDirty() {
+  return !!settingsDraft && JSON.stringify(settingsDraft) !== settingsBaseline;
+}
+
+function updateSettingsDirty() {
+  const dirty = settingsDirty();
+  const status = document.getElementById('setDirty');
+  const save = document.getElementById('setSave');
+  const discard = document.getElementById('setDiscard');
+  const tab = document.getElementById('pzSettingsTab');
+  const msg = document.getElementById('setMsg');
+  if (status) status.textContent = dirty ? 'Unsaved changes' : 'All changes saved';
+  if (save) save.disabled = !dirty;
+  if (discard) discard.hidden = !dirty;
+  if (dirty && msg) msg.textContent = '';
+  if (tab) {
+    tab.classList.toggle('has-draft', dirty);
+    tab.setAttribute('aria-label', dirty ? 'Settings, unsaved changes' : 'Settings');
+  }
+}
+
+function discardSettingsDraft() {
+  resetSettingsDraft(ensureToday(loadState()));
+  applyTheme(settingsDraft.theme || 'auto');
+  renderParentPanel();
+}
 
 function openParentZone() {
+  clearTimeout(_toastTimer);
+  document.getElementById('toast').classList.remove('show');
   const t = new Date();
   pzMonth = new Date(t.getFullYear(), t.getMonth(), 1);
   pzSelected = getToday();
   pzView = 'dashboard';
+  modalReturnFocus.set(document.getElementById('parentPanel'), document.activeElement);
   document.getElementById('parentOverlay').style.display = 'block';
   renderParentPanel();
 }
 
 function pzSwitch(view) {
+  if (view === pzView) return;
   pzView = view;
   if (view === 'settings') {
     const st = ensureToday(loadState());
-    settingsDraft = clone(st.settings);
-    settingsDraft._name = st.name || '';   // the kid's name rides the draft, stored on state at save
+    if (!settingsDraft || !settingsDirty()) resetSettingsDraft(st);
+    applyTheme(settingsDraft.theme || 'auto');
   }
   else { const s = loadState(); applyTheme((s && s.settings && s.settings.theme) || 'auto'); }  // drop unsaved theme preview
   renderParentPanel();
+  document.querySelector('.pz-tab.active')?.focus();
 }
 
 function renderParentPanel() {
@@ -4230,19 +4493,49 @@ function renderParentPanel() {
   const state = ensureToday(loadState());
   syncDerived(state);
   saveState(state);
+  if (pzView === 'settings' && !settingsDraft) resetSettingsDraft(state);
+
+  const panel = document.getElementById('parentPanel');
+  const previous = panel.querySelector('.pz-content');
+  if (previous) pzScroll[previous.dataset.view] = previous.scrollTop;
 
   const tabs = `
-    <div class="pz-tabs">
-      <button class="pz-tab ${pzView === 'dashboard' ? 'active' : ''}" onclick="pzSwitch('dashboard')">📅 Dashboard</button>
-      <button class="pz-tab ${pzView === 'review' ? 'active' : ''}" onclick="pzSwitch('review')">📋 Review</button>
-      <button class="pz-tab ${pzView === 'settings' ? 'active' : ''}" onclick="pzSwitch('settings')">⚙️ Settings</button>
+    <div class="pz-tabs" role="tablist" aria-label="Parent tools">
+      <button id="pzDashboardTab" class="pz-tab ${pzView === 'dashboard' ? 'active' : ''}" role="tab" aria-controls="pzContent" aria-selected="${pzView === 'dashboard'}" tabindex="${pzView === 'dashboard' ? '0' : '-1'}" onclick="pzSwitch('dashboard')">Dashboard</button>
+      <button id="pzReviewTab" class="pz-tab ${pzView === 'review' ? 'active' : ''}" role="tab" aria-controls="pzContent" aria-selected="${pzView === 'review'}" tabindex="${pzView === 'review' ? '0' : '-1'}" onclick="pzSwitch('review')">Review</button>
+      <button id="pzSettingsTab" class="pz-tab ${pzView === 'settings' ? 'active' : ''}" role="tab" aria-controls="pzContent" aria-selected="${pzView === 'settings'}" tabindex="${pzView === 'settings' ? '0' : '-1'}" onclick="pzSwitch('settings')">Settings</button>
     </div>`;
   const body = pzView === 'settings' ? renderSettingsForm()
     : pzView === 'review' ? renderReview(state)
     : renderDashboard(state);
-  document.getElementById('parentPanel').innerHTML =
-    `<button class="close-parent" onclick="closeParentZone()">✕</button>` + tabs + body;
+  panel.classList.toggle('has-settings', pzView === 'settings');
+  panel.innerHTML = `<div class="pz-toolbar">${tabs}<button class="close-parent" aria-label="Close parent tools" onclick="closeParentZone()">✕</button></div>` +
+    `<div class="pz-content" id="pzContent" role="tabpanel" aria-labelledby="pz${pzView[0].toUpperCase() + pzView.slice(1)}Tab" data-view="${pzView}">${body}</div>` +
+    (pzView === 'settings' ? `<div class="set-savebar">
+      <div class="set-save-status"><span class="set-dirty" id="setDirty" role="status"></span><button class="set-discard" id="setDiscard" onclick="discardSettingsDraft()">Discard changes</button></div>
+      <div class="set-msg" id="setMsg" role="status" aria-live="polite"></div>
+      <button class="set-save" id="setSave" onclick="saveSettings()">Save settings</button>
+    </div>` : '');
+  panel.querySelector('.pz-content').scrollTop = pzScroll[pzView] || 0;
+  updateSettingsDirty();
+  syncModalAccess();
 }
+
+document.getElementById('parentPanel').addEventListener('input', updateSettingsDirty);
+document.getElementById('parentPanel').addEventListener('change', updateSettingsDirty);
+document.getElementById('parentPanel').addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeParentZone(); return; }
+  if (!e.target.matches('.pz-tab')) return;
+  const tabs = [...document.querySelectorAll('.pz-tab')];
+  let next = tabs.indexOf(e.target);
+  if (e.key === 'ArrowRight') next = (next + 1) % tabs.length;
+  else if (e.key === 'ArrowLeft') next = (next + tabs.length - 1) % tabs.length;
+  else if (e.key === 'Home') next = 0;
+  else if (e.key === 'End') next = tabs.length - 1;
+  else return;
+  e.preventDefault();
+  tabs[next].click();
+});
 
 // ── Weekly review: a plain 7-day table per kid, no featured KPI. All auto-recorded. ──
 function _clock(ts) {
@@ -4262,7 +4555,7 @@ function renderReview(state) {
     const preEpoch = k < (state.epoch || today);   // days before the new rules: never a false miss
     const label = d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
     const half = (which) => {
-      if (day && day.paused) return '<span class="rv-dim">paused</span>';
+      if (isRestDay(k, state)) return '<span class="rv-dim">rest</span>';
       const earned = !!(day && day.checks && day.checks[which]);
       const drop = day && day.drop && day.drop[which];
       const grant = day && day.grant && day.grant[which];
@@ -4274,8 +4567,8 @@ function renderReview(state) {
       return counting ? '<span class="rv-miss">missed</span>' : '<span class="rv-dim">leeway</span>';
     };
     const school = () => {
+      if (isRestDay(k, state)) return '<span class="rv-dim">rest</span>';
       if (!counting || preEpoch) return '<span class="rv-dim">·</span>';
-      if (day && day.paused) return '<span class="rv-dim">paused</span>';
       if (day && day.noSchool) return '<span class="rv-dim">no school</span>';
       const a = day && day.academic;
       if (a && a.done) return `<span class="rv-earned">${a.granted ? 'granted' : _clock(a.done)}</span>`;
@@ -4372,13 +4665,15 @@ function renderSettingsForm() {
       <div class="set-tasks">
         ${arr.map((t, i) => `
           <div class="set-task-row">
-            <span class="set-move-col">
-              <button class="set-move" onclick="moveTask('${routine}',${i},-1)" ${i === 0 ? 'disabled' : ''} aria-label="Move up">▲</button>
-              <button class="set-move" onclick="moveTask('${routine}',${i},1)" ${i === arr.length - 1 ? 'disabled' : ''} aria-label="Move down">▼</button>
-            </span>
-            <input class="set-emoji" value="${escapeHtml(t.emoji)}" maxlength="4" oninput="setTaskField('${routine}',${i},'emoji',this.value)">
-            <input class="set-label" value="${escapeHtml(t.label)}" maxlength="28" placeholder="Task name" oninput="setTaskField('${routine}',${i},'label',this.value)">
-            <button class="set-remove" onclick="removeTask('${routine}',${i})" aria-label="Remove">✕</button>
+            <textarea class="set-label" rows="2" maxlength="28" placeholder="Task name" aria-label="${label} task ${i + 1} name" oninput="setTaskField('${routine}',${i},'label',this.value)">${escapeHtml(t.label)}</textarea>
+            <div class="set-task-tools">
+              <input class="set-emoji" value="${escapeHtml(t.emoji)}" maxlength="4" aria-label="${label} task ${i + 1} icon" oninput="setTaskField('${routine}',${i},'emoji',this.value)">
+              <span class="set-move-col">
+                <button class="set-move" onclick="moveTask('${routine}',${i},-1)" ${i === 0 ? 'disabled' : ''} aria-label="Move ${escapeHtml(t.label || 'task')} up">↑</button>
+                <button class="set-move" onclick="moveTask('${routine}',${i},1)" ${i === arr.length - 1 ? 'disabled' : ''} aria-label="Move ${escapeHtml(t.label || 'task')} down">↓</button>
+              </span>
+              <button class="set-remove" onclick="removeTask('${routine}',${i})" aria-label="Remove ${escapeHtml(t.label || 'task')}">✕</button>
+            </div>
           </div>`).join('')}
       </div>
       <button class="set-add" onclick="addTask('${routine}')">＋ Add task</button>
@@ -4387,8 +4682,8 @@ function renderSettingsForm() {
 
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
   const dayChips = dayNames.map((nm, i) => `
-    <button type="button" class="set-seg-btn ${(d.countingDays || []).includes(i) ? 'on' : ''}"
-      onclick="setCountingDay(${i})">${nm.slice(0, 2)}</button>`).join('');
+    <button type="button" class="set-seg-btn ${(d.restDays || []).includes(i) ? 'on' : ''}" aria-pressed="${(d.restDays || []).includes(i)}" aria-label="${nm} rest day"
+      onclick="setRestDay(${i})">${nm}</button>`).join('');
 
   return `
     <h2>Settings</h2>
@@ -4412,9 +4707,10 @@ function renderSettingsForm() {
       <label class="set-time"><span>🌙 Evening star by</span><input type="time" value="${escapeHtml(d.times.bedtime)}" oninput="setTime('bedtime',this.value)"></label>
     </div>
 
-    <div class="set-section-title">School and counting days</div>
-    <div class="date-label">These days show the School card and count for the streak. A half not checked off by the end of one of these days breaks the streak. The rest are leeway: earning helps, missing costs nothing.</div>
-    <div class="set-seg" role="group" aria-label="Counting days">${dayChips}</div>
+    <div class="set-section-title">Rest days</div>
+    <div class="date-label">Choose your days off. No routines or new stars. Rest days won’t break your streak or empty your jar. Other days follow your usual routine.</div>
+    <div class="set-seg rest-days-picker" role="group" aria-label="Rest days">${dayChips}</div>
+    <div class="date-label" style="margin-top:10px">Changes start today. Past days keep their schedule. For a one-off day off, choose a date on the Dashboard and tap Rest day.</div>
 
     <div class="set-section-title">Money and treats</div>
     <div class="set-times">
@@ -4446,8 +4742,6 @@ function renderSettingsForm() {
     <div class="date-label">Optional: a once-a-year celebration on this day. Leave blank to turn it off.</div>
     <label class="set-time"><span>🎂 Birthday</span><input type="date" value="${escapeHtml(d.birthday || '')}" oninput="setBirthday(this.value)"></label>
 
-    <div class="set-msg" id="setMsg"></div>
-    <button class="set-save" onclick="saveSettings()">Save settings</button>
   `;
 }
 
@@ -4457,9 +4751,9 @@ function setTime(which, val) { settingsDraft.times[which] = val; }
 function setKidName(val) { settingsDraft._name = val; }
 function setPayout(val) { settingsDraft.jarPayout = parseInt(val, 10); }
 function setTreatLabel(val) { settingsDraft.treatLabel = val; }
-function toggleWitness(btn) { settingsDraft.witness = settingsDraft.witness === false; btn.classList.toggle('on', settingsDraft.witness !== false); }
-function setCountingDay(i) {
-  const arr = Array.isArray(settingsDraft.countingDays) ? settingsDraft.countingDays : (settingsDraft.countingDays = DEFAULT_COUNTING_DAYS.slice());
+function toggleWitness(btn) { settingsDraft.witness = settingsDraft.witness === false; btn.classList.toggle('on', settingsDraft.witness !== false); updateSettingsDirty(); }
+function setRestDay(i) {
+  const arr = settingsDraft.restDays;
   const at = arr.indexOf(i);
   if (at >= 0) arr.splice(at, 1); else arr.push(i);
   arr.sort((a, b) => a - b);
@@ -4477,13 +4771,14 @@ function moveTask(routine, i, dir) {
   [arr[i], arr[j]] = [arr[j], arr[i]];
   renderParentPanel();
 }
-function toggleMute(btn) { settingsDraft.muted = !settingsDraft.muted; btn.classList.toggle('on', !settingsDraft.muted); }
+function toggleMute(btn) { settingsDraft.muted = !settingsDraft.muted; btn.classList.toggle('on', !settingsDraft.muted); updateSettingsDirty(); }
 // Live-preview the theme as the parent taps; persisted only on Save. An unsaved preview is
 // reverted to the saved theme when the panel closes or the tab switches away (see below).
 function setTheme(val, btn) {
   settingsDraft.theme = val;
   applyTheme(val);
   if (btn) { btn.parentElement.querySelectorAll('.set-seg-btn').forEach(b => b.classList.remove('on')); btn.classList.add('on'); }
+  updateSettingsDirty();
 }
 
 function setSettingsMsg(msg, ok) {
@@ -4492,7 +4787,7 @@ function setSettingsMsg(msg, ok) {
 }
 
 function saveSettings() {
-  const draft = settingsDraft;
+  const draft = clone(settingsDraft);
   // tidy tasks: trim labels, drop empty rows, default a missing emoji
   ['morning', 'bedtime', 'academic'].forEach(r => {
     draft.tasks[r] = (draft.tasks[r] || [])
@@ -4501,7 +4796,8 @@ function saveSettings() {
   });
   if (draft.tasks.morning.length === 0 || draft.tasks.bedtime.length === 0) { setSettingsMsg('Keep at least one task in each routine.'); return; }
   if (draft.tasks.academic.length === 0) { setSettingsMsg('Keep at least one school block.'); return; }
-  if (!Array.isArray(draft.countingDays) || draft.countingDays.length === 0) { setSettingsMsg('Keep at least one counting day.'); return; }
+  draft.restDays = [...new Set((draft.restDays || []).filter(d => Number.isInteger(d) && d >= 0 && d <= 6))].sort((a, b) => a - b);
+  draft.countingDays = [0, 1, 2, 3, 4, 5, 6].filter(d => !draft.restDays.includes(d));
   if (!(draft.jarPayout > 0) || draft.jarPayout > 999) { setSettingsMsg('Jar payout must be between 1 and 999.'); return; }
   draft.treatLabel = (draft.treatLabel || '').trim() || 'Your choice of a treat';
   const pin = (draft.pin || '').replace(/\D/g, '');
@@ -4516,6 +4812,13 @@ function saveSettings() {
   // replay never re-judges past days under rules that did not exist when they were lived.
   const oldDays = JSON.stringify(((state.settings && state.settings.countingDays) || []).slice().sort((a, b) => a - b));
   const newDays = JSON.stringify(draft.countingDays.slice().sort((a, b) => a - b));
+  const oldRest = JSON.stringify(state.settings.restDays || []);
+  if (oldRest !== JSON.stringify(draft.restDays)) {
+    const entry = { from: getToday(), days: draft.restDays.slice() };
+    const last = state.restLog[state.restLog.length - 1];
+    if (last && last.from === entry.from) state.restLog[state.restLog.length - 1] = entry;
+    else state.restLog.push(entry);
+  }
   state.settings = clone(draft);
   if (newName) state.name = newName;
   if (oldDays !== newDays) {
@@ -4530,8 +4833,7 @@ function saveSettings() {
   saveState(state);
   render(state);
 
-  settingsDraft = clone(state.settings);
-  settingsDraft._name = state.name || '';
+  resetSettingsDraft(state);
   renderParentPanel();           // rebuild form with the cleaned values
   setSettingsMsg('Saved! ✓', true);
 }
@@ -4560,10 +4862,12 @@ function buildCalendarCells(state, today) {
     const isFuture = k > today;
     let status = 'none';
     if (d) status = dayStarred(d) ? 'approved' : (((d.checks && (d.checks.morning || d.checks.bedtime)) || Object.values(d.tasks).some(Boolean)) ? 'partial' : 'none');
+    const rest = isRestDay(k, state);
+    if (rest) status = 'rest';
     const cls = ['pz-day', isFuture ? 'future' : status, k === today ? 'today' : '', k === pzSelected ? 'selected' : ''].filter(Boolean).join(' ');
     const click = isFuture ? '' : `onclick="pzSelect('${k}')"`;
-    const mark = (!isFuture && status === 'approved') ? `<span class="pz-star">★</span>` : '';
-    cells += `<div class="${cls}" ${click}><span class="pz-daynum">${day}</span>${mark}</div>`;
+    const mark = rest ? '<span class="pz-rest-mark" aria-hidden="true">Ⅱ</span>' : (!isFuture && status === 'approved') ? `<span class="pz-star">★</span>` : '';
+    cells += `<button type="button" class="${cls}" ${click} aria-label="${k}${rest ? ', rest day' : ''}" ${isFuture ? 'disabled' : ''}><span class="pz-daynum">${day}</span>${mark}</button>`;
   }
   return cells;
 }
@@ -4577,11 +4881,13 @@ function buildDayDetail(state, key, today) {
   const cm = !!(d && d.checks && d.checks.morning);
   const cb = !!(d && d.checks && d.checks.bedtime);
   const counting = isCountingDay(key, state);
-  const paused = !!(d && d.paused);
+  const paused = isRestDay(key, state);
+  const scheduledRest = isScheduledRestDay(key, state);
   const noSchool = !!(d && d.noSchool);
   const aDefs = defs.academic || [];
   const aDone = !!(d && d.academic && d.academic.done);
-  const allDefs = defs.morning.concat(defs.bedtime, aDefs);
+  const hasSchool = counting && !noSchool && !paused;
+  const allDefs = paused ? [] : defs.morning.concat(defs.bedtime, hasSchool ? aDefs : []);
   const done = allDefs.filter(t => tasks[t.id]).length;
   const rows = (list) => list.map(t => `
     <div class="pz-task ${tasks[t.id] ? 'done' : ''}" onclick="pzToggleTask('${key}','${t.id}')">
@@ -4615,19 +4921,20 @@ function buildDayDetail(state, key, today) {
     <div class="pz-day-detail">
       <div class="pz-detail-head">
         <div class="pz-detail-date">${label}${key === today ? ' · Today' : ''}</div>
-        <div class="pz-detail-count">${done}/${allDefs.length} done${counting ? '' : ' · leeway day'}</div>
+        <div class="pz-detail-count">${paused ? 'Rest day' : `${done}/${allDefs.length} done${counting ? '' : ' · optional day'}`}</div>
       </div>
-      ${defs.morning.length ? `<div class="pz-detail-grouplbl">☀️ Morning</div>${halfLine('morning')}${rows(defs.morning)}` : ''}
-      ${defs.bedtime.length ? `<div class="pz-detail-grouplbl">🌙 Bedtime</div>${halfLine('bedtime')}${rows(defs.bedtime)}` : ''}
-      ${aDefs.length && counting ? `<div class="pz-detail-grouplbl">📖 School</div>${rows(aDefs)}` : ''}
+      ${!paused && defs.morning.length ? `<div class="pz-detail-grouplbl">☀️ Morning</div>${halfLine('morning')}${rows(defs.morning)}` : ''}
+      ${!paused && defs.bedtime.length ? `<div class="pz-detail-grouplbl">🌙 Bedtime</div>${halfLine('bedtime')}${rows(defs.bedtime)}` : ''}
+      ${aDefs.length && hasSchool ? `<div class="pz-detail-grouplbl">📖 School</div>${rows(aDefs)}` : ''}
+      ${paused ? '<div class="date-label">No routines required. Stars already earned stay in the jar.</div>' : ''}
       <div class="pz-checks">
-        ${grantBtn('morning', 'Morning')}
-        ${grantBtn('bedtime', 'Evening')}
+        ${paused ? '' : grantBtn('morning', 'Morning')}
+        ${paused ? '' : grantBtn('bedtime', 'Evening')}
       </div>
       <div class="pz-checks">
-        ${counting ? academicBtn : ''}
-        <button class="pz-check-toggle ${paused ? 'on' : ''}" onclick="pzToggleFlag('${key}','paused')">${paused ? 'Paused ✓' : 'Pause day'}</button>
-        ${counting ? `<button class="pz-check-toggle ${noSchool ? 'on' : ''}" onclick="pzToggleFlag('${key}','noSchool')">${noSchool ? 'No school ✓' : 'No school'}</button>` : ''}
+        ${hasSchool ? academicBtn : ''}
+        <button class="pz-check-toggle ${paused ? 'on' : ''}" aria-pressed="${paused}" ${scheduledRest ? 'disabled' : `onclick="pzToggleFlag('${key}','paused')"`}>${scheduledRest ? 'Scheduled rest day' : paused ? 'Rest day ✓' : 'Rest day'}</button>
+        ${counting && !paused ? `<button class="pz-check-toggle ${noSchool ? 'on' : ''}" onclick="pzToggleFlag('${key}','noSchool')">${noSchool ? 'No school ✓' : 'No school'}</button>` : ''}
       </div>
     </div>`;
 }
@@ -4727,6 +5034,10 @@ function pzUndoPay() {
 function closeParentZone() {
   document.getElementById('parentOverlay').style.display = 'none';
   const s = loadState(); applyTheme((s && s.settings && s.settings.theme) || 'auto');  // revert any unsaved theme preview
+  const dialog = document.getElementById('parentPanel');
+  syncModalAccess(modalReturnFocus.get(dialog) || parentToggle);
+  modalReturnFocus.delete(dialog);
+  maybeRefresh();
 }
 
 document.getElementById('parentOverlay').addEventListener('click', (e) => {
@@ -4774,10 +5085,16 @@ function spawnConfetti(colors, opts) {
 // Reset the shared overlay to a clean base so claim / day-complete / PIN / star-earned
 // modes never leak UI into one another.
 function resetCelebrationUI() {
+  clearTimeout(_toastTimer);
+  document.getElementById('toast').classList.remove('show');
   if (dadNoteTimer) { clearInterval(dadNoteTimer); dadNoteTimer = null; }   // kill any running read-gate countdown
   if (dadNoteUnfoldTimer) { clearTimeout(dadNoteUnfoldTimer); dadNoteUnfoldTimer = null; }   // and any pending unfold beat
   const icon = document.getElementById('celebIcon');
   icon.classList.remove('tappable');
+  icon.removeAttribute('role');
+  icon.removeAttribute('tabindex');
+  icon.removeAttribute('aria-label');
+  icon.onkeydown = null;
   icon.onclick = null;                   // drop a pending sealed-note unfold handler
   document.getElementById('pinPad').style.display = 'none';
   document.getElementById('pinMsg').textContent = '';
@@ -4786,20 +5103,25 @@ function resetCelebrationUI() {
   action.disabled = false;
   action.onclick = null;                 // drop any dad-note/claim handler so it can't leak between modes
   document.querySelector('.celebration-close').textContent = 'Awesome! ⭐';
+  document.querySelector('.celebration-close').classList.remove('secondary');
   document.getElementById('celebration').querySelectorAll('.confetti-piece').forEach(p => p.remove());
 }
 
 function closeCelebration() {
-  document.getElementById('celebration').classList.remove('show');
+  const dialog = document.getElementById('celebration');
+  dialog.classList.remove('show');
   resetCelebrationUI();
   pinMode = null;
   pinEntry = '';
   _pendingDrop = null;       // an abandoned drop records nothing
   _pendingAcademic = null;   // likewise the school check
+  syncModalAccess(modalReturnFocus.get(dialog));
+  modalReturnFocus.delete(dialog);
   // a star banked while the overlay covered the jar, so let the kid watch it land now:
   // the arc-into-jar ceremony only plays behind a whole-day celebration (a carried half
   // can complete a visual star mid-morning; that gets the plain drop-in, not the arc)
   if (_jarFxQueued) {
+    _jarEntranceUntil = Date.now() + 1200;
     if (_pendingArcIndex !== null && _arcWholeOk) { const i = _pendingArcIndex; _pendingArcIndex = null; arcStarIntoJar(i); }
     else { _pendingArcIndex = null; playJarEntrances(); popJar(); }
   }
@@ -4809,7 +5131,7 @@ function closeCelebration() {
   // entrance animations have had their moment; render() only fires one moment per pass.
   setTimeout(() => {
     const app = document.getElementById('app');
-    if (!app || app.style.display === 'none' || _drainRunning) return;
+    if (!app || !app.classList.contains('is-visible') || _drainRunning) return;
     if (document.getElementById('celebration').classList.contains('show')) return;
     if (document.getElementById('parentOverlay').style.display === 'block') return;
     const s = loadState();
@@ -4820,7 +5142,7 @@ function closeCelebration() {
       || (s._lastWipeId && s._lastWipeId > (s.wipeSeenId || ''))
       || ((s.bankedJars || 0) > (s.jarsSeen || 0))
       || (s._lastTreat && s._lastTreat.id.slice(0, 10) > (s.treatSeenId || '').slice(0, 10));
-    if (pending) { saveState(s); render(s); }
+    if (pending || _renderedDay !== getToday()) { saveState(s); render(s); }
   }, 1200);
 }
 
