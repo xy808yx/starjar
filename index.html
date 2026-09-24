@@ -77,12 +77,36 @@
 
     /* streak flame — deepened so it stays AA-legible as text on the cream surfaces
        (drives the PIN-fail + settings-error messages and the "N in a row" streak line) */
-    --streak-flame: #C0492E;
+    --streak-flame: #B04128;
     --streak-flame-glow: rgba(242, 118, 46, 0.35);
 
     --radius: 22px;
     --radius-sm: 16px;
     --radius-lg: 28px;
+
+    /* Type scale: every font-size in this file reads one of these seven steps.
+       Phone values here; tablets get one step of growth below. A kid never
+       reads anything under --fs-body; the parent zone never goes under --fs-meta.
+       Focusable fields stay at 16px or more (iOS zooms the page on focus below that). */
+    --fs-meta: 15px;      /* parent-only dense data: calendar, stat labels, table, tabs */
+    --fs-body: 18px;      /* the kid floor; parent reading text, labels and fields */
+    --fs-lead: 21px;      /* task names, note and celebration text, primary buttons */
+    --fs-title: 25px;     /* routine titles, panel headings */
+    --fs-heading: 30px;   /* greeting, PIN digits */
+    --fs-display: 36px;   /* jar number, celebration headline */
+    --fs-hero: 46px;      /* onboarding logo only */
+    --lh-tight: 1.15;     /* titles and up */
+    --lh-snug: 1.3;       /* one-line UI */
+    --lh-read: 1.5;       /* paragraphs a kid reads */
+    /* kid controls and pictures that grow with the words */
+    --box: 36px;          /* task checkbox */
+    --tile: 50px;         /* routine picture tile */
+    --tile-glyph: 28px;   /* the picture inside it */
+    --wk: 22px;           /* week-row sun, moon and book */
+    --mark: 12px;         /* calendar star and rest marks */
+
+    /* readable green for small status text (review times) */
+    --ok-ink: #46692F;
 
     --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
     --ease-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -134,6 +158,27 @@
     --streak-flame-glow: rgba(242, 118, 46, 0.4);
 
     --edge-hi: rgba(255, 255, 255, 0.06);
+    --ok-ink: var(--check-green);
+  }
+
+  /* Tablet type: starts at 700px so iPad mini portrait (744) gets it too, even though
+     its layout stays single-column until 760px. The height test keeps a sideways
+     iPhone on phone type. */
+  @media (min-width: 700px) and (min-height: 600px) {
+    :root {
+      --fs-meta: 17px;
+      --fs-body: 22px;
+      --fs-lead: 26px;
+      --fs-title: 30px;
+      --fs-heading: 36px;
+      --fs-display: 44px;
+      --fs-hero: 54px;
+      --box: 44px;
+      --tile: 58px;
+      --tile-glyph: 32px;
+      --wk: 26px;
+      --mark: 15px;
+    }
   }
 
   /* Dark overrides for surfaces/text that are hardcoded light in the base styles.
@@ -245,7 +290,7 @@
 
   .onboarding h1 {
     font-family: 'Baloo 2', cursive;
-    font-size: 46px;
+    font-size: var(--fs-hero);
     font-weight: 800;
     color: var(--accent);
     margin-bottom: 10px;
@@ -254,7 +299,7 @@
   }
 
   .onboarding p {
-    font-size: 18px;
+    font-size: var(--fs-lead);
     color: var(--text-soft);
     margin-bottom: 34px;
     line-height: 1.55;
@@ -263,7 +308,7 @@
 
   .name-input {
     font-family: 'Nunito', sans-serif;
-    font-size: 27px;
+    font-size: var(--fs-heading);
     font-weight: 800;
     text-align: center;
     border: 2.5px solid transparent;
@@ -289,7 +334,7 @@
   .start-btn {
     margin-top: 26px;
     font-family: 'Baloo 2', cursive;
-    font-size: 21px;
+    font-size: var(--fs-lead);
     font-weight: 700;
     letter-spacing: 0.3px;
     color: #6B4A12;
@@ -336,7 +381,7 @@
 
   .greeting {
     font-family: 'Baloo 2', cursive;
-    font-size: 24px;
+    font-size: var(--fs-heading);
     font-weight: 800;
     color: var(--text);
     letter-spacing: -0.3px;
@@ -344,7 +389,7 @@
   }
 
   .today-date {
-    font-size: 13px;
+    font-size: var(--fs-body);
     font-weight: 700;
     color: var(--text-soft);
     margin-top: 3px;
@@ -410,7 +455,7 @@
   .jar-count {
     text-align: center;
     margin-top: 0;
-    font-size: 17px;
+    font-size: var(--fs-body);
     font-weight: 700;
     color: var(--text-soft);
     z-index: 1;
@@ -419,7 +464,7 @@
   .jar-count .jar-num {
     color: var(--accent-ink);
     font-family: 'Baloo 2', cursive;
-    font-size: 30px;
+    font-size: var(--fs-display);
     font-weight: 800;
     vertical-align: -3px;
   }
@@ -428,7 +473,7 @@
   .jar-hint {
     text-align: center;
     margin-top: 0;
-    font-size: 14px;
+    font-size: var(--fs-body);
     font-weight: 700;
     color: var(--text-soft);
     z-index: 1;
@@ -447,7 +492,7 @@
   }
   .jar-shelf-cap {
     font-family: 'Baloo 2', cursive;
-    font-size: 13px;
+    font-size: var(--fs-body);
     font-weight: 800;
     color: var(--accent-ink);
   }
@@ -467,7 +512,7 @@
   @keyframes shelfPop { 0% { transform: scale(0); } 60% { transform: scale(1.2); } 100% { transform: scale(1); } }
   .jar-shelf .shelf-more {
     font-family: 'Baloo 2', cursive;
-    font-size: 16px;
+    font-size: var(--fs-body);
     font-weight: 800;
     color: var(--accent-ink);
     background: rgba(244, 180, 60, 0.16);
@@ -508,13 +553,13 @@
   }
 
   .routine-icon {
-    width: 42px;
-    height: 42px;
+    width: var(--tile);
+    height: var(--tile);
     border-radius: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 21px;
+    font-size: var(--tile-glyph);
     box-shadow: inset 0 1px 0 var(--edge-hi), 0 2px 6px rgba(150, 116, 74, 0.12);
   }
 
@@ -525,7 +570,7 @@
 
   .routine-title {
     font-family: 'Baloo 2', cursive;
-    font-size: 22px;
+    font-size: var(--fs-title);
     font-weight: 700;
     color: var(--text);
   }
@@ -541,16 +586,16 @@
     font-family: 'Baloo 2', cursive;
     box-shadow: none;
   }
-  .routine-target .rt-pre { font-size: 13px; font-weight: 600; opacity: 0.8; }
-  .routine-target .rt-time { font-size: 17px; font-weight: 800; }
-  #morningBlock .routine-target { background: linear-gradient(160deg, #FFF1CF, #FFDF9A); color: #97600F; }
+  .routine-target .rt-pre { font-size: var(--fs-body); font-weight: 600; opacity: 0.8; }
+  .routine-target .rt-time { font-size: var(--fs-body); font-weight: 800; }
+  #morningBlock .routine-target { background: linear-gradient(160deg, #FFF1CF, #FFDF9A); color: #85540C; }
   #bedtimeBlock .routine-target { background: linear-gradient(160deg, #F1EBFA, #DCD0F1); color: #5C4986; }
 
   /* time-of-day foregrounding */
   .routine-header { cursor: pointer; }
   .routine-chevron {
     margin-left: 8px;
-    font-size: 13px;
+    font-size: var(--fs-meta);
     color: var(--text-soft);
     transition: transform 0.28s var(--ease-out);
     flex-shrink: 0;
@@ -573,7 +618,7 @@
     color: var(--text);
     font-family: 'Baloo 2', cursive;
     font-weight: 700;
-    font-size: 16px;
+    font-size: var(--fs-body);
     padding: 12px 22px;
     border-radius: 40px;
     box-shadow: 0 12px 30px rgba(150, 116, 74, 0.28), inset 0 1px 0 var(--edge-hi);
@@ -587,7 +632,7 @@
   .routine-progress {
     margin-left: auto;
     font-family: 'Baloo 2', cursive;
-    font-size: 14px;
+    font-size: var(--fs-body);
     font-weight: 700;
     color: var(--text-soft);
     background: var(--bg);
@@ -614,8 +659,8 @@
 
   .task-checkbox {
     position: relative;
-    width: 32px;
-    height: 32px;
+    width: var(--box);
+    height: var(--box);
     border-radius: 11px;
     border: 2.5px solid var(--text-faint);
     background: var(--card-2);
@@ -637,7 +682,7 @@
     transform: scale(0.4);
     transition: opacity 0.18s ease, transform 0.3s var(--ease-bounce);
     color: white;
-    font-size: 18px;
+    font-size: var(--fs-lead);
     font-weight: 900;
     line-height: 1;
   }
@@ -676,7 +721,7 @@
   }
 
   .task-label {
-    font-size: 17px;
+    font-size: var(--fs-lead);
     font-weight: 700;
     color: var(--text);
     transition: color 0.3s;
@@ -696,7 +741,7 @@
 
   .milestones-title {
     font-family: 'Baloo 2', cursive;
-    font-size: 22px;
+    font-size: var(--fs-title);
     font-weight: 700;
     margin-bottom: 14px;
     padding: 0 6px;
@@ -723,13 +768,13 @@
   }
   .prize-tally-lbl {
     font-family: 'Baloo 2', cursive;
-    font-size: 13px;
+    font-size: var(--fs-body);
     font-weight: 800;
     color: #8A5A12;
   }
   .prize-tally-item {
     font-family: 'Baloo 2', cursive;
-    font-size: 14px;
+    font-size: var(--fs-body);
     font-weight: 800;
     color: #7E5A1E;
     background: rgba(255, 255, 255, 0.55);
@@ -803,7 +848,7 @@
 
   .milestone-days {
     font-family: 'Baloo 2', cursive;
-    font-size: 13px;
+    font-size: var(--fs-body);
     font-weight: 700;
     color: var(--text-soft);
     margin-bottom: 3px;
@@ -813,7 +858,7 @@
   .milestone-card.unlocked .milestone-days { color: #9A6512; }
 
   .milestone-label {
-    font-size: 12px;
+    font-size: var(--fs-body);
     font-weight: 600;
     color: var(--text-soft);
     line-height: 1.3;
@@ -832,14 +877,14 @@
   .milestone-card.ready:active { transform: scale(0.97) !important; }
   .milestone-cta {
     font-family: 'Baloo 2', cursive;
-    font-size: 11px;
+    font-size: var(--fs-meta);
     font-weight: 700;
     margin-top: 5px;
     position: relative;
     color: #B26A00;
   }
   .milestone-progress {
-    font-size: 11px;
+    font-size: var(--fs-meta);
     font-weight: 700;
     color: var(--text-soft);
     margin-top: 5px;
@@ -922,13 +967,13 @@
 
   .parent-panel h2 {
     font-family: 'Baloo 2', cursive;
-    font-size: 25px;
+    font-size: var(--fs-title);
     margin-bottom: 4px;
     color: var(--text);
   }
 
   .parent-panel .date-label {
-    font-size: 14px;
+    font-size: var(--fs-meta);
     color: var(--text-soft);
     margin-bottom: 18px;
     font-weight: 600;
@@ -941,7 +986,7 @@
     border-radius: 50%;
     background: rgba(150, 116, 74, 0.12);
     border: none;
-    font-size: 16px;
+    font-size: var(--fs-body);
     color: var(--text-soft);
     cursor: pointer;
     display: flex;
@@ -955,7 +1000,7 @@
   .reset-link {
     text-align: center;
     margin-top: 18px;
-    font-size: 13px;
+    font-size: var(--fs-meta);
     color: var(--text-soft);
     cursor: pointer;
     text-decoration: underline;
@@ -971,13 +1016,13 @@
     text-align: center;
     box-shadow: var(--card-shadow-soft);
   }
-  .pz-stat-num { font-family: 'Baloo 2', cursive; font-size: 20px; font-weight: 800; color: var(--text); }
-  .pz-stat-lbl { font-size: 11px; font-weight: 700; color: var(--text-soft); margin-top: 2px; }
+  .pz-stat-num { font-family: 'Baloo 2', cursive; font-size: var(--fs-lead); font-weight: 800; color: var(--text); }
+  .pz-stat-lbl { font-size: var(--fs-meta); font-weight: 700; color: var(--text-soft); margin-top: 2px; }
   .pz-stat-jar { flex: 1; }
-  .pz-stat-jar .pz-stat-num { font-size: 21px; white-space: nowrap; }
+  .pz-stat-jar .pz-stat-num { font-size: var(--fs-lead); white-space: nowrap; }
 
   .pz-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
-  .pz-month { font-family: 'Baloo 2', cursive; font-size: 18px; font-weight: 700; color: var(--text); }
+  .pz-month { font-family: 'Baloo 2', cursive; font-size: var(--fs-lead); font-weight: 700; color: var(--text); }
   .pz-nav {
     width: 44px; height: 44px;
     border-radius: 50%;
@@ -985,7 +1030,7 @@
     background: var(--card);
     box-shadow: var(--card-shadow-soft);
     color: var(--accent);
-    font-size: 22px; font-weight: 800; line-height: 1;
+    font-size: var(--fs-lead); font-weight: 800; line-height: 1;
     cursor: pointer;
     transition: transform 0.15s;
   }
@@ -993,7 +1038,7 @@
 
   .pz-cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
   .pz-weekdays { margin-bottom: 6px; }
-  .pz-weekday { text-align: center; font-size: 11px; font-weight: 800; color: var(--text-soft); }
+  .pz-weekday { text-align: center; font-size: var(--fs-meta); font-weight: 800; color: var(--text-soft); }
 
   .pz-day {
     border: 0;
@@ -1009,20 +1054,20 @@
   }
   .pz-day:active { transform: scale(0.92); }
   .pz-day.empty, .pz-day.future { background: none; box-shadow: none; cursor: default; }
-  .pz-daynum { font-size: 13px; font-weight: 700; color: var(--text-soft); }
+  .pz-daynum { font-size: var(--fs-meta); font-weight: 700; color: var(--text-soft); }
   .pz-day.future .pz-daynum { color: var(--text-faint); opacity: 0.45; }
   .pz-day.none .pz-daynum { color: var(--text-soft); }
   .pz-day.partial { box-shadow: inset 0 0 0 2px var(--accent-glow); }
   .pz-day.partial .pz-daynum { color: var(--accent-deep); }
   .pz-day.approved { background: linear-gradient(160deg, #FFE39E, #F6C45A); box-shadow: inset 0 0 0 1px rgba(214, 150, 40, 0.5); }
-  .pz-day.approved .pz-daynum { color: #7E5A1E; }
-  .pz-star { position: absolute; top: 1px; right: 4px; font-size: 9px; color: #B9791E; }
-  .pz-rest-mark { position: absolute; top: 2px; right: 4px; font-size: 11px; color: var(--text-soft); }
+  .pz-day.approved .pz-daynum { color: #5E400F; }
+  .pz-star { position: absolute; top: 2px; right: 3px; font-size: var(--mark); line-height: 1; color: #8A5812; }
+  .pz-rest-mark { position: absolute; top: 2px; right: 3px; font-size: var(--mark); line-height: 1; color: var(--text-soft); }
   .pz-day.rest { background: var(--card-2); }
   .pz-day.today { box-shadow: inset 0 0 0 2px var(--accent); }
   .pz-day.selected { box-shadow: inset 0 0 0 2px var(--accent), 0 0 0 3px rgba(232, 151, 46, 0.22); }
 
-  .pz-legend { display: flex; justify-content: center; gap: 16px; margin: 13px 0 2px; font-size: 11px; font-weight: 700; color: var(--text-soft); }
+  .pz-legend { display: flex; justify-content: center; gap: 16px; margin: 13px 0 2px; font-size: var(--fs-meta); font-weight: 700; color: var(--text-soft); }
   .pz-legend .dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
   .pz-legend .dot.approved { background: #F6C45A; }
   .pz-legend .dot.partial { background: var(--accent-glow); }
@@ -1037,9 +1082,9 @@
     animation: fadeIn 0.25s ease;
   }
   .pz-detail-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px; }
-  .pz-detail-date { font-family: 'Baloo 2', cursive; font-size: 16px; font-weight: 700; color: var(--text); }
-  .pz-detail-count { font-size: 13px; font-weight: 700; color: var(--text-soft); }
-  .pz-detail-grouplbl { font-size: 12px; font-weight: 800; color: var(--text-soft); margin: 8px 0 2px; }
+  .pz-detail-date { font-family: 'Baloo 2', cursive; font-size: var(--fs-body); font-weight: 700; color: var(--text); }
+  .pz-detail-count { font-size: var(--fs-meta); font-weight: 700; color: var(--text-soft); }
+  .pz-detail-grouplbl { font-size: var(--fs-meta); font-weight: 800; color: var(--text-soft); margin: 8px 0 2px; }
   .pz-task { display: flex; align-items: center; gap: 10px; padding: 7px 4px; cursor: pointer; border-radius: 8px; }
   .pz-task:active { background: rgba(232, 151, 46, 0.07); }
   .pz-task-box {
@@ -1048,11 +1093,11 @@
     border: 2px solid var(--text-faint);
     background: var(--card-2);
     display: flex; align-items: center; justify-content: center;
-    color: white; font-size: 13px; font-weight: 900;
+    color: white; font-size: var(--fs-meta); font-weight: 900;
     flex-shrink: 0;
   }
   .pz-task.done .pz-task-box { background: var(--check-green); border-color: var(--check-green-deep); }
-  .pz-task-lbl { font-size: 14px; font-weight: 600; color: var(--text); }
+  .pz-task-lbl { font-size: var(--fs-body); font-weight: 600; color: var(--text); }
   .pz-task.done .pz-task-lbl { color: var(--text-faint); text-decoration: line-through; }
 
   .pz-approve-toggle {
@@ -1062,7 +1107,7 @@
     border: none;
     border-radius: 40px;
     font-family: 'Baloo 2', cursive;
-    font-size: 15px; font-weight: 700;
+    font-size: var(--fs-meta); font-weight: 700;
     cursor: pointer;
     background: var(--card-2);
     color: var(--text-soft);
@@ -1084,7 +1129,7 @@
     border: none;
     border-radius: 30px;
     font-family: 'Baloo 2', cursive;
-    font-size: 13.5px; font-weight: 700;
+    font-size: var(--fs-meta); font-weight: 700;
     cursor: pointer;
     background: var(--card-2);
     color: var(--text-soft);
@@ -1102,27 +1147,27 @@
   .pz-tabs { display: flex; flex: 1; min-width: 0; gap: 5px; margin: 0; }
   .pz-tab {
     flex: 1; min-width: 0; min-height: 44px; padding: 9px 4px; border: none; border-radius: 14px; white-space: nowrap;
-    font-family: 'Baloo 2', cursive; font-size: 14px; font-weight: 700;
+    font-family: 'Baloo 2', cursive; font-size: var(--fs-meta); font-weight: 700;
     color: var(--text-soft); background: var(--card-2);
     box-shadow: inset 0 0 0 1px var(--hairline); cursor: pointer;
     transition: transform 0.15s, background 0.2s, color 0.2s, box-shadow 0.2s;
   }
   .pz-tab.active {
     background: linear-gradient(180deg, var(--accent-glow), var(--accent));
-    color: #6B4A12; box-shadow: inset 0 0 0 1px rgba(150, 100, 35, 0.14);
+    color: #523608; box-shadow: inset 0 0 0 1px rgba(150, 100, 35, 0.14);
   }
   .pz-tab:active { transform: scale(0.97); }
   .pz-tab.has-draft::after { content: ''; display: inline-block; width: 5px; height: 5px; margin-left: 4px; border-radius: 50%; background: currentColor; vertical-align: middle; }
 
   /* ─── Settings form ─── */
-  .set-section-title { font-family: 'Baloo 2', cursive; font-size: 16px; font-weight: 700; color: var(--text); margin: 20px 4px 9px; }
+  .set-section-title { font-family: 'Baloo 2', cursive; font-size: var(--fs-lead); font-weight: 700; color: var(--text); margin: 20px 4px 9px; }
   .set-group { background: var(--card); border-radius: var(--radius-sm); padding: 12px 14px; margin-bottom: 12px; box-shadow: var(--card-shadow-soft); }
-  .set-grouphead { font-family: 'Baloo 2', cursive; font-size: 15px; font-weight: 700; color: var(--text-soft); margin-bottom: 10px; }
+  .set-grouphead { font-family: 'Baloo 2', cursive; font-size: var(--fs-body); font-weight: 700; color: var(--text-soft); margin-bottom: 10px; }
   .set-task-row { display: flex; flex-direction: column; gap: 7px; padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--hairline); }
   .set-task-tools { display: flex; align-items: center; gap: 8px; width: 100%; }
   /* 16px is the floor: iOS auto-zooms the page on focus for any smaller field. */
   .set-emoji, .set-label, .set-pin, .set-time input {
-    font-family: 'Nunito', sans-serif; font-size: 16px; font-weight: 700; color: var(--text);
+    font-family: 'Nunito', sans-serif; font-size: max(16px, var(--fs-body)); font-weight: 700; color: var(--text);
     background: var(--card-2); border: 1.5px solid var(--hairline); border-radius: 12px;
     padding: 10px 12px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
   }
@@ -1132,7 +1177,7 @@
   .set-emoji:focus, .set-label:focus, .set-pin:focus, .set-time input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(232, 151, 46, 0.14); }
   .set-remove {
     width: 44px; height: 44px; flex-shrink: 0; border: none; border-radius: 10px;
-    background: rgba(201, 74, 46, 0.1); color: #C0492E; font-size: 15px; font-weight: 800; cursor: pointer;
+    background: rgba(201, 74, 46, 0.1); color: var(--streak-flame); font-size: var(--fs-meta); font-weight: 800; cursor: pointer;
     transition: transform 0.15s, background 0.2s;
   }
   .set-remove:active { transform: scale(0.88); background: rgba(201, 74, 46, 0.2); }
@@ -1141,7 +1186,7 @@
   .set-move {
     width: 44px; height: 44px; border: none; border-radius: 10px; padding: 0;
     background: rgba(120, 90, 50, 0.12); color: var(--text-soft);
-    font-size: 16px; line-height: 1; cursor: pointer;
+    font-size: var(--fs-meta); line-height: 1; cursor: pointer;
     transition: transform 0.12s, background 0.2s;
   }
   .set-move:active:not(:disabled) { transform: scale(0.85); background: var(--accent-soft); }
@@ -1149,18 +1194,20 @@
   [data-theme="dark"] .set-move { background: rgba(255, 233, 205, 0.1); }
   .set-add {
     width: 100%; padding: 11px; border: 1.5px dashed var(--text-faint); border-radius: 12px;
-    background: none; color: var(--text-soft); font-family: 'Baloo 2', cursive; font-size: 14px; font-weight: 700;
+    background: none; color: var(--text-soft); font-family: 'Baloo 2', cursive; font-size: var(--fs-meta); font-weight: 700;
     cursor: pointer; transition: background 0.2s; margin-top: 2px;
   }
   .set-add:active { background: var(--accent-soft); }
   .set-times { display: flex; flex-direction: column; gap: 10px; }
   .set-time { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: var(--card); border-radius: var(--radius-sm); padding: 12px 14px; box-shadow: var(--card-shadow-soft); font-weight: 700; color: var(--text); }
-  .set-time input { width: 145px; }
+  .set-time > span { flex: 0 0 auto; }
+  .set-time input { width: auto; flex: 0 1 8em; min-width: 6.5em; }
+  .set-time input[type="text"] { flex: 1 1 8em; }
   .set-ms { background: var(--card); border-radius: var(--radius-sm); padding: 12px 14px; box-shadow: var(--card-shadow-soft); }
   .set-ms-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
   .set-ms-row:last-child { margin-bottom: 0; }
-  .set-ms-days { width: 62px; flex-shrink: 0; font-family: 'Baloo 2', cursive; font-weight: 700; font-size: 13px; color: var(--accent-deep); }
-  .set-pin { width: 130px; letter-spacing: 7px; text-align: center; font-size: 21px; }
+  .set-ms-days { width: 62px; flex-shrink: 0; font-family: 'Baloo 2', cursive; font-weight: 700; font-size: var(--fs-meta); color: var(--accent-deep); }
+  .set-pin { width: 130px; letter-spacing: 7px; text-align: center; font-size: max(16px, var(--fs-lead)); }
   .set-mute { display: flex; align-items: center; justify-content: space-between; background: var(--card); border-radius: var(--radius-sm); padding: 14px; margin-top: 18px; box-shadow: var(--card-shadow-soft); font-weight: 700; color: var(--text); }
   .set-switch { width: 52px; height: 30px; flex-shrink: 0; border-radius: 30px; border: none; background: var(--text-faint); position: relative; cursor: pointer; transition: background 0.25s; }
   .set-switch.on { background: var(--check-green); }
@@ -1169,23 +1216,23 @@
   .set-seg { display: flex; gap: 6px; background: var(--card); border-radius: var(--radius-sm); padding: 6px; margin-top: 10px; box-shadow: var(--card-shadow-soft); }
   .set-seg-btn {
     flex: 1; padding: 11px 6px; border: none; border-radius: 12px; cursor: pointer;
-    font-family: 'Baloo 2', cursive; font-size: 14px; font-weight: 700;
+    font-family: 'Baloo 2', cursive; font-size: var(--fs-meta); font-weight: 700;
     color: var(--text-soft); background: transparent;
     transition: background 0.2s, color 0.2s, transform 0.15s;
   }
-  .set-seg-btn.on { background: linear-gradient(180deg, var(--accent-glow), var(--accent)); color: #6B4A12; box-shadow: 0 3px 10px rgba(232, 151, 46, 0.3); }
+  .set-seg-btn.on { background: linear-gradient(180deg, var(--accent-glow), var(--accent)); color: #523608; box-shadow: 0 3px 10px rgba(232, 151, 46, 0.3); }
   .set-seg-btn:active { transform: scale(0.96); }
   .set-savebar { flex-shrink: 0; padding: 10px 18px calc(12px + env(safe-area-inset-bottom)); border-top: 1px solid var(--hairline); background: var(--bg); }
   .set-save-status { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; min-height: 44px; }
-  .set-dirty { font-size: 13px; font-weight: 800; color: var(--text-soft); }
-  .set-discard { border: none; background: transparent; color: var(--text-soft); font-family: inherit; font-size: 13px; font-weight: 700; padding: 4px 0 4px 8px; min-height: 44px; text-decoration: underline; cursor: pointer; }
-  .set-msg { text-align: center; font-weight: 700; font-size: 14px; margin: 0 0 6px; }
+  .set-dirty { font-size: var(--fs-meta); font-weight: 800; color: var(--text-soft); }
+  .set-discard { border: none; background: transparent; color: var(--text-soft); font-family: inherit; font-size: var(--fs-meta); font-weight: 700; padding: 4px 0 4px 8px; min-height: 44px; text-decoration: underline; cursor: pointer; }
+  .set-msg { text-align: center; font-weight: 700; font-size: var(--fs-body); margin: 0 0 6px; }
   .set-msg:empty { display: none; }
   .set-msg.ok { color: var(--check-green-deep); }
   .set-msg.err { color: var(--streak-flame); }
   .set-save {
     width: 100%; min-height: 48px; padding: 10px 16px; border: none; border-radius: 16px; margin-top: 0;
-    font-family: 'Baloo 2', cursive; font-size: 17px; font-weight: 700; color: #6B4A12;
+    font-family: 'Baloo 2', cursive; font-size: var(--fs-lead); font-weight: 700; color: #6B4A12;
     background: linear-gradient(180deg, var(--accent-glow), var(--accent));
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4); cursor: pointer;
     transition: transform 0.18s var(--ease-bounce);
@@ -1232,13 +1279,13 @@
 
   .celebration h2 {
     font-family: 'Baloo 2', cursive;
-    font-size: 33px;
+    font-size: var(--fs-display);
     color: var(--accent);
     margin-bottom: 8px;
   }
 
   .celebration p {
-    font-size: 18px;
+    font-size: var(--fs-lead);
     color: var(--text-soft);
     line-height: 1.5;
     margin-bottom: 26px;
@@ -1247,7 +1294,7 @@
 
   .celebration-close {
     font-family: 'Baloo 2', cursive;
-    font-size: 18px;
+    font-size: var(--fs-lead);
     font-weight: 700;
     background: linear-gradient(180deg, var(--accent-glow), var(--accent) 60%, var(--accent-deep));
     color: #6B4A12;
@@ -1265,7 +1312,7 @@
 
   .celebration-action {
     font-family: 'Baloo 2', cursive;
-    font-size: 20px;
+    font-size: var(--fs-lead);
     font-weight: 700;
     background: linear-gradient(180deg, #FFE08A, #FFC83C 60%, #F2A23A);
     color: #6B4A12;
@@ -1286,7 +1333,7 @@
     display: block;
     margin: 2px auto 12px;
     font-family: 'Baloo 2', cursive;
-    font-size: 17px;
+    font-size: var(--fs-lead);
     font-weight: 800;
     letter-spacing: 0.2px;
     color: #6B4A12;
@@ -1337,15 +1384,15 @@
     border: none;
     background: var(--card);
     font-family: 'Baloo 2', cursive;
-    font-size: 27px; font-weight: 700;
+    font-size: var(--fs-heading); font-weight: 700;
     color: var(--text);
     cursor: pointer;
     box-shadow: var(--card-shadow-soft), inset 0 1px 0 var(--edge-hi);
     transition: transform 0.12s var(--ease-bounce), background 0.15s;
   }
   .pin-key:active { transform: scale(0.9); background: var(--accent-soft); }
-  .pin-key-util { font-size: 20px; color: var(--text-soft); background: var(--card-2); }
-  .pin-msg { margin-top: 14px; font-weight: 700; font-size: 15px; color: var(--streak-flame); min-height: 19px; }
+  .pin-key-util { font-size: var(--fs-heading); color: var(--text-soft); background: var(--card-2); }
+  .pin-msg { margin-top: 14px; font-weight: 700; font-size: var(--fs-body); color: var(--streak-flame); min-height: calc(var(--fs-body) * var(--lh-snug)); }
 
   /* ─── Parent: prizes to hand out ─── */
   .pz-prizes {
@@ -1357,7 +1404,7 @@
   }
   .pz-prizes-title {
     font-family: 'Baloo 2', cursive;
-    font-size: 16px;
+    font-size: var(--fs-lead);
     font-weight: 700;
     color: #8A5A12;
     margin-bottom: 8px;
@@ -1371,14 +1418,14 @@
   }
   .pz-prize-row:first-of-type { border-top: none; }
   .pz-prize-head { display: flex; align-items: baseline; justify-content: space-between; gap: 6px 12px; flex-wrap: wrap; }
-  .pz-prize-info { font-size: 15px; font-weight: 700; color: var(--text); }
-  .pz-prize-counts { font-size: 12px; font-weight: 700; color: var(--text-soft); white-space: nowrap; }
-  .pz-prize-counts b.owed { color: #B26A00; font-weight: 800; }
+  .pz-prize-info { font-size: var(--fs-body); font-weight: 700; color: var(--text); }
+  .pz-prize-counts { font-size: var(--fs-meta); font-weight: 700; color: var(--text-soft); white-space: nowrap; }
+  .pz-prize-counts b.owed { color: var(--accent-ink); font-weight: 800; }
   /* one tickable check-off box per owed prize, so every claimable prize is visible */
   .pz-give-chips { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
   .pz-give-chip {
     font-family: 'Baloo 2', cursive;
-    font-size: 13px; font-weight: 700;
+    font-size: var(--fs-meta); font-weight: 700;
     color: #6B4A12;
     background: rgba(255, 255, 255, 0.6);
     border: 1.5px dashed rgba(214, 150, 40, 0.7);
@@ -1388,11 +1435,11 @@
     transition: transform 0.15s var(--ease-bounce);
   }
   .pz-give-chip:active { transform: scale(0.94); }
-  .pz-give-chip.all { border-style: solid; border-color: transparent; background: var(--check-green); color: #fff; }
-  .pz-give-more { font-size: 12px; font-weight: 700; color: var(--text-soft); }
+  .pz-give-chip.all { border-style: solid; border-color: transparent; background: var(--ok-ink); color: #fff; }
+  .pz-give-more { font-size: var(--fs-meta); font-weight: 700; color: var(--text-soft); }
   .pz-give-undo {
     font-family: 'Baloo 2', cursive;
-    font-size: 12px; font-weight: 700;
+    font-size: var(--fs-meta); font-weight: 700;
     color: var(--text-soft);
     background: rgba(120, 90, 50, 0.1);
     border: none; border-radius: 40px;
@@ -1481,7 +1528,7 @@
   .routine-progress { transition: background 0.35s, color 0.35s, box-shadow 0.35s; }
   .routine-progress.complete {
     background: linear-gradient(180deg, #FFE39E, #F6C45A);
-    color: #7E5A1E;
+    color: #6B4A12;
     box-shadow: 0 3px 10px rgba(244, 180, 60, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.55);
   }
 
@@ -1702,7 +1749,7 @@
     padding: 11px 14px;
     margin: 6px 0 10px;
     font-family: 'Baloo 2', cursive;
-    font-size: 15px;
+    font-size: var(--fs-body);
     font-weight: 700;
     text-align: center;
   }
@@ -1713,7 +1760,7 @@
     color: var(--text-soft);
     box-shadow: inset 0 0 0 1px var(--hairline);
     font-family: 'Nunito', sans-serif;
-    font-size: 14px;
+    font-size: var(--fs-body);
     font-weight: 700;
   }
   [data-theme="dark"] .state-band.free { background: linear-gradient(160deg, #332815, #2A2113); color: #F4CD82; }
@@ -1754,19 +1801,19 @@
   }
   .wk-day.today { box-shadow: inset 0 0 0 2px var(--accent); }
   .wk-day.future .wk-g { opacity: 0.5; }
-  .wk-letter { font-family: 'Baloo 2', cursive; font-size: 13px; font-weight: 800; color: var(--text-soft); }
-  .wk-g { width: 15px; height: 15px; display: block; }
+  .wk-letter { font-family: 'Baloo 2', cursive; font-size: var(--fs-body); font-weight: 800; color: var(--text-soft); }
+  .wk-g { width: var(--wk); height: var(--wk); display: block; }
   .week-caption {
     text-align: center;
     margin-top: 8px;
-    font-size: 13px;
+    font-size: var(--fs-body);
     font-weight: 700;
     color: var(--text-soft);
   }
 
   .rest-day { text-align: center; padding: 24px 20px; background: var(--card); border-radius: var(--radius); margin-bottom: 14px; }
-  .rest-day h2 { font-family: 'Baloo 2', cursive; font-size: 24px; margin-bottom: 6px; }
-  .rest-day p { font-size: 17px; line-height: 1.5; color: var(--text-soft); }
+  .rest-day h2 { font-family: 'Baloo 2', cursive; font-size: var(--fs-title); margin-bottom: 6px; }
+  .rest-day p { font-size: var(--fs-lead); line-height: 1.5; color: var(--text-soft); }
   .rest-day[hidden] { display: none; }
   .rest-days-picker { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
   .rest-days-picker .set-seg-btn { min-width: 44px; min-height: 44px; padding: 8px; }
@@ -1778,13 +1825,128 @@
 
   /* ── Weekly review table (parent zone) ── */
   .rv-table-wrap { overflow-x: auto; background: var(--card); border-radius: var(--radius-sm); box-shadow: var(--card-shadow-soft); padding: 4px 6px; }
-  .rv-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  .rv-table th { text-align: left; font-size: 13px; font-weight: 800; color: var(--text-soft); padding: 8px; border-bottom: 1.5px solid var(--hairline); }
+  .rv-table { width: 100%; border-collapse: collapse; font-size: var(--fs-meta); }
+  .rv-table th { text-align: left; font-size: var(--fs-meta); font-weight: 800; color: var(--text-soft); padding: 8px; border-bottom: 1.5px solid var(--hairline); }
   .rv-table td { padding: 8px; border-bottom: 1px solid var(--hairline); font-weight: 600; color: var(--text); white-space: nowrap; }
   .rv-table tr:last-child td { border-bottom: none; }
   .rv-earned { color: var(--check-green-deep); font-weight: 800; }
   .rv-miss { color: var(--streak-flame); font-weight: 700; }
   .rv-dim { color: var(--text-soft); }
+
+  /* ═══════ Type scale layer (Sep 2026): what the bigger type needs around it ═══════
+     Sizes live in the --fs-* steps on :root. This block sets line heights, gives the
+     words room, lets kid controls grow with them, and lifts the few text inks that
+     read below 4.5:1. */
+  /* the default text size is the kid floor, so nothing can fall back to the browser's 16px */
+  body { font-size: var(--fs-body); line-height: var(--lh-snug); }
+  .greeting, .routine-title, .parent-panel h2, .rest-day h2, .jar-count .jar-num,
+  .onboarding h1, .celebration h2 { line-height: var(--lh-tight); }
+  .greeting, .onboarding h1 { letter-spacing: 0; }
+  .greeting, .jar-hint, .week-caption { text-wrap: balance; }
+  /* the evening and night washes darken the page top, so soft ink goes one shade deeper */
+  :root[data-daypart="dusk"]:not([data-theme="dark"]),
+  :root[data-daypart="night"]:not([data-theme="dark"]) { --text-soft: #5E4A37; }
+  :root[data-daypart="dusk"]:not([data-theme="dark"]) .jar-shelf-cap,
+  :root[data-daypart="night"]:not([data-theme="dark"]) .jar-shelf-cap { color: #7E4A06; }
+  /* the smallest phones (iPhone SE) take the greeting down one step so it stays on one line */
+  @media (max-width: 380px) { .greeting { font-size: var(--fs-title); } }
+  .today-date, .jar-count, .jar-hint, .jar-shelf-cap, .routine-progress, .state-band,
+  .toast, .wk-letter, .week-caption, .pin-msg, .pz-detail-date, .pz-task-lbl,
+  .set-grouphead, .set-msg { line-height: var(--lh-snug); }
+
+  /* Baloo below the title step stays at 700 so the letter holes stay open */
+  .jar-shelf-cap, .jar-shelf .shelf-more, .wk-letter, .prize-tally-lbl, .prize-tally-item { font-weight: 700; }
+  /* the late band changes colour, not face */
+  .state-band.late { font-family: 'Baloo 2', cursive; }
+
+  /* the streak sits on its own line on phones, beside the date on tablets */
+  .streak-line { display: block; color: var(--streak-flame); font-weight: 800; white-space: nowrap; }
+  @media (min-width: 760px) {
+    .streak-line { display: inline; }
+    .streak-line::before { content: ' \00B7  '; color: var(--text-soft); font-weight: 700; }
+  }
+
+  /* task rows: room for the bigger names; a name that must wrap hangs its second
+     line under the words, not under the picture */
+  @media (max-width: 759px) { .app { padding-left: 16px; padding-right: 16px; } }
+  .task-item { gap: 12px; padding-left: 2px; padding-right: 2px; }
+  .task-label { line-height: var(--lh-snug); text-wrap: balance; padding-left: 1.4em; text-indent: -1.4em; }
+  .routine-icon { border-radius: 15px; flex-shrink: 0; }
+  .routine-icon svg { width: var(--tile-glyph); height: var(--tile-glyph); }
+  .routine-target .rt-pre { opacity: 1; }
+  .check-btn, .celebration-action { max-width: 100%; text-wrap: balance; }
+  .start-btn, .check-btn, .celebration-action, .celebration-close, .set-save { line-height: var(--lh-snug); letter-spacing: 0; }
+
+  /* toast: centred with side insets instead of a half-width squeeze */
+  .toast {
+    left: 16px; right: 16px; margin-left: auto; margin-right: auto;
+    width: fit-content; max-width: calc(100vw - 32px);
+    text-align: center; text-wrap: balance;
+    transform: translateY(16px);
+  }
+  .toast.show { transform: translateY(0); }
+
+  /* overlays: a readable line length, balanced headlines, a narrower phone gutter */
+  .celebration h2 { max-width: 14em; text-wrap: balance; }
+  .celebration p, .onboarding p, .rest-day p {
+    line-height: var(--lh-read); max-width: 21em;
+    margin-left: auto; margin-right: auto; text-wrap: pretty;
+  }
+  .celebration-close { padding-left: 32px; padding-right: 32px; }
+  /* tablets: two even lines instead of a short tail (phones keep sentence-end breaks) */
+  @media (min-width: 700px) and (min-height: 600px) { .celebration p { text-wrap: balance; } }
+  @media (max-width: 759px) {
+    .celebration { padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom)); }
+  }
+  /* short screens (iPhone SE, an iPhone in a Safari tab): the PIN pad and Cancel fit */
+  @media (max-height: 760px) {
+    .celebration { padding-top: 16px; padding-bottom: 16px; }
+    .celebration-icon { font-size: 52px; margin-bottom: 6px; }
+    .celebration h2 { margin-bottom: 4px; }
+    .celebration:has(#pinPad[style*="flex"]) p { margin-bottom: 12px; }
+    .pin-pad { margin-bottom: 8px; }
+    .pin-dots { margin-bottom: 14px; }
+    .pin-keys { grid-template-columns: repeat(3, 64px); gap: 10px; }
+    .pin-key { width: 64px; height: 64px; }
+    .pin-msg { margin-top: 8px; }
+  }
+
+  /* parent zone: stat labels on one line, room for bigger rows */
+  .pz-content { padding-left: 16px; padding-right: 16px; }
+  .pz-stats { gap: 6px; }
+  .pz-stat { padding: 12px 2px; }
+  .pz-stat-lbl { margin-top: 4px; text-wrap: balance; }
+  .pz-legend { flex-wrap: wrap; row-gap: 4px; }
+  .pz-detail-head { flex-wrap: wrap; column-gap: 10px; row-gap: 2px; }
+  .pz-task-box { width: 26px; height: 26px; }
+  .pz-task, .pz-give-chip, .pz-give-undo { min-height: 44px; }
+  .reset-link { padding: 12px 0; }
+  @media (max-width: 559px) {
+    .pz-checks { flex-wrap: wrap; }
+    .pz-check-toggle { flex: 1 1 calc(50% - 4px); }
+  }
+  .set-ms-days { width: 72px; }
+  #pzContent[data-view="settings"] .date-label { font-size: var(--fs-body); }
+  @media (max-width: 400px) {
+    .rv-table th, .rv-table td { padding-left: 5px; padding-right: 5px; }
+  }
+  /* phones: a 'late 9:00 AM' or 'no school' cell wraps inside its column instead of pushing past the card */
+  @media (max-width: 559px) {
+    .rv-table td { white-space: normal; }
+    .rv-table td:first-child { white-space: nowrap; }
+  }
+
+  /* text inks: no faded words, and every small text colour at 4.5:1 or better */
+  .task-item.done .task-label, .pz-task.done .pz-task-lbl { color: var(--text-soft); }
+  .celebration h2, .onboarding h1 { color: var(--accent-ink); }
+  .pz-day.future .pz-daynum { color: var(--text-soft); opacity: 1; }
+  .pz-day.today:not(.approved) .pz-daynum, .pz-day.partial .pz-daynum { color: var(--accent-ink); }
+  .pz-nav { color: var(--accent-ink); }
+  .rv-earned { color: var(--ok-ink); }
+  .celebration-action[disabled], .start-btn:disabled, .set-save:disabled {
+    opacity: 1; background: var(--card-2); color: var(--text-soft);
+    box-shadow: inset 0 0 0 1.5px var(--hairline);
+  }
 
   /* Tablet room: the jar and week stay beside the daily work. Narrow windows
      keep the phone's single column, including iPad multitasking. */
@@ -1801,25 +1963,17 @@
       padding: max(28px, env(safe-area-inset-top)) 32px calc(28px + env(safe-area-inset-bottom));
     }
     .header { grid-column: 1 / -1; grid-row: 1; margin-bottom: 0; padding: 0; }
-    .greeting { font-size: 30px; }
-    .today-date { font-size: 15px; margin-top: 4px; }
+    .today-date { margin-top: 4px; }
     .parent-zone-toggle { width: 48px; height: 48px; }
     .jar-section { grid-column: 1; grid-row: 2; margin: 0; padding-top: 12px; }
     .jar-container { width: 226px; }
     .jar-section::after { width: 300px; height: 300px; max-width: 100%; }
-    .jar-count { font-size: 18px; }
-    .jar-count .jar-num { font-size: 34px; }
-    .jar-hint { font-size: 15px; }
     .daily-routines { grid-column: 2; grid-row: 2 / span 2; min-width: 0; }
     .week-section { grid-column: 1; grid-row: 3; min-width: 0; margin: 0; }
     .week-row { gap: 2px; padding: 8px 6px; }
-    .week-caption { font-size: 14px; line-height: 1.4; }
+    .week-caption { line-height: 1.4; }
     .routine-block { padding: 18px 18px 12px; margin-bottom: 14px; }
-    .routine-title { font-size: 24px; }
-    .routine-icon { width: 46px; height: 46px; flex-shrink: 0; }
     .task-item { min-height: 64px; }
-    .task-label { font-size: 19px; }
-    .task-checkbox { width: 36px; height: 36px; }
     .rest-day { padding: 32px 24px; }
     .rest-day p { max-width: 30ch; margin: 0 auto; }
 
@@ -1830,18 +1984,13 @@
     }
     .pz-content { padding: 20px 28px 28px; }
     .pz-toolbar { padding-left: 24px; padding-right: 24px; }
-    .pz-tab { font-size: 16px; }
     .pz-day { aspect-ratio: auto; min-height: 52px; }
-    .pz-task { min-height: 44px; }
-    .pz-daynum, .pz-weekday, .pz-stat-lbl, .pz-legend { font-size: 13px; }
     .set-task-row { flex-direction: row; align-items: center; gap: 14px; }
     .set-task-row .set-label { flex: 1; width: 0; min-height: 54px; height: 54px; }
     .set-task-tools { width: 208px; flex-shrink: 0; }
     .rest-days-picker { grid-template-columns: repeat(7, 1fr); }
     .set-savebar { padding-left: 28px; padding-right: 28px; }
     .set-savebar .set-save { max-width: 320px; display: block; margin-left: auto; }
-    .celebration h2, .celebration p { max-width: 560px; }
-    .celebration p { font-size: 20px; }
   }
 
   /* Leave room for every PIN control when landscape Safari is shorter. */
@@ -3130,7 +3279,7 @@ function render(state) {
   const _dateStr = new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
   const _streakNow = state.streak || 0;
   document.getElementById('todayDate').innerHTML = escapeHtml(_dateStr) +
-    (_streakNow >= 2 ? ` · <span style="color:var(--streak-flame);font-weight:800">🔥 ${_streakNow} in a row</span>` : '');
+    (_streakNow >= 2 ? `<span class="streak-line">🔥 ${_streakNow} in a row</span>` : '');
 
   // Whole-day-done state (both halves earned): dim the routine lists
   const app = document.getElementById('app');
@@ -4690,7 +4839,7 @@ function renderSettingsForm() {
     <div class="date-label">Changes apply going forward. Past days keep their tasks.</div>
 
     <div class="set-section-title">Kid</div>
-    <label class="set-time"><span>Name</span><input type="text" style="width:145px" maxlength="12" autocapitalize="words" value="${escapeHtml(d._name || '')}" oninput="setKidName(this.value)"></label>
+    <label class="set-time"><span>Name</span><input type="text" maxlength="12" autocapitalize="words" value="${escapeHtml(d._name || '')}" oninput="setKidName(this.value)"></label>
 
     <div class="set-section-title">Routines</div>
     ${taskGroup('morning', 'Morning', '☀️')}
@@ -4715,7 +4864,7 @@ function renderSettingsForm() {
     <div class="set-section-title">Money and treats</div>
     <div class="set-times">
       <label class="set-time"><span>💵 Full jar pays ($)</span><input type="number" inputmode="numeric" min="1" max="999" value="${escapeHtml(String(d.jarPayout || 10))}" oninput="setPayout(this.value)"></label>
-      <label class="set-time"><span>🎉 Treat at every ${TREAT_EVERY}</span><input type="text" style="width:145px" value="${escapeHtml(d.treatLabel || '')}" maxlength="40" oninput="setTreatLabel(this.value)"></label>
+      <label class="set-time"><span>🎉 Treat at every ${TREAT_EVERY}</span><input type="text" value="${escapeHtml(d.treatLabel || '')}" maxlength="40" oninput="setTreatLabel(this.value)"></label>
     </div>
 
     <label class="set-mute">
