@@ -1,14 +1,17 @@
 /* Star Jar — service worker
    Precaches the app shell, serves the page network-first (so updates land),
    and runtime-caches Google Fonts so the app works fully offline. */
-const CACHE = 'starjar-v13';
+const CACHE = 'starjar-v14';
 const SHELL = [
   './',
   './index.html',
   './manifest.json',
+  './favicon-32.png',
   './icon-180.png',
   './icon-192.png',
-  './icon-512.png'
+  './icon-512.png',
+  './icon-maskable-192.png',
+  './icon-maskable-512.png'
 ];
 
 self.addEventListener('install', (event) => {

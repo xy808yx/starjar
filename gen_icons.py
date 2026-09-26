@@ -1,109 +1,82 @@
 #!/usr/bin/env python3
-"""Generate an 8-bit pixel-art star app icon (warm gold on solid black).
+"""Build every Star Jar icon PNG from the two master drawings.
 
-Renders a 32x32 master sprite with 3-tone cel shading + a specular glint,
-then upscales with nearest-neighbour to crisp PNGs at the sizes iOS/Android
-want. The star fits inside the maskable safe circle (radius 40% of canvas)
-so it never gets clipped by adaptive icon masks.
+Run from this folder:  python3 gen_icons.py
+
+Reads  icon.svg           the 1024 App Store master (glass jar, three gold stars)
+       icon-maskable.svg  the same art with the jar shrunk into Android's safe
+                          circle, for launchers that crop icons round
+Writes favicon-32.png          browser tab
+       icon-180.png            iPhone and iPad home screen (apple-touch-icon)
+       icon-192.png, icon-512.png                   installed app icon
+       icon-maskable-192.png, icon-maskable-512.png Android adaptive icon
+
+The masters come from docs/logo-options/final-3star/make.py (local only, docs/
+is gitignored): edit that, rerun it, copy icon.svg and icon-maskable.svg here,
+then run this. Each size is drawn fresh from the vector art by headless Chrome,
+so small sizes stay sharp. The PNGs are opaque, which home screens and the App
+Store expect. Bump CACHE in sw.js whenever these files change.
 """
-import math
 import os
+import signal
+import subprocess
+import sys
+import tempfile
+import time
 
-from PIL import Image
-
-N = 32                      # logical sprite grid (chunky 8-bit feel)
-C = N / 2.0                 # centre
-R = 11.6                    # outer radius  (~72% of width -> maskable safe)
-r = R * 0.40                # inner radius
-SIZES = (180, 192, 512)     # 180 = apple-touch, 192/512 = manifest
-
-# --- warm gold palette -------------------------------------------------------
-BG   = (0, 0, 0)            # solid black
-HL   = (255, 231, 150)      # highlight (lit, upper-left)
-BASE = (255, 200, 60)       # base gold
-SH   = (226, 150, 40)       # shadow (lower-right)
-RIM  = (150, 92, 26)        # dark rim on the shadow side
-GLINT = (255, 252, 236)     # specular sparkle
-
-# --- build the 10-vertex star polygon ---------------------------------------
-verts = []
-for k in range(5):
-    ao = math.radians(-90 + k * 72)        # outer point
-    ai = math.radians(-90 + k * 72 + 36)   # inner point
-    verts.append((C + R * math.cos(ao), C + R * math.sin(ao)))
-    verts.append((C + r * math.cos(ai), C + r * math.sin(ai)))
+HERE = os.path.dirname(os.path.abspath(__file__))
+CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+OUTPUTS = [
+    ("icon.svg", 32, "favicon-32.png"),
+    ("icon.svg", 180, "icon-180.png"),
+    ("icon.svg", 192, "icon-192.png"),
+    ("icon.svg", 512, "icon-512.png"),
+    ("icon-maskable.svg", 192, "icon-maskable-192.png"),
+    ("icon-maskable.svg", 512, "icon-maskable-512.png"),
+]
+PAGE = ('<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0}'
+        'img{display:block;width:%dpx;height:%dpx}</style></head>'
+        '<body><img src="file://%s"></body></html>')
 
 
-def inside(px, py):
-    """Ray-cast point-in-polygon."""
-    c = False
-    n = len(verts)
-    j = n - 1
-    for i in range(n):
-        xi, yi = verts[i]
-        xj, yj = verts[j]
-        if ((yi > py) != (yj > py)) and (px < (xj - xi) * (py - yi) / (yj - yi) + xi):
-            c = not c
-        j = i
-    return c
+def shoot(svg, size, png):
+    """Screenshot the SVG at exactly size x size. Chrome with its own profile
+    writes the file but does not always quit, so wait for it, then close it."""
+    if os.path.exists(png):
+        os.remove(png)
+    with tempfile.TemporaryDirectory() as tmp:
+        page = os.path.join(tmp, "icon.html")
+        with open(page, "w") as fh:
+            fh.write(PAGE % (size, size, svg))
+        proc = subprocess.Popen(
+            [CHROME, "--headless=new", "--disable-gpu", "--hide-scrollbars", "--no-first-run",
+             "--no-default-browser-check", f"--user-data-dir={tmp}/profile",
+             "--force-device-scale-factor=1", f"--window-size={size},{size}",
+             "--virtual-time-budget=3000", f"--screenshot={png}", "file://" + page],
+            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, start_new_session=True)
+        deadline, last = time.time() + 60, -1
+        while time.time() < deadline:
+            if os.path.exists(png):
+                n = os.path.getsize(png)
+                if proc.poll() is not None or (n > 0 and n == last):
+                    break
+                last = n
+            time.sleep(0.5)
+        if proc.poll() is None:
+            try:
+                os.killpg(proc.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+            proc.wait()
+    if not os.path.exists(png):
+        sys.exit(f"render failed: {png}")
 
 
-# --- mask + cel shading ------------------------------------------------------
-Lx, Ly = -0.60, -0.80       # light from upper-left (y points down)
-mask = [[False] * N for _ in range(N)]
-col = [[BG] * N for _ in range(N)]
-
-for y in range(N):
-    for x in range(N):
-        if inside(x + 0.5, y + 0.5):
-            mask[y][x] = True
-
-for y in range(N):
-    for x in range(N):
-        if not mask[y][x]:
-            continue
-        dx, dy = (x + 0.5 - C), (y + 0.5 - C)
-        d = math.hypot(dx, dy) or 1.0
-        b = (dx / d) * Lx + (dy / d) * Ly
-        # mostly solid gold body, with a shaded lower-right quadrant for form
-        col[y][x] = SH if b < -0.35 else BASE
+def main():
+    for svg, size, name in OUTPUTS:
+        shoot(os.path.join(HERE, svg), size, os.path.join(HERE, name))
+    print("icons written:", ", ".join(name for _, _, name in OUTPUTS))
 
 
-def boundary(x, y):
-    for ax, ay in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-        nx, ny = x + ax, y + ay
-        if nx < 0 or ny < 0 or nx >= N or ny >= N or not mask[ny][nx]:
-            return True
-    return False
-
-
-# dark rim on shadow side, keep the lit edge bright
-for y in range(N):
-    for x in range(N):
-        if mask[y][x] and boundary(x, y):
-            dx, dy = (x + 0.5 - C), (y + 0.5 - C)
-            d = math.hypot(dx, dy) or 1.0
-            b = (dx / d) * Lx + (dy / d) * Ly
-            col[y][x] = HL if b > 0.25 else RIM
-
-# specular glint: brightest upper-left highlight pixel -> white
-glint = None
-for y in range(N):
-    for x in range(N):
-        if col[y][x] == HL and (glint is None or (x + y) < (glint[0] + glint[1])):
-            glint = (x, y)
-if glint:
-    gx, gy = glint
-    col[gy][gx] = GLINT
-
-# --- render ------------------------------------------------------------------
-master = Image.new("RGB", (N, N), BG)
-for y in range(N):
-    for x in range(N):
-        master.putpixel((x, y), col[y][x])
-
-out_dir = os.path.dirname(os.path.abspath(__file__))
-for size in SIZES:
-    master.resize((size, size), Image.NEAREST).save(os.path.join(out_dir, f"icon-{size}.png"))
-
-print("icons written:", ", ".join(f"icon-{s}.png" for s in SIZES))
+if __name__ == "__main__":
+    main()
